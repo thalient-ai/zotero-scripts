@@ -4,6 +4,8 @@
 
 This JavaScript script allows users to bulk edit records in Zotero by providing an easy-to-use prompt system to search and replace field values across multiple selected items. It supports a wide range of fields and ensures that the editing process is intuitive and user-friendly.
 
+The script has been tested in Zotero v7.
+
 This project builds on [Schoeneh's](https://github.com/Schoeneh) Zotero Search and Replace script.
 
 ## Features
@@ -48,19 +50,21 @@ In this example, we will update the `Publisher` field for a group of selected it
 
    ![Screenshot](doc/zotero_4.png)
 
-7. Your input does not have to be case-sensitive or complete. The application will offer suggestions based on your input.
+   **Not every field is supported by the Zotero API (such as Author First and Last). [Here](https://api.zotero.org/itemFields) is a list of supported fields.
+
+8. Your input does not have to be case-sensitive or complete. The application will offer suggestions based on your input.
 
    ![Screenshot](doc/zotero_5.png)
 
-8. Enter the search term. The script supports regular expressions and can handle blank fields. Because the `Publisher` field we are updating is empty, we will leave this field blank.
+9. Enter the search term. The script supports regular expressions and can handle blank fields. Because the `Publisher` field we are updating is empty, we will leave this field blank.
 
    ![Screenshot](doc/zotero_6.png)
 
-9. Enter the replacement text.
+10. Enter the replacement text.
 
    ![Screenshot](doc/zotero_7.png)
 
-10. The script will provide a summary of the changes for review before making them.
+11. The script will provide a summary of the changes for review before making them.
 
    ![Screenshot](doc/zotero_8.png)
 
@@ -70,7 +74,7 @@ In this example, we will update the `Publisher` field for a group of selected it
 
 ## Back Up
 
-**Back up your local Zotero library beforehand!**
+**Back up your local Zotero library**
 
 - [Guide by University of Ottawa Library](https://uottawa.libguides.com/how_to_use_zotero/back_up_and_restore)
 - [Official Documentation](https://www.zotero.org/support/zotero_data)
