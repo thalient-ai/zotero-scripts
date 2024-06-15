@@ -38,31 +38,33 @@ In this example, we will update the `Publisher` field for a group of selected it
 
    ![Screenshot](doc/zotero_2.png)
 
-4. **Copy and paste the Bulk Edit script** into the `Run Javascript` window and select `Run`. This will start the JavaScript application.
+4. **Copy and paste the [Bulk Edit script](https://github.com/thalient-ai/zotero-bulk-edit/blob/main/src/zotero_bulk_edit.js)** into the `Run Javascript` window and select `Run`. This will start the JavaScript application.
 
    ![Screenshot](doc/zotero_3.png)
 
-5. **Enter the field** that you wish to edit.
+   **You can either access the script [here](https://github.com/thalient-ai/zotero-bulk-edit/blob/main/src/zotero_bulk_edit.js) or by opening the .js file in your chosen text editor.
+
+6. **Enter the field** that you wish to edit.
 
    ![Screenshot](doc/zotero_4.png)
 
-6. **Your input** does not have to be case-sensitive or complete. The application will offer suggestions based on your input.
+7. **Your input** does not have to be case-sensitive or complete. The application will offer suggestions based on your input.
 
    ![Screenshot](doc/zotero_5.png)
 
-7. **Enter the search term**. The script supports regular expressions and can handle blank fields. Because the `Publisher` field we are updating is empty, we will leave this field blank.
+8. **Enter the search term**. The script supports regular expressions and can handle blank fields. Because the `Publisher` field we are updating is empty, we will leave this field blank.
 
    ![Screenshot](doc/zotero_6.png)
 
-8. **Enter the replacement text**.
+9. **Enter the replacement text**.
 
    ![Screenshot](doc/zotero_7.png)
 
-9. The script will provide a summary of the changes for review before making them.
+10. The script will provide a summary of the changes for review before making them.
 
    ![Screenshot](doc/zotero_8.png)
 
-10. Here are the results.
+11. Here are the results.
 
     ![Screenshot](doc/zotero_9.png)
 
