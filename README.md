@@ -31,7 +31,7 @@ If you want to replace the content of the `Abstract` field for selected items th
 3. **Replacement Value**: Enter `new`.
 4. **Confirm Changes**: Review the preview and confirm to apply the changes to all matching items.
 
-## Back Uos
+## Back Up
 **Back up your local Zotero-library beforehand!**
 - [Guide by University of Ottawa Library](https://uottawa.libguides.com/how_to_use_zotero/back_up_and_restore)
 - [Official Documentation](https://www.zotero.org/support/zotero_data)
