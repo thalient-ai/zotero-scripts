@@ -25,9 +25,13 @@ This project builds from [Schoeneh's](https://github.com/Schoeneh) Zotero Search
 
 In this example, we will update the `Publisher` field for a group of selected items:
 
-1. **Run Javascript**: Type "abstract" and select "Abstract" from the list.
-   ![Screenshot](doc/zotero_1.png)
-3. **Search Term**: Enter the regular expression `old`.
+1. **Run Javascript**: Open the `Run Javascript` window in Zotero under Tools > Developer > Run Javascript
+![Screenshot](doc/zotero_1.png)
+![Screenshot](doc/zotero_2.png)
+
+2. **Copy the Javascript**: Copy and paste the Bulk Edit script into the `Run Javascript`
+![Screenshot](doc/zotero_3.png)
+
 4. **Replacement Value**: Enter `new`.
 5. **Confirm Changes**: Review the preview and confirm to apply the changes to all matching items.
 
