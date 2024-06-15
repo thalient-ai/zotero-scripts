@@ -29,16 +29,18 @@ In this example, we will update the `Publisher` field for a group of selected it
 ![Screenshot](doc/zotero_0.png)
 
 
-2. **Run Javascript**: Select the `Run Javascript` window in Zotero under `Tools > Developer > Run Javascript`. This will open a second window in Zotero.
+2. **Run Javascript**: Select the `Run Javascript` window in Zotero under `Tools > Developer > Run Javascript`.
 ![Screenshot](doc/zotero_1.png)
+
+This will open a second window in Zotero.
 ![Screenshot](doc/zotero_2.png)
 
 
-3. **Copy the Javascript**: Copy and paste the Bulk Edit script into the `Run Javascript` and select `Run`
+4. **Copy the Javascript**: Copy and paste the Bulk Edit script into the `Run Javascript` and select `Run`
 ![Screenshot](doc/zotero_3.png)
 
-4. **Replacement Value**: Enter `new`.
-5. **Confirm Changes**: Review the preview and confirm to apply the changes to all matching items.
+5. **Replacement Value**: Enter `new`.
+6. **Confirm Changes**: Review the preview and confirm to apply the changes to all matching items.
 
 ## Back Up
 **Back up your local Zotero-library beforehand!**
