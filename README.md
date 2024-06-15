@@ -30,30 +30,39 @@ In this example, we will update the `Publisher` field for a group of selected it
 ![Screenshot](doc/zotero_0.png)
 
 2. Select the `Run Javascript` window in Zotero under `Tools > Developer > Run Javascript`.
+
 ![Screenshot](doc/zotero_1.png)
 
-3. This will open a second window in Zotero.
+4. This will open a second window in Zotero.
+
 ![Screenshot](doc/zotero_2.png)
 
-4. Copy and paste the Bulk Edit script into the `Run Javascript` and select `Run`. This will start the Javascript Application.
+5. Copy and paste the Bulk Edit script into the `Run Javascript` and select `Run`. This will start the Javascript Application.
+
 ![Screenshot](doc/zotero_3.png)
 
-5. Enter the field that you wish to edit.
+6. Enter the field that you wish to edit.
+
 ![Screenshot](doc/zotero_4.png)
 
-6. Your input does not have to be case sensitive nor complete. The application will offer suggestions based on your input.
+7. Your input does not have to be case sensitive nor complete. The application will offer suggestions based on your input.
+
 ![Screenshot](doc/zotero_5.png)
   
-7. Enter the text that you wish to update. The script supports regular expressions and can handle blank fields. Because the `Publisher` field that we are updating is empty, we will leave this field blank.
+8. Enter the text that you wish to update. The script supports regular expressions and can handle blank fields. Because the `Publisher` field that we are updating is empty, we will leave this field blank.
+
 ![Screenshot](doc/zotero_6.png)
 
-8. Enter the text that you wish to replace.
+9. Enter the text that you wish to replace.
+
 ![Screenshot](doc/zotero_7.png)
 
-9. The script will provide a summary of the changes for review before making them.
+10. The script will provide a summary of the changes for review before making them.
+
 ![Screenshot](doc/zotero_8.png)
 
-10. Here are the results
+11. Here are the results
+
 ![Screenshot](doc/zotero_9.png)
 
 ## Back Up
