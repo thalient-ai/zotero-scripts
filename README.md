@@ -26,6 +26,7 @@ This project builds from [Schoeneh's](https://github.com/Schoeneh) Zotero Search
 In this example, we will update the `Publisher` field for a group of selected items:
 
 0. In Zotero, select the items that you wish to edit
+
 ![Screenshot](doc/zotero_0.png)
 
 2. Select the `Run Javascript` window in Zotero under `Tools > Developer > Run Javascript`.
