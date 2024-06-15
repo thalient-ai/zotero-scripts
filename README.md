@@ -1,18 +1,37 @@
-# Zotero-S'n'R Expanded - Search and Replace for Zotero
-This is an expanded version of [Schoeneh's](https://github.com/Schoeneh) Zotero search and replace script.
+# Zotero Bulk Edit Script
 
-This version supports supports selections, regular expressions, better search handling, and autocomplete suggestions.
+## Overview
 
-## What you should do:
-**Back up your local Zotero-library before using my script (or doing any batch-editing)!**
+This JavaScript script allows users to bulk edit records in Zotero by providing an easy-to-use prompt system to search and replace field values across multiple selected items. It supports a wide range of fields and ensures that the editing process is intuitive and user-friendly.
+
+This project builds from [Schoeneh's](https://github.com/Schoeneh) Zotero Search and Replace script.
+
+### Features
+
+- **Autocomplete Field Selection**: Start typing the name of the field you want to edit, and the script provides a list of matching fields for you to choose from.
+- **Regular Expression Search**: Use full regular expressions to search for patterns within field values, allowing for advanced search capabilities.
+- **Case-Insensitive Matching**: The search functionality is case-insensitive, making it easier to find the records you want to edit.
+- **Preview Changes**: Before applying changes, the script shows a preview of the old and new values for one of the matching records, allowing you to confirm the bulk edit.
+- **Bulk Processing**: Edits are applied to all selected items that match the search criteria.
+
+### Getting Started
+1. **Select Items in Zotero**: Begin by selecting the items you want to edit in Zotero.
+2. **Run the Script**: Execute the script to start the bulk editing process.
+3. **Field Selection**: When prompted, start typing the field name you want to edit. The script will show matching options for you to confirm.
+4. **Search and Replace**: Enter the search term using regular expressions for advanced search patterns, and specify the replacement value.
+5. **Confirm Changes**: Review the preview of the changes and confirm to apply the edits.
+
+### Example
+
+In this example, we will update the `Publisher` field for a group of selected items:
+
+1. **Run Javascript**: Type "abstract" and select "Abstract" from the list.
+   ![Screenshot](doc/zotero_1.png)
+3. **Search Term**: Enter the regular expression `old`.
+4. **Replacement Value**: Enter `new`.
+5. **Confirm Changes**: Review the preview and confirm to apply the changes to all matching items.
+
+## Back Up
+**Back up your local Zotero-library beforehand!**
 - [Guide by University of Ottawa Library](https://uottawa.libguides.com/how_to_use_zotero/back_up_and_restore)
 - [Official Documentation](https://www.zotero.org/support/zotero_data)
-
-
-## How to use it -- 1: "Run JavaScript"
-The easiest way of running Zotero-S'n'R is to copy the code from '[src/basic_script.js](https://github.com/Schoeneh/zotero-s-n-r/releases/latest/download/basic_script.js)' into Tools --> Developer --> Run Javascript:
-
-![Screenshot showing the menu and submenus: Tools, Developer, Run JavaScript](doc/screenshot_developer.png)
-
-## How to use it -- 2: Plugin
---- in development ---
