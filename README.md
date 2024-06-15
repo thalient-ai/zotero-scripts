@@ -40,7 +40,7 @@ In this example, we will update the `Publisher` field for a group of selected it
 
    ![Screenshot](doc/zotero_2.png)
 
-4. Copy and paste the [Bulk Edit script](https://github.com/thalient-ai/zotero-bulk-edit/blob/main/src/zotero_bulk_edit.js) into the `Run Javascript` window and select `Run`. This will start the JavaScript application.
+4. Copy and paste the [Bulk Edit script](https://github.com/thalient-ai/zotero-bulk-edit/blob/main/src/zotero_bulk_edit.js) into the `Run Javascript` window and select the `Run` button in the top left corner. This will start the JavaScript application.
 
    ![Screenshot](doc/zotero_3.png)
 
