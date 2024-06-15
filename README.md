@@ -42,7 +42,7 @@ In this example, we will update the `Publisher` field for a group of selected it
 
    ![Screenshot](doc/zotero_3.png)
 
-   **You can either access the script [here](https://github.com/thalient-ai/zotero-bulk-edit/blob/main/src/zotero_bulk_edit.js) or by opening the .js file in your chosen text editor.
+   **You can either access the script [here](https://github.com/thalient-ai/zotero-bulk-edit/blob/main/src/zotero_bulk_edit.js) or by opening the .js file in your chosen text editor.**
 
 6. **Enter the field** that you wish to edit.
 
