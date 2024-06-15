@@ -1,6 +1,6 @@
-## Zotero Bulk Edit Script
+# Zotero Bulk Edit Script
 
-### Overview
+## Overview
 
 This JavaScript script allows users to bulk edit records in Zotero by providing an easy-to-use prompt system to search and replace field values across multiple selected items. It supports a wide range of fields and ensures that the editing process is intuitive and user-friendly.
 
@@ -14,8 +14,7 @@ This project builds from [Schoeneh's](https://github.com/Schoeneh) Zotero Search
 - **Preview Changes**: Before applying changes, the script shows a preview of the old and new values for one of the matching records, allowing you to confirm the bulk edit.
 - **Bulk Processing**: Edits are applied to all selected items that match the search criteria.
 
-### Usage
-
+### Getting Started
 1. **Select Items in Zotero**: Begin by selecting the items you want to edit in Zotero.
 2. **Run the Script**: Execute the script to start the bulk editing process.
 3. **Field Selection**: When prompted, start typing the field name you want to edit. The script will show matching options for you to confirm.
@@ -24,12 +23,13 @@ This project builds from [Schoeneh's](https://github.com/Schoeneh) Zotero Search
 
 ### Example
 
-If you want to replace the content of the `Abstract` field for selected items that contain the word "old" with "new":
+In this example, we will update the `Publisher` field for a group of selected items:
 
-1. **Field Selection**: Type "abstract" and select "Abstract" from the list.
-2. **Search Term**: Enter the regular expression `old`.
-3. **Replacement Value**: Enter `new`.
-4. **Confirm Changes**: Review the preview and confirm to apply the changes to all matching items.
+1. **Run Javascript**: Type "abstract" and select "Abstract" from the list.
+   ![Screenshot](doc/zotero_1.png)
+3. **Search Term**: Enter the regular expression `old`.
+4. **Replacement Value**: Enter `new`.
+5. **Confirm Changes**: Review the preview and confirm to apply the changes to all matching items.
 
 ## Back Up
 **Back up your local Zotero-library beforehand!**
