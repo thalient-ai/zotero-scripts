@@ -66,7 +66,7 @@ In this example, we will update the `Publisher` field for a group of selected it
 
 11. Here are the results.
 
-    ![Screenshot](doc/zotero_9.png)
+   ![Screenshot](doc/zotero_9.png)
 
 ## Back Up
 
