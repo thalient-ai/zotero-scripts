@@ -175,12 +175,12 @@ if (search === "") {
     searchRegex = new RegExp(regexPattern, "i");  // "i" for case-insensitive matching
 }
 
-// Option to edit selected items or all items in the collection
-var editOption = confirm("Do you want to edit only selected items? Click OK for Yes, Cancel for editing all items in the current collection.");
+// Option to edit selected items, all items in the collection, or all items in the saved search
+var editOption = prompt("Enter '1' to edit only selected items, '2' to edit all items in the current collection, or '3' to edit all items in a saved search:");
 
 var itemsToEdit;
 
-if (!editOption) {
+if (editOption === '2') {
     // Edit all items in the current collection
     let collection = ZoteroPane.getSelectedCollection();
     if (!collection) {
@@ -188,6 +188,14 @@ if (!editOption) {
         return;
     }
     itemsToEdit = await collection.getChildItems();
+} else if (editOption === '3') {
+    // Edit all items in a saved search
+    let savedSearch = ZoteroPane.getSelectedSavedSearch();
+    if (!savedSearch) {
+        alert("No saved search selected.");
+        return;
+    }
+    itemsToEdit = await savedSearch.getChildItems();
 } else {
     // Edit only selected items
     itemsToEdit = ZoteroPane.getSelectedItems();
