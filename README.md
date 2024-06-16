@@ -96,5 +96,3 @@ Zotero handles item fields and creator names differently due to their distinct d
 ### Practical Implications:
 - **Item Fields**: Simplified bulk edits with standard search and replace functionality.
 - **Creator Names**: Requires transaction management, validation checks, and potential deletion if fields are empty post-editing to maintain data integrity.
-
-In summary, while item fields allow straightforward editing, creator names require additional validation and structured handling to ensure integrity and compliance with Zotero's data requirements.
