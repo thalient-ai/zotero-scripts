@@ -119,7 +119,7 @@ function autocompletePrompt(promptText, suggestions) {
     let input = "";
     while (true) {
         input = prompt(promptText + "\n\nCurrent input: " + input);
-        if (!input) return null;
+        if (input === null) return null;  // Handle cancel button
 
         let matches = suggestions.filter(suggestion => suggestion.localized.toLowerCase().startsWith(input.toLowerCase()));
         if (matches.length === 0) {
@@ -130,7 +130,7 @@ function autocompletePrompt(promptText, suggestions) {
         } else {
             let suggestionText = matches.map((match, index) => `${index + 1}. ${match.localized}`).join("\n");
             let additionalInput = prompt(`Multiple matches found:\n\n${suggestionText}\n\nCurrent input: ${input}\n\nType more characters to refine or select a number:`);
-            if (!additionalInput) {
+            if (additionalInput === null) {
                 alert("Input canceled. Please start over.");
                 return null;
             }
@@ -175,11 +175,26 @@ if (search === "") {
     searchRegex = new RegExp(regexPattern, "i");  // "i" for case-insensitive matching
 }
 
-// Get selected items
-var selectedItems = ZoteroPane.getSelectedItems();
-if (!selectedItems.length) {
-    alert("No items selected.");
-    return;
+// Option to edit selected items or all items in the collection
+var editOption = confirm("Do you want to edit all items in the current collection? Click OK for Yes, Cancel for editing only selected items.");
+
+var itemsToEdit;
+
+if (editOption) {
+    // Edit all items in the current collection
+    let collection = ZoteroPane.getSelectedCollection();
+    if (!collection) {
+        alert("No collection selected.");
+        return;
+    }
+    itemsToEdit = await collection.getChildItems();
+} else {
+    // Edit only selected items
+    itemsToEdit = ZoteroPane.getSelectedItems();
+    if (!itemsToEdit.length) {
+        alert("No items selected.");
+        return;
+    }
 }
 
 // Handle creator name fields separately
@@ -189,7 +204,7 @@ if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
     let originalCreatorsMap = new Map(); // To store original creators
 
     await Zotero.DB.executeTransaction(async function () {
-        for (let item of selectedItems) {
+        for (let item of itemsToEdit) {
             let creators = item.getCreators();
             originalCreatorsMap.set(item.id, JSON.parse(JSON.stringify(creators))); // Store a deep copy of original creators
             let updated = false;
@@ -265,7 +280,7 @@ if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
 
 // Filter items that contain the search term in the specified field or are blank if search is empty
 var idsCorrect = [];
-for (let item of selectedItems) {
+for (let item of itemsToEdit) {
     var fieldValue = item.getField(fieldName) || "";
     if (searchRegex.test(fieldValue)) {
         idsCorrect.push(item.id);
@@ -273,7 +288,7 @@ for (let item of selectedItems) {
 }
 
 if (!idsCorrect.length) {
-    alert("No items found with the specified search term in the selected items.");
+    alert("No items found with the specified search term.");
     return;
 }
 
@@ -285,7 +300,7 @@ var confirmed = confirm(idsCorrect.length + " item(s) found" + "\n\n" +
     "Old:\n" + previewItem.getField(fieldName) + "\n" + "New:\n" + previewNewValue);
 
 // Replace
-if (confirmed == true) {
+if (confirmed) {
     await Zotero.DB.executeTransaction(async function () {
         for (let id of idsCorrect) {
             let item = await Zotero.Items.getAsync(id);
