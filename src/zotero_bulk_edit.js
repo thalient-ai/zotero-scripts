@@ -175,34 +175,55 @@ if (!selectedItems.length) {
 
 // Handle creator name fields separately
 if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
+    let deletionConfirmed = false;
     await Zotero.DB.executeTransaction(async function () {
         for (let item of selectedItems) {
             let creators = item.getCreators();
             let updated = false;
-            
-            // If there are no creators, initialize an empty array
-            if (!creators.length) {
-                creators = [{ creatorType: "author", firstName: "", lastName: "" }];
-            }
+            let newCreators = [];
 
             for (let creator of creators) {
-                // Initialize the fields if they are not present
-                if (!creator.firstName) creator.firstName = "";
-                if (!creator.lastName) creator.lastName = "";
-
                 let nameToSearch = fieldName === "creatorFirstName" ? creator.firstName : creator.lastName;
+
                 if (searchRegex.test(nameToSearch)) {
                     if (fieldName === "creatorFirstName") {
                         creator.firstName = nameToSearch.replace(searchRegex, replace);
                     } else {
                         creator.lastName = nameToSearch.replace(searchRegex, replace);
                     }
+
+                    // Check if both firstName and lastName are empty after replacement
+                    if (!creator.firstName && !creator.lastName) {
+                        // Confirm deletion of creator entry if not already confirmed
+                        if (!deletionConfirmed) {
+                            deletionConfirmed = confirm("Some creator entries will be empty after the update. Do you want to delete these entries?");
+                        }
+
+                        // If deletion is confirmed, skip adding this creator to newCreators, effectively deleting it
+                        if (deletionConfirmed) {
+                            updated = true;
+                            continue;
+                        }
+                    }
+                    updated = true;
+                }
+                newCreators.push(creator);
+            }
+
+            // Ensure new creators are added if field was initially empty
+            if (!updated && (fieldName === "creatorFirstName" || fieldName === "creatorLastName")) {
+                if (!creators.length) {
+                    if (fieldName === "creatorFirstName") {
+                        newCreators.push({ creatorType: "author", firstName: replace, lastName: "" });
+                    } else {
+                        newCreators.push({ creatorType: "author", firstName: "", lastName: replace });
+                    }
                     updated = true;
                 }
             }
 
             if (updated) {
-                item.setCreators(creators);
+                item.setCreators(newCreators);
                 await item.save();
             }
         }
