@@ -1,5 +1,5 @@
 var fields = [
-    { "field": "abstractNote", "localized": "Abstract Note" },
+    { "field": "abstractNote", "localized": "Abstract" },
     { "field": "accessDate", "localized": "Accessed Date" },
     { "field": "applicationNumber", "localized": "Application Number" },
     { "field": "archive", "localized": "Archive" },
@@ -64,6 +64,7 @@ var fields = [
     { "field": "meetingName", "localized": "Meeting Name" },
     { "field": "nameOfAct", "localized": "Name of Act" },
     { "field": "network", "localized": "Network" },
+    { "field": "note", "localized": "Note" },  // Add this line
     { "field": "numPages", "localized": "Number of Pages" },
     { "field": "number", "localized": "Number" },
     { "field": "numberOfVolumes", "localized": "Number of Volumes" },
@@ -260,7 +261,7 @@ async function updateCreators(fieldName, itemsToEdit, searchRegex, replace) {
     });
 
     if (toBeDeletedItems.length && !deletionConfirmed) {
-        deletionConfirmed = confirm("Some creator entries will be empty after the update. Do you want to delete these entries?");
+        deletionConfirmed = confirm("Some author names (first and last names) will be blank after this update. Do you want to delete these author entries? Note: This will not delete the entire item or attached files, only the blank author names.");
         if (deletionConfirmed) {
             await Zotero.DB.executeTransaction(async function () {
                 for (let item of toBeDeletedItems) {
@@ -280,13 +281,33 @@ async function updateCreators(fieldName, itemsToEdit, searchRegex, replace) {
         }
     }
 
-    alert("Creator names updated.");
+    alert("The names were successfully updated.");
     return;
+}
+
+// Function to update notes
+async function updateNotes(itemsToEdit, searchRegex, replace) {
+    await Zotero.DB.executeTransaction(async function () {
+        for (let item of itemsToEdit) {
+            if (item.isNote()) {
+                let noteContent = item.getNote();
+                let newNoteContent = noteContent.replace(searchRegex, replace);
+                if (newNoteContent !== noteContent) {
+                    await item.setNote(newNoteContent);  // Ensure await is used here
+                    await item.save();
+                }
+            }
+        }
+    });
+    alert("Notes updated.");
 }
 
 // Update creator names if necessary
 if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
-    updateCreators(fieldName, itemsToEdit, searchRegex, replace);
+    await updateCreators(fieldName, itemsToEdit, searchRegex, replace);  // Ensure await is used here
+} else if (fieldName === "note") {  // Add this check
+    // Update notes
+    await updateNotes(itemsToEdit, searchRegex, replace);  // Ensure await is used here
 } else {
     // Filter items based on the search term
     var idsCorrect = [];
