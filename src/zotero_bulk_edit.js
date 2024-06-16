@@ -64,7 +64,7 @@ var fields = [
     { "field": "meetingName", "localized": "Meeting Name" },
     { "field": "nameOfAct", "localized": "Name of Act" },
     { "field": "network", "localized": "Network" },
-    { "field": "note", "localized": "Note" },  // Add this line
+    { "field": "note", "localized": "Note" },
     { "field": "numPages", "localized": "Number of Pages" },
     { "field": "number", "localized": "Number" },
     { "field": "numberOfVolumes", "localized": "Number of Volumes" },
@@ -114,6 +114,7 @@ var fields = [
     { "field": "websiteType", "localized": "Website Type" }
 ];
 
+// Sort fields alphabetically by localized name
 fields.sort((a, b) => a.localized.localeCompare(b.localized));
 
 // Function to escape special characters for regular expressions
@@ -125,7 +126,7 @@ function escapeRegExp(string) {
 function autocompletePrompt(promptText, suggestions) {
     let input = "";
     while (true) {
-        input = prompt(promptText + "\n\nCurrent input: " + input + "\n\nStart typing the name of the field you want to edit.");
+        input = prompt(promptText + "\n\nCurrent input: " + input + "\n\nStart typing the name of the field you want to edit (e.g., 'title', 'publisher', 'type', 'name', etc.).");
         if (input === null) return null;  // Handle cancel button
 
         let matches = suggestions.filter(suggestion => suggestion.localized.toLowerCase().includes(input.toLowerCase()));
@@ -164,6 +165,7 @@ if (search === null) {
     return;
 }
 
+// Prompt user for replacement term
 var replace = prompt("What should it be replaced with?", "");
 if (replace === null) {
     alert("Replace operation canceled.");
