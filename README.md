@@ -50,7 +50,7 @@ In this example, we will update the `Publisher` field for a group of selected it
 
    ![Screenshot](doc/zotero_4.png)
 
-   **[Here](https://api.zotero.org/itemFields) is a list of supported fields. Note that `First Name` and `Last Name` are handled differently than the other item fields. The script is able to modify existing `First Name` and `Last Name` values, but is unable to modify blank fields**
+   **[Here](https://api.zotero.org/itemFields) is a list of supported fields. The script also support First Name & Last Name**
 
 8. Your input does not have to be case-sensitive or complete. The application will offer suggestions based on your input.
 
