@@ -179,7 +179,17 @@ if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
         for (let item of selectedItems) {
             let creators = item.getCreators();
             let updated = false;
+            
+            // If there are no creators, initialize an empty array
+            if (!creators.length) {
+                creators = [{ creatorType: "author", firstName: "", lastName: "" }];
+            }
+
             for (let creator of creators) {
+                // Initialize the fields if they are not present
+                if (!creator.firstName) creator.firstName = "";
+                if (!creator.lastName) creator.lastName = "";
+
                 let nameToSearch = fieldName === "creatorFirstName" ? creator.firstName : creator.lastName;
                 if (searchRegex.test(nameToSearch)) {
                     if (fieldName === "creatorFirstName") {
@@ -190,6 +200,7 @@ if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
                     updated = true;
                 }
             }
+
             if (updated) {
                 item.setCreators(creators);
                 await item.save();
