@@ -16,6 +16,13 @@ This project builds on [Schoeneh's](https://github.com/Schoeneh) Zotero Search a
 - **Preview Changes**: Before applying changes, the script shows a preview of the old and new values for one of the matching records, allowing you to confirm the bulk edit.
 - **Bulk Processing**: Edits are applied to all selected items that match the search criteria.
 
+## Back Up
+
+**Be sure to back up your local Zotero library**
+
+- [Guide by University of Ottawa Library](https://uottawa.libguides.com/how_to_use_zotero/back_up_and_restore)
+- [Official Documentation](https://www.zotero.org/support/zotero_data)
+
 ## Getting Started
 
 1. **Select Items in Zotero**: Begin by selecting the items you want to edit in Zotero.
@@ -72,9 +79,20 @@ In this example, we will update the `Publisher` field for a group of selected it
 
    ![Screenshot](doc/zotero_9.png)
 
-## Back Up
+Zotero handles item fields and creator names differently due to their distinct data structures and use cases:
 
-**Back up your local Zotero library**
+### Item Fields:
+- **General Metadata**: Fields like `title`, `abstractNote`, `publisher`, etc., are standard metadata fields applicable to various item types (e.g., books, articles).
+- **Single Value**: Each field typically holds a single value.
+- **Direct Editing**: Users can directly edit these fields without special handling.
 
-- [Guide by University of Ottawa Library](https://uottawa.libguides.com/how_to_use_zotero/back_up_and_restore)
-- [Official Documentation](https://www.zotero.org/support/zotero_data)
+### Creator Names:
+- **Complex Structure**: Creator fields (`creatorFirstName`, `creatorLastName`) consist of multiple components (first name, last name, creator type).
+- **Multiple Entries**: An item can have multiple creators (authors, editors, etc.).
+- **Validation**: Both `firstName` and `lastName` fields need careful handling to avoid empty values, as Zotero enforces non-empty creator names.
+
+### Practical Implications:
+- **Item Fields**: Simplified bulk edits with standard search and replace functionality.
+- **Creator Names**: Requires transaction management, validation checks, and potential deletion if fields are empty post-editing to maintain data integrity.
+
+In summary, while item fields allow straightforward editing, creator names require additional validation and structured handling to ensure integrity and compliance with Zotero's data requirements.
