@@ -79,6 +79,8 @@ In this example, we will update the `Publisher` field for a group of selected it
 
    ![Screenshot](doc/zotero_9.png)
 
+## Other Considerations
+
 Zotero handles item fields and creator names differently due to their distinct data structures and use cases:
 
 ### Item Fields:
