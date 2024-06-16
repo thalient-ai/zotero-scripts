@@ -120,7 +120,7 @@
     fields.sort((a, b) => a.localized.localeCompare(b.localized));
 
     // Function to escape special characters for regular expressions
-    function escapeRegExp(string) {
+	function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
@@ -292,7 +292,7 @@
             var previewItem = await Zotero.Items.getAsync(idsCorrect[0]);
             let previewOldValue = previewItem.getField(fieldName) || "";
             let previewNewValue = previewOldValue.replace(searchRegex, replace);
-            var confirmed = confirm(`${idsCorrect.length} item(s) found with the specified search term in the field "${selectedField.localized}".\n\nOld value:\n${previewOldValue}\n\nNew value:\n${previewNewValue}\n\nDo you want to apply these changes to all items?`);
+            var confirmed = confirm(`${idsCorrect.length} item(s) found with the specified search term in the field "${selectedField.localized}".\n\nExample of change:\nOld: ${previewOldValue}\nNew: ${previewNewValue}\n\nDo you want to apply these changes to all items?`);
         }
 
         // Replace values in selected items
@@ -317,16 +317,22 @@
         return;
     }
     var fieldName = selectedField.field;
+    alert(`Field "${selectedField.localized}" selected.`);
+
+    // Display warning if "Note" field is selected
+    if (fieldName === "note") {
+        alert("Warning: Only selected Notes can be edited. Ensure you have selected the notes you wish to edit.");
+    }
 
     // Prompt user for search term
-    var search = prompt("What characters/words should be searched for? Use * as a wildcard. Leave empty to search for blank fields. Use \\ to escape special characters (e.g., C++ becomes C\\+\\+).", "");
+    var search = prompt("Enter the characters or words to search for. Use * as a wildcard. Leave empty to search for blank fields. Use \\ to escape special characters (e.g., C++ becomes C\\+\\+).", "");
     if (search === null) {
         alert("Search operation canceled.");
         return;
     }
 
     // Prompt user for replacement term
-    var replace = prompt("What should it be replaced with?", "");
+    var replace = prompt("Enter the replacement term:", "");
     if (replace === null) {
         alert("Replace operation canceled.");
         return;
@@ -341,20 +347,37 @@
         searchRegex = new RegExp(regexPattern, "i");  // "i" for case-insensitive matching
     }
 
-    // Prompt user for edit option
-    var editOption = prompt("Enter '1' to edit only selected items, '2' to edit all items in the current collection, or '3' to edit all items in a saved search:");
-
-    let itemsToEdit = await getItemsToEdit(editOption);
-    if (!itemsToEdit) {
-        return;
+    // Prompt user for edit option if not "Note"
+    let itemsToEdit;
+    if (fieldName === "note") {
+        itemsToEdit = ZoteroPane.getSelectedItems().filter(item => item.isNote());
+        if (!itemsToEdit.length) {
+            alert("No Notes selected.");
+            return;
+        }
+    } else {
+        var editOption = prompt("Enter '1' to edit only selected items, '2' to edit all items in the current collection, or '3' to edit allcollection, or '3' to edit all items in a saved search:");
+        try {
+            itemsToEdit = await getItemsToEdit(editOption);
+            if (!itemsToEdit) {
+                return;
+            }
+        } catch (error) {
+            alert(`An error occurred while retrieving items: ${error.message}`);
+            return;
+        }
     }
 
     // Update creator names if necessary
-    if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
-        await updateCreators(fieldName, itemsToEdit, searchRegex, replace);
-    } else if (fieldName === "note") {
-        await updateNotes(itemsToEdit, searchRegex, replace);
-    } else {
-        await updateFieldValues(fieldName, itemsToEdit, searchRegex, replace);
+    try {
+        if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
+            await updateCreators(fieldName, itemsToEdit, searchRegex, replace);
+        } else if (fieldName === "note") {
+            await updateNotes(itemsToEdit, searchRegex, replace);
+        } else {
+            await updateFieldValues(fieldName, itemsToEdit, searchRegex, replace);
+        }
+    } catch (error) {
+        alert(`An error occurred during the update process: ${error.message}`);
     }
 })();
