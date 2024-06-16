@@ -151,7 +151,16 @@ if (!selectedField) {
 var fieldName = selectedField.field;
 
 var search = prompt("What characters/words should be searched for? Use * as a wildcard. Leave empty to search for blank fields.", "");
+if (search === null) {
+    alert("Search operation canceled.");
+    return;
+}
+
 var replace = prompt("What should it be replaced with?", "");
+if (replace === null) {
+    alert("Replace operation canceled.");
+    return;
+}
 
 // Convert the search term into a regular expression
 function escapeRegExp(string) {
@@ -176,9 +185,13 @@ if (!selectedItems.length) {
 // Handle creator name fields separately
 if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
     let deletionConfirmed = false;
+    let toBeDeletedItems = [];
+    let originalCreatorsMap = new Map(); // To store original creators
+
     await Zotero.DB.executeTransaction(async function () {
         for (let item of selectedItems) {
             let creators = item.getCreators();
+            originalCreatorsMap.set(item.id, JSON.parse(JSON.stringify(creators))); // Store a deep copy of original creators
             let updated = false;
             let newCreators = [];
 
@@ -194,25 +207,19 @@ if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
 
                     // Check if both firstName and lastName are empty after replacement
                     if (!creator.firstName && !creator.lastName) {
-                        // Confirm deletion of creator entry if not already confirmed
-                        if (!deletionConfirmed) {
-                            deletionConfirmed = confirm("Some creator entries will be empty after the update. Do you want to delete these entries?");
-                        }
-
-                        // If deletion is confirmed, skip adding this creator to newCreators, effectively deleting it
-                        if (deletionConfirmed) {
-                            updated = true;
-                            continue;
-                        }
+                        toBeDeletedItems.push(item);
+                    } else {
+                        newCreators.push(creator);
                     }
                     updated = true;
+                } else {
+                    newCreators.push(creator);
                 }
-                newCreators.push(creator);
             }
 
-            // Ensure new creators are added if field was initially empty
-            if (!updated && (fieldName === "creatorFirstName" || fieldName === "creatorLastName")) {
-                if (!creators.length) {
+            if (!updated) {
+                // Add a new creator if fields were initially empty
+                if (!creators.length || (fieldName === "creatorFirstName" && !creators.some(c => c.firstName)) || (fieldName === "creatorLastName" && !creators.some(c => c.lastName))) {
                     if (fieldName === "creatorFirstName") {
                         newCreators.push({ creatorType: "author", firstName: replace, lastName: "" });
                     } else {
@@ -228,6 +235,30 @@ if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
             }
         }
     });
+
+    // Confirm deletion of all empty creator entries at once
+    if (toBeDeletedItems.length && !deletionConfirmed) {
+        deletionConfirmed = confirm("Some creator entries will be empty after the update. Do you want to delete these entries?");
+        if (deletionConfirmed) {
+            await Zotero.DB.executeTransaction(async function () {
+                for (let item of toBeDeletedItems) {
+                    let creators = item.getCreators().filter(creator => creator.firstName || creator.lastName);
+                    item.setCreators(creators);
+                    await item.save();
+                }
+            });
+        } else {
+            // Restore original creators if deletion is not confirmed
+            await Zotero.DB.executeTransaction(async function () {
+                for (let item of toBeDeletedItems) {
+                    let originalCreators = originalCreatorsMap.get(item.id);
+                    item.setCreators(originalCreators);
+                    await item.save();
+                }
+            });
+        }
+    }
+
     alert("Creator names updated.");
     return;
 }
