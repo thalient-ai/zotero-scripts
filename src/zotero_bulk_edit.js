@@ -121,23 +121,22 @@ function autocompletePrompt(promptText, suggestions) {
         input = prompt(promptText + "\n\nCurrent input: " + input);
         if (input === null) return null;  // Handle cancel button
 
-        let matches = suggestions.filter(suggestion => suggestion.localized.toLowerCase().startsWith(input.toLowerCase()));
+        let matches = suggestions.filter(suggestion => suggestion.localized.toLowerCase().includes(input.toLowerCase()));
         if (matches.length === 0) {
             alert("No matches found. Please try again.");
             continue;
-        } else if (matches.length === 1) {
-            return matches[0];
         } else {
             let suggestionText = matches.map((match, index) => `${index + 1}. ${match.localized}`).join("\n");
-            let additionalInput = prompt(`Multiple matches found:\n\n${suggestionText}\n\nCurrent input: ${input}\n\nType more characters to refine or select a number:`);
-            if (additionalInput === null) {
+            let choice = prompt(`Multiple matches found:\n\n${suggestionText}\n\nType the number to select:`);
+            if (choice === null || choice === "") {
                 alert("Input canceled. Please start over.");
                 return null;
             }
-            if (!isNaN(additionalInput) && additionalInput > 0 && additionalInput <= matches.length) {
-                return matches[parseInt(additionalInput, 10) - 1];
+            let selectedIndex = parseInt(choice, 10);
+            if (!isNaN(selectedIndex) && selectedIndex > 0 && selectedIndex <= matches.length) {
+                return matches[selectedIndex - 1];
             } else {
-                input += additionalInput;
+                alert("Invalid selection. Please try again.");
             }
         }
     }
@@ -175,7 +174,7 @@ if (search === "") {
     searchRegex = new RegExp(regexPattern, "i");  // "i" for case-insensitive matching
 }
 
-// Option to edit selected items, all items in the collection, or all items in the saved search
+// Option to edit selected items or all items in the collection
 var editOption = prompt("Enter '1' to edit only selected items, '2' to edit all items in the current collection, or '3' to edit all items in a saved search:");
 
 var itemsToEdit;
@@ -261,7 +260,7 @@ if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
 
     // Confirm deletion of all empty creator entries at once
     if (toBeDeletedItems.length && !deletionConfirmed) {
-        deletionConfirmed = confirm("Some author names (first and last names) will be blank after this update. Do you want to delete these author entries? Note: This will not delete the entire item or attached files, only the blank author names.");
+        deletionConfirmed = confirm("Some creator entries will be empty after the update. Do you want to delete these entries?");
         if (deletionConfirmed) {
             await Zotero.DB.executeTransaction(async function () {
                 for (let item of toBeDeletedItems) {
@@ -301,11 +300,12 @@ if (!idsCorrect.length) {
 }
 
 // Preview of Edit
-var previewItem = await Zotero.Items.getAsync(idsCorrect[0]);
-let previewOldValue = previewItem.getField(fieldName) || "";
-let previewNewValue = previewOldValue.replace(searchRegex, replace);
-var confirmed = confirm(idsCorrect.length + " item(s) found" + "\n\n" +
-    "Old:\n" + previewItem.getField(fieldName) + "\n" + "New:\n" + previewNewValue);
+if (idsCorrect.length > 0) {
+    var previewItem = await Zotero.Items.getAsync(idsCorrect[0]);
+    let previewOldValue = previewItem.getField(fieldName) || "";
+    let previewNewValue = previewOldValue.replace(searchRegex, replace);
+    var confirmed = confirm(`${idsCorrect.length} item(s) found with the specified search term in the field "${selectedField.localized}".\n\nFirst item preview:\n\nOld value:\n${previewOldValue}\n\nNew value:\n${previewNewValue}\n\nDo you want to apply these changes to all items?`);
+}
 
 // Replace
 if (confirmed) {
