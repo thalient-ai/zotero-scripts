@@ -319,7 +319,7 @@
     var fieldName = selectedField.field;
 
     // Prompt user for search term
-    var search = prompt("What characters/words should be searched for? Use * as a wildcard (e.g., 'example*'). Leave empty to search for blank fields.", "");
+    var search = prompt("What characters/words should be searched for? The script supports regular expressions. Use * as a wildcard. Leave empty to search for blank fields. Use `\` to escape special characters (e.g., C++ becomes C\+\+)", "");
     if (search === null) {
         alert("Search operation canceled.");
         return;
