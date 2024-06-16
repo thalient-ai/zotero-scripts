@@ -176,11 +176,11 @@ if (search === "") {
 }
 
 // Option to edit selected items or all items in the collection
-var editOption = confirm("Do you want to edit all items in the current collection? Click OK for Yes, Cancel for editing only selected items.");
+var editOption = confirm("Do you want to edit only selected items? Click OK for Yes, Cancel for editing all items in the current collection.");
 
 var itemsToEdit;
 
-if (editOption) {
+if (!editOption) {
     // Edit all items in the current collection
     let collection = ZoteroPane.getSelectedCollection();
     if (!collection) {
@@ -253,7 +253,7 @@ if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
 
     // Confirm deletion of all empty creator entries at once
     if (toBeDeletedItems.length && !deletionConfirmed) {
-        deletionConfirmed = confirm("Some creator entries will be empty after the update. Do you want to delete these entries?");
+        deletionConfirmed = confirm("Some author names (first and last names) will be blank after this update. Do you want to delete these author entries? Note: This will not delete the entire item or attached files, only the blank author names.");
         if (deletionConfirmed) {
             await Zotero.DB.executeTransaction(async function () {
                 for (let item of toBeDeletedItems) {
