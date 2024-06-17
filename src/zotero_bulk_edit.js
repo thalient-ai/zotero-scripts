@@ -153,103 +153,115 @@
     }
 
     // Function to get items to edit based on user selection
-    async function getItemsToEdit(editOption) {
-        if (editOption === '2') {
-            let collection = ZoteroPane.getSelectedCollection();
-            if (!collection) {
-                alert("No collection selected.");
-                return null;
-            }
-            return await collection.getChildItems();
-        } else if (editOption === '3') {
-            let savedSearch = ZoteroPane.getSelectedSavedSearch();
-            if (!savedSearch) {
-                alert("No saved search selected.");
-                return null;
-            }
-            return await savedSearch.getChildItems();
-        } else {
-            let selectedItems = ZoteroPane.getSelectedItems();
-            if (!selectedItems.length) {
-                alert("No items selected.");
-                return null;
-            }
-            return selectedItems;
+	async function getItemsToEdit(editOption) {
+    if (editOption === '2') {
+        let collection = ZoteroPane.getSelectedCollection();
+        if (!collection) {
+            alert("No collection selected.");
+            return null;
         }
+        return await collection.getChildItems();
+    } else if (editOption === '3') {
+        let savedSearch = ZoteroPane.getSelectedSavedSearch();
+        if (!savedSearch) {
+            alert("No saved search selected.");
+            return null;
+        }
+        
+        // Perform the saved search and get the item IDs
+        let search = new Zotero.Search();
+        search.addCondition('savedSearchID', 'is', savedSearch.searchID);
+        
+        let itemIDs = await search.search();
+        
+        if (itemIDs.length === 0) {
+            alert("No items found in the saved search.");
+            return null;
+        }
+
+        // Fetch the actual items from their IDs
+        let items = await Zotero.Items.getAsync(itemIDs);
+        return items;
+    } else {
+        let selectedItems = ZoteroPane.getSelectedItems();
+        if (!selectedItems.length) {
+            alert("No items selected.");
+            return null;
+        }
+        return selectedItems;
     }
+}
 
-	// Function to update creator names
-async function updateCreators(fieldName, itemsToEdit, searchRegex, replace) {
-    let deletionConfirmed = false;
-    let toBeDeletedItems = [];
-    let originalCreatorsMap = new Map();
+    // Function to update creator names
+    async function updateCreators(fieldName, itemsToEdit, searchRegex, replace) {
+        let deletionConfirmed = false;
+        let toBeDeletedItems = [];
+        let originalCreatorsMap = new Map();
 
-    await Zotero.DB.executeTransaction(async function() {
-        for (let item of itemsToEdit) {
-            let creators = item.getCreators();
-            originalCreatorsMap.set(item.id, JSON.parse(JSON.stringify(creators)));
-            let updated = false;
-            let newCreators = [];
+        await Zotero.DB.executeTransaction(async function() {
+            for (let item of itemsToEdit) {
+                let creators = item.getCreators();
+                originalCreatorsMap.set(item.id, JSON.parse(JSON.stringify(creators)));
+                let updated = false;
+                let newCreators = [];
 
-            for (let creator of creators) {
-                let nameToSearch = fieldName === "creatorFirstName" ? creator.firstName : creator.lastName;
+                for (let creator of creators) {
+                    let nameToSearch = fieldName === "creatorFirstName" ? creator.firstName : creator.lastName;
 
-                if (searchRegex.test(nameToSearch)) {
-                    if (fieldName === "creatorFirstName") {
-                        creator.firstName = nameToSearch.replace(searchRegex, replace);
-                    } else {
-                        creator.lastName = nameToSearch.replace(searchRegex, replace);
-                    }
+                    if (searchRegex.test(nameToSearch)) {
+                        if (fieldName === "creatorFirstName") {
+                            creator.firstName = nameToSearch.replace(searchRegex, replace);
+                        } else {
+                            creator.lastName = nameToSearch.replace(searchRegex, replace);
+                        }
 
-                    if (!creator.firstName && !creator.lastName) {
-                        // Mark the item for deletion if both names are empty
-                        toBeDeletedItems.push(item);
+                        if (!creator.firstName && !creator.lastName) {
+                            // Mark the item for deletion if both names are empty
+                            toBeDeletedItems.push(item);
+                        } else {
+                            newCreators.push(creator);
+                        }
+                        updated = true;
                     } else {
                         newCreators.push(creator);
                     }
-                    updated = true;
-                } else {
-                    newCreators.push(creator);
                 }
-            }
 
-            // Ensure that new creators are added only if they have non-empty names
-            newCreators = newCreators.filter(creator => creator.firstName || creator.lastName);
+                // Ensure that new creators are added only if they have non-empty names
+                newCreators = newCreators.filter(creator => creator.firstName || creator.lastName);
 
-            if (updated) {
-                item.setCreators(newCreators);
-                await item.save();
-            }
-        }
-    });
-
-    if (toBeDeletedItems.length && !deletionConfirmed) {
-        deletionConfirmed = confirm("Some author names (first and last names) will be blank after this update. Do you want to delete these author entries? Note: This will not delete the entire item or attached files, only the blank author names.");
-        if (deletionConfirmed) {
-            await Zotero.DB.executeTransaction(async function() {
-                for (let item of toBeDeletedItems) {
-                    let creators = item.getCreators().filter(creator => creator.firstName || creator.lastName);
-                    item.setCreators(creators);
+                if (updated) {
+                    console.log(`Updating item ${item.id} with new creators:`, newCreators);
+                    item.setCreators(newCreators);
                     await item.save();
                 }
-            });
-        } else {
-            await Zotero.DB.executeTransaction(async function() {
-                for (let item of toBeDeletedItems) {
-                    let originalCreators = originalCreatorsMap.get(item.id);
-                    item.setCreators(originalCreators);
-                    await item.save();
-                }
-            });
+            }
+        });
+
+        if (toBeDeletedItems.length && !deletionConfirmed) {
+            deletionConfirmed = confirm("Some author names (first and last names) will be blank after this update. Do you want to delete these author entries? Note: This will not delete the entire item or attached files, only the blank author names.");
+            if (deletionConfirmed) {
+                await Zotero.DB.executeTransaction(async function() {
+                    for (let item of toBeDeletedItems) {
+                        let creators = item.getCreators().filter(creator => creator.firstName || creator.lastName);
+                        item.setCreators(creators);
+                        await item.save();
+                    }
+                });
+            } else {
+                await Zotero.DB.executeTransaction(async function() {
+                    for (let item of toBeDeletedItems) {
+                        let originalCreators = originalCreatorsMap.get(item.id);
+                        item.setCreators(originalCreators);
+                        await item.save();
+                    }
+                });
+            }
         }
+
+        alert("The names were successfully updated.");
+        return;
     }
-
-    alert("The names were successfully updated.");
-    return;
-}
-
-
-
 
     // Function to update notes
     async function updateNotes(itemsToEdit, searchRegex, replace) {
@@ -298,6 +310,7 @@ async function updateCreators(fieldName, itemsToEdit, searchRegex, replace) {
                     let item = await Zotero.Items.getAsync(id);
                     let oldValue = item.getField(fieldName) || "";
                     let newValue = oldValue.replace(searchRegex, replace);
+                    console.log(`Updating item ${item.id} field "${fieldName}" from "${oldValue}" to "${newValue}"`);
                     item.setField(fieldName, newValue);
                     await item.save();
                 }
