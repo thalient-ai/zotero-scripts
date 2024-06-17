@@ -153,44 +153,44 @@
     }
 
     // Function to get items to edit based on user selection
-	async function getItemsToEdit(editOption) {
-    if (editOption === '2') {
-        let collection = ZoteroPane.getSelectedCollection();
-        if (!collection) {
-            alert("No collection selected.");
-            return null;
-        }
-        return await collection.getChildItems();
-    } else if (editOption === '3') {
-        let savedSearch = ZoteroPane.getSelectedSavedSearch();
-        if (!savedSearch) {
-            alert("No saved search selected.");
-            return null;
-        }
-        
-        // Perform the saved search and get the item IDs
-        let search = new Zotero.Search();
-        search.addCondition('savedSearchID', 'is', savedSearch.searchID);
-        
-        let itemIDs = await search.search();
-        
-        if (itemIDs.length === 0) {
-            alert("No items found in the saved search.");
-            return null;
-        }
+    async function getItemsToEdit(editOption) {
+        if (editOption === '2') {
+            let collection = ZoteroPane.getSelectedCollection();
+            if (!collection) {
+                alert("No collection selected.");
+                return null;
+            }
+            return await collection.getChildItems();
+        } else if (editOption === '3') {
+            let savedSearch = ZoteroPane.getSelectedSavedSearch();
+            if (!savedSearch) {
+                alert("No saved search selected.");
+                return null;
+            }
+            
+            // Perform the saved search and get the item IDs
+            let search = new Zotero.Search();
+            search.addCondition('savedSearchID', 'is', savedSearch.searchID);
+            
+            let itemIDs = await search.search();
+            
+            if (itemIDs.length === 0) {
+                alert("No items found in the saved search.");
+                return null;
+            }
 
-        // Fetch the actual items from their IDs
-        let items = await Zotero.Items.getAsync(itemIDs);
-        return items;
-    } else {
-        let selectedItems = ZoteroPane.getSelectedItems();
-        if (!selectedItems.length) {
-            alert("No items selected.");
-            return null;
+            // Fetch the actual items from their IDs
+            let items = await Zotero.Items.getAsync(itemIDs);
+            return items;
+        } else {
+            let selectedItems = ZoteroPane.getSelectedItems();
+            if (!selectedItems.length) {
+                alert("No items selected.");
+                return null;
+            }
+            return selectedItems;
         }
-        return selectedItems;
     }
-}
 
     // Function to update creator names
     async function updateCreators(fieldName, itemsToEdit, searchRegex, replace) {
