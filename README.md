@@ -27,7 +27,7 @@ This project builds on [Schoeneh's](https://github.com/Schoeneh) Zotero Search a
 
 1. **Select Items in Zotero**: Begin by selecting the items you want to edit in Zotero.
 2. **Run the Script**: Execute the script to start the bulk editing process.
-3. **Field Selection**: When prompted, start typing the field name you want to edit. The script will show matching options for you to confirm. If multiple matches are found, you will be prompted to select the correct field.
+3. **Field Selection**: When prompted, start typing the field name you want to edit. The script will show matching options for you to confirm. If multiple matches are found, you will be prompted to select the correct field. For example, if you type "date," you might see options like "Date," "Date Decided," and "Date Enacted." Simply enter the number corresponding to your choice.
 4. **Search and Replace**: Enter the search term using regular expressions for advanced search patterns, and specify the replacement value. Special characters can be escaped using `\`.
 5. **Confirm Changes**: Review the preview of the changes for the first matching record and confirm to apply the edits.
 
@@ -47,9 +47,7 @@ In this example, we will update the `Publisher` field for a group of selected it
 
    ![Screenshot](doc/zotero_2.webp)
 
-4. Copy and paste the [Bulk Edit script](https://github.com/thalient-ai/zotero-bulk-edit/blob/main/src/zotero_bulk_edit.js) into the `Run Javascript` window and select the `Run` button in the top left corner. This will start the JavaScript application.
-
-	**You can either access the script [here](https://github.com/thalient-ai/zotero-bulk-edit/blob/main/src/zotero_bulk_edit.js) or by opening the .js file in your chosen text editor.**
+4. Copy and paste the [Bulk Edit script](https://github.com/thalient-ai/zotero-bulk-edit/blob/main/src/zotero_bulk_edit.js) into the `Run Javascript` window and select the `Run` button in the top left corner. This will start the JavaScript application. The script can be accessed [here](https://github.com/thalient-ai/zotero-bulk-edit/blob/main/src/zotero_bulk_edit.js) or by opening the .js file in your chosen text editor.
 
 	![Screenshot](doc/zotero_3.webp)
 
@@ -184,6 +182,24 @@ In this example, we will update the `Publisher` field for a group of selected it
 
 9. Enter the search term. The script supports regular expressions and can handle blank fields. Because the `Publisher` field of the selected items contains both blank and populated values, we will use the wildcard `*`.
 
+	<details>
+	  <summary>Click to expand for detailed explanations of special characters used in regular expressions</summary>
+	  
+	  - `.` : Matches any single character except newline.
+	  - `*` : Matches 0 or more of the preceding element.
+	  - `+` : Matches 1 or more of the preceding element.
+	  - `?` : Matches 0 or 1 of the preceding element (makes it optional).
+	  - `^` : Matches the start of the string.
+	  - `$` : Matches the end of the string.
+	  - `[]` : Matches any one of the enclosed characters.
+	  - `[^]` : Matches any one character not enclosed.
+	  - `\` : Escapes a special character.
+	  - `|` : Acts as a logical OR between patterns.
+	  - `()` : Groups patterns together and remembers the match.
+	  - `{}` : Matches a specified number of occurrences of the preceding element.
+
+	</details>
+
 	![Screenshot](doc/zotero_6.webp)
 
 10. Enter the replacement text.
@@ -191,6 +207,10 @@ In this example, we will update the `Publisher` field for a group of selected it
 	![Screenshot](doc/zotero_7.webp)
    
 11. Choose whether you want to edit selected items, all items in the active collection, or items in the active saved search.
+
+	- **Selected Items**: Edits are applied only to items you have explicitly selected in Zotero.
+	- **Active Collection**: Edits are applied to all items within the currently selected collection in Zotero.
+	- **Active Saved Search**: Edits are applied to all items that match the criteria of a saved search in Zotero.
 
 	![Screenshot](doc/zotero_7a.webp)
 
@@ -207,6 +227,15 @@ In this example, we will update the `Publisher` field for a group of selected it
 ## Error Handling
 
 The script includes error handling to ensure a smooth user experience. If an error occurs during the update process, an alert will be displayed with the error message. Ensure that the items you want to edit are correctly selected, and follow the prompts carefully.
+
+### Potential Error Messages and Solutions:
+
+- **"No matches found. Please try again."**: This occurs if your field selection doesn't match any available fields. Try typing a different field name.
+- **"Input canceled. Please start over."**: This indicates that the input was canceled. Restart the process and carefully follow the prompts.
+- **"No items found with the specified search term."**: No items matched your search criteria. Verify your search term and try again.
+- **"No items selected."**: Ensure you have selected the items you wish to edit before running the script.
+- **"No collection selected."**: Make sure you have an active collection selected in Zotero if you choose to edit items in the active collection.
+- **"No saved search selected."**: Ensure you have an active saved search selected in Zotero if you choose to edit items in a saved search.
 
 ## Other Considerations
 
@@ -226,12 +255,12 @@ Zotero handles item fields, creator names, and notes differently due to their di
 - **Rich Text Content**: Notes can contain rich text, allowing for annotations, links, and other formatted content.
 - **Distinct Type**: Notes are treated as a special type of item in Zotero, separate from general metadata fields.
 - **Multiple Notes**: An item can have multiple notes attached to it.
-- **Direct Editing**: Notes can be edited directly, but their content structure requires handling of text formatting and potential links. The script can edit Notes that are selected (i.e., selected items), it cannot edit Notes using the active collection or saved search setting.
+- **Direct Editing**: Notes can be edited directly, but their content structure requires handling of text formatting and potential links. The script can edit Notes that are selected (i.e., selected items); it cannot edit Notes using the active collection or saved search setting.
 
 ### Practical Implications:
 - **Item Fields**: Simplified bulk edits with standard search and replace functionality.
 - **Creator Names**: Requires transaction management, validation checks, and potential deletion if fields are empty post-editing to maintain data integrity.
-- **Notes**: Editing notes requires careful handling of rich text content and ensuring that the formatting is preserved. Bulk editing notes follows the same search and replace principles but needs to manage potential formatting issues.
+- **Notes**: Bulk edits require handling rich text content, preserving formatting, and managing multiple notes per item. Bulk editing notes follows the same search and replace principles but needs to manage potential formatting issues.
 
 ### Summary:
 - **Item Fields**: Bulk edits are straightforward and involve replacing text in single-value fields.
