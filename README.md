@@ -55,10 +55,8 @@ In this example, we will update the `Publisher` field for a group of selected it
 
 6. Enter the field that you wish to edit.
 
-	**[Here](https://api.zotero.org/itemFields) is a list of supported fields. The script also support First Name & Last Name**
-	
 	<details>
-	  <summary>Localized Values</summary>
+	  <summary>Here is a list of all supported fields</summary>
 	  
 	  - Abstract
 	  - Accessed Date
@@ -184,7 +182,7 @@ In this example, we will update the `Publisher` field for a group of selected it
    
 	![Screenshot](doc/zotero_5a.webp)
 
-9. Enter the search term. The script supports regular expressions and can handle blank fields. Because the `Publisher` field of the selected items contains both blank and populated values, we will use the wildcard `*` this field blank.
+9. Enter the search term. The script supports regular expressions and can handle blank fields. Because the `Publisher` field of the selected items contains both blank and populated values, we will use the wildcard `*`.
 
 	![Screenshot](doc/zotero_6.webp)
 
