@@ -37,47 +37,55 @@ In this example, we will update the `Publisher` field for a group of selected it
 
 1. Select the items in Zotero that you wish to edit.
 
-   ![Screenshot](doc/zotero_0.png)
+   ![Screenshot](doc/zotero_0.webp)
 
 2. Open the `Run Javascript` window in Zotero under `Tools > Developer > Run Javascript`.
 
-   ![Screenshot](doc/zotero_1.png)
+   ![Screenshot](doc/zotero_1.webp)
 
 3. This will open a second window in Zotero.
 
-   ![Screenshot](doc/zotero_2.png)
+   ![Screenshot](doc/zotero_2.webp)
 
 4. Copy and paste the [Bulk Edit script](https://github.com/thalient-ai/zotero-bulk-edit/blob/main/src/zotero_bulk_edit.js) into the `Run Javascript` window and select the `Run` button in the top left corner. This will start the JavaScript application.
 
-   ![Screenshot](doc/zotero_3.png)
+**You can either access the script [here](https://github.com/thalient-ai/zotero-bulk-edit/blob/main/src/zotero_bulk_edit.js) or by opening the .js file in your chosen text editor.**
 
-   **You can either access the script [here](https://github.com/thalient-ai/zotero-bulk-edit/blob/main/src/zotero_bulk_edit.js) or by opening the .js file in your chosen text editor.**
+   ![Screenshot](doc/zotero_3.webp)
 
 6. Enter the field that you wish to edit.
 
-   ![Screenshot](doc/zotero_4.png)
+**[Here](https://api.zotero.org/itemFields) is a list of supported fields. The script also support First Name & Last Name**
 
-   **[Here](https://api.zotero.org/itemFields) is a list of supported fields. The script also support First Name & Last Name**
+   ![Screenshot](doc/zotero_4.webp)
 
 8. Your input does not have to be case-sensitive or complete. The application will offer suggestions based on your input.
 
-   ![Screenshot](doc/zotero_5.png)
+   ![Screenshot](doc/zotero_5.webp)
+   
+   ![Screenshot](doc/zotero_5a.webp)
 
 9. Enter the search term. The script supports regular expressions and can handle blank fields. Because the `Publisher` field we are updating is empty, we will leave this field blank.
 
-   ![Screenshot](doc/zotero_6.png)
+   ![Screenshot](doc/zotero_6.webp)
 
 10. Enter the replacement text.
 
-   ![Screenshot](doc/zotero_7.png)
+   ![Screenshot](doc/zotero_7.webp)
+   
+11. Choose whether you want to edit selected items, all items in the active collection, or items in the active saved search.
+
+	![Screenshot](doc/zotero_7a.webp)
 
 11. The script will provide a summary of the changes for review before making them.
 
-   ![Screenshot](doc/zotero_8.png)
+   ![Screenshot](doc/zotero_8.webp)
+   
+   ![Screenshot](doc/zotero_9.webp)
 
 11. Here are the results.
 
-   ![Screenshot](doc/zotero_9.png)
+   ![Screenshot](doc/zotero_10.webp)
 
 ## Other Considerations
 
