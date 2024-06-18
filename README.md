@@ -56,6 +56,125 @@ In this example, we will update the `Publisher` field for a group of selected it
 6. Enter the field that you wish to edit.
 
 	**[Here](https://api.zotero.org/itemFields) is a list of supported fields. The script also support First Name & Last Name**
+	
+	<details>
+	  <summary>Localized Values</summary>
+	  
+	  - Abstract
+	  - Accessed Date
+	  - Application Number
+	  - Archive
+	  - Archive ID
+	  - Artwork Medium
+	  - Artwork Size
+	  - Assignee
+	  - Audio File Type
+	  - Audio Format
+	  - Bill Number
+	  - Blog Title
+	  - Book Title
+	  - Call Number
+	  - Case Name
+	  - Citation Key
+	  - Code
+	  - Code Number
+	  - Code Pages
+	  - Code Volume
+	  - Committee
+	  - Company
+	  - Conference Name
+	  - Country
+	  - Court
+	  - Date
+	  - Date Decided
+	  - Date Enacted
+	  - Dictionary Title
+	  - Distributor
+	  - Docket Number
+	  - Document Number
+	  - DOI
+	  - Edition
+	  - Encyclopedia Title
+	  - Episode Number
+	  - Extra
+	  - Filing Date
+	  - First Name
+	  - First Page
+	  - Format
+	  - Forum Title
+	  - Genre
+	  - History
+	  - Identifier
+	  - Institution
+	  - Interview Medium
+	  - ISBN
+	  - ISSN
+	  - Issue
+	  - Issue Date
+	  - Issuing Authority
+	  - Journal Abbreviation
+	  - Label
+	  - Language
+	  - Last Name
+	  - Legal Status
+	  - Legislative Body
+	  - Library Catalog
+	  - Location in Archive
+	  - Map Type
+	  - Manuscript Type
+	  - Meeting Name
+	  - Name of Act
+	  - Network
+	  - Note
+	  - Number
+	  - Number of Pages
+	  - Number of Volumes
+	  - Organization
+	  - Pages
+	  - Patent Number
+	  - Place
+	  - Post Type
+	  - Presentation Type
+	  - Priority Numbers
+	  - Proceedings Title
+	  - Program Title
+	  - Programming Language
+	  - Public Law Number
+	  - Publication Title
+	  - Publisher
+	  - References
+	  - Report Number
+	  - Report Type
+	  - Reporter
+	  - Reporter Volume
+	  - Repository
+	  - Repository Location
+	  - Rights
+	  - Running Time
+	  - Scale
+	  - Section
+	  - Series
+	  - Series Number
+	  - Series Text
+	  - Series Title
+	  - Session
+	  - Short Title
+	  - Status
+	  - Studio
+	  - Subject
+	  - System
+	  - Thesis Type
+	  - Title
+	  - Type
+	  - University
+	  - URL
+	  - Version
+	  - Video Recording Format
+	  - Volume
+	  - Website Title
+	  - Website Type
+
+	</details>
 
 	![Screenshot](doc/zotero_4.webp)
 
