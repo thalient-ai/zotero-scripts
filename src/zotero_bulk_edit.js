@@ -154,25 +154,32 @@
 
     // Function to get items to edit based on user selection
     async function getItemsToEdit(editOption) {
+        const zoteroPane = Zotero.getActiveZoteroPane();
+        
         if (editOption === '2') {
-            let collection = ZoteroPane.getSelectedCollection();
+            let collection = zoteroPane.getSelectedCollection();
             if (!collection) {
                 alert("No collection selected.");
                 return null;
             }
             return await collection.getChildItems();
         } else if (editOption === '3') {
-            let savedSearch = ZoteroPane.getSelectedSavedSearch();
+            let savedSearch = zoteroPane.getSelectedSavedSearch();
             if (!savedSearch) {
                 alert("No saved search selected.");
                 return null;
             }
             
+            console.log(`Saved search found: ${savedSearch.name} (ID: ${savedSearch.id})`);
+            
             // Perform the saved search and get the item IDs
             let search = new Zotero.Search();
-            search.addCondition('savedSearchID', 'is', savedSearch.searchID);
+            search.libraryID = savedSearch.libraryID;
+            search.addCondition('savedSearchID', 'is', savedSearch.id);
             
             let itemIDs = await search.search();
+            
+            console.log(`Number of items found in saved search: ${itemIDs.length}`);
             
             if (itemIDs.length === 0) {
                 alert("No items found in the saved search.");
@@ -183,7 +190,7 @@
             let items = await Zotero.Items.getAsync(itemIDs);
             return items;
         } else {
-            let selectedItems = ZoteroPane.getSelectedItems();
+            let selectedItems = zoteroPane.getSelectedItems();
             if (!selectedItems.length) {
                 alert("No items selected.");
                 return null;
@@ -359,7 +366,7 @@
     // Prompt user for edit option if not "Note"
     let itemsToEdit;
     if (fieldName === "note") {
-        itemsToEdit = ZoteroPane.getSelectedItems().filter(item => item.isNote());
+        itemsToEdit = Zotero.getActiveZoteroPane().getSelectedItems().filter(item => item.isNote());
         if (!itemsToEdit.length) {
             alert("No Notes selected.");
             return;
