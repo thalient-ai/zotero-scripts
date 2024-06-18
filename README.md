@@ -2,7 +2,7 @@
 
 ## Overview
 
-This JavaScript script allows users to bulk edit records in Zotero by providing an easy-to-use prompt system to search and replace field values across multiple selected items. It supports a wide range of fields and ensures that the editing process is intuitive and user-friendly.
+This script allows users to bulk edit records in Zotero by providing an easy-to-use prompt system to search and replace field values across multiple selected items. It supports a wide range of fields and ensures that the editing process is intuitive and user-friendly.
 
 The script has been tested in Zotero v7.
 
@@ -10,11 +10,11 @@ This project builds on [Schoeneh's](https://github.com/Schoeneh) Zotero Search a
 
 ## Features
 
-- **Autocomplete Field Selection**: Start typing the name of the field you want to edit, and the script provides a list of matching fields for you to choose from.
-- **Regular Expression Search**: Use full regular expressions to search for patterns within field values, allowing for advanced search capabilities.
+- **Autocomplete Field Selection**: Start typing the name of the field you want to edit, and the script provides a list of matching fields for you to choose from. If multiple matches are found, the script prompts you to select the correct field.
+- **Regular Expression Search**: Use full regular expressions to search for patterns within field values, allowing for advanced search capabilities. Wildcards (`*`) and special character escaping (`\`) are supported.
 - **Case-Insensitive Matching**: The search functionality is case-insensitive, making it easier to find the records you want to edit.
-- **Preview Changes**: Before applying changes, the script shows a preview of the old and new values for one of the matching records, allowing you to confirm the bulk edit.
-- **Bulk Processing**: Edits are applied to all selected items that match the search criteria.
+- **Preview Changes**: Before applying changes, the script shows a preview of the old and new values for the first matching record, allowing you to confirm the bulk edit.
+- **Bulk Processing**: Edits are applied to all selected items, items in the current collection, or items in a saved search that match the search criteria.
 
 ## Back Up
 
@@ -27,9 +27,9 @@ This project builds on [Schoeneh's](https://github.com/Schoeneh) Zotero Search a
 
 1. **Select Items in Zotero**: Begin by selecting the items you want to edit in Zotero.
 2. **Run the Script**: Execute the script to start the bulk editing process.
-3. **Field Selection**: When prompted, start typing the field name you want to edit. The script will show matching options for you to confirm.
-4. **Search and Replace**: Enter the search term using regular expressions for advanced search patterns, and specify the replacement value.
-5. **Confirm Changes**: Review the preview of the changes and confirm to apply the edits.
+3. **Field Selection**: When prompted, start typing the field name you want to edit. The script will show matching options for you to confirm. If multiple matches are found, you will be prompted to select the correct field.
+4. **Search and Replace**: Enter the search term using regular expressions for advanced search patterns, and specify the replacement value. Special characters can be escaped using `\`.
+5. **Confirm Changes**: Review the preview of the changes for the first matching record and confirm to apply the edits.
 
 ## Example
 
@@ -194,15 +194,19 @@ In this example, we will update the `Publisher` field for a group of selected it
 
 	![Screenshot](doc/zotero_7a.webp)
 
-11. The script will provide a summary of the changes for review before making them.
+12. The script will provide a summary of the changes for review before making them.
 
 	![Screenshot](doc/zotero_8.webp)
    
 	![Screenshot](doc/zotero_9.webp)
 
-11. Here are the results.
+13. Here are the results.
 
 	![Screenshot](doc/zotero_10.webp)
+
+## Error Handling
+
+The script includes error handling to ensure a smooth user experience. If an error occurs during the update process, an alert will be displayed with the error message. Ensure that the items you want to edit are correctly selected, and follow the prompts carefully.
 
 ## Other Considerations
 
