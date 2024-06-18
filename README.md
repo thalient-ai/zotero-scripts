@@ -49,205 +49,205 @@ In this example, we will update the `Publisher` field for a group of selected it
 
 4. Copy and paste the [Bulk Edit script](https://github.com/thalient-ai/zotero-bulk-edit/blob/main/src/zotero_bulk_edit.js) into the `Run Javascript` window and select the `Run` button in the top left corner. This will start the JavaScript application. The script can be accessed [here](https://github.com/thalient-ai/zotero-bulk-edit/blob/main/src/zotero_bulk_edit.js) or by opening the .js file in your chosen text editor.
 
-	![Screenshot](doc/zotero_3.webp)
+   ![Screenshot](doc/zotero_3.webp)
 
-6. Enter the field that you wish to edit.
+5. Enter the field that you wish to edit.
 
-	<details>
-	  <summary>Here is a list of all supported fields</summary>
-	  
-	  - Abstract
-	  - Accessed Date
-	  - Application Number
-	  - Archive
-	  - Archive ID
-	  - Artwork Medium
-	  - Artwork Size
-	  - Assignee
-	  - Audio File Type
-	  - Audio Format
-	  - Bill Number
-	  - Blog Title
-	  - Book Title
-	  - Call Number
-	  - Case Name
-	  - Citation Key
-	  - Code
-	  - Code Number
-	  - Code Pages
-	  - Code Volume
-	  - Committee
-	  - Company
-	  - Conference Name
-	  - Country
-	  - Court
-	  - Date
-	  - Date Decided
-	  - Date Enacted
-	  - Dictionary Title
-	  - Distributor
-	  - Docket Number
-	  - Document Number
-	  - DOI
-	  - Edition
-	  - Encyclopedia Title
-	  - Episode Number
-	  - Extra
-	  - Filing Date
-	  - First Name
-	  - First Page
-	  - Format
-	  - Forum Title
-	  - Genre
-	  - History
-	  - Identifier
-	  - Institution
-	  - Interview Medium
-	  - ISBN
-	  - ISSN
-	  - Issue
-	  - Issue Date
-	  - Issuing Authority
-	  - Journal Abbreviation
-	  - Label
-	  - Language
-	  - Last Name
-	  - Legal Status
-	  - Legislative Body
-	  - Library Catalog
-	  - Location in Archive
-	  - Map Type
-	  - Manuscript Type
-	  - Meeting Name
-	  - Name of Act
-	  - Network
-	  - Note
-	  - Number
-	  - Number of Pages
-	  - Number of Volumes
-	  - Organization
-	  - Pages
-	  - Patent Number
-	  - Place
-	  - Post Type
-	  - Presentation Type
-	  - Priority Numbers
-	  - Proceedings Title
-	  - Program Title
-	  - Programming Language
-	  - Public Law Number
-	  - Publication Title
-	  - Publisher
-	  - References
-	  - Report Number
-	  - Report Type
-	  - Reporter
-	  - Reporter Volume
-	  - Repository
-	  - Repository Location
-	  - Rights
-	  - Running Time
-	  - Scale
-	  - Section
-	  - Series
-	  - Series Number
-	  - Series Text
-	  - Series Title
-	  - Session
-	  - Short Title
-	  - Status
-	  - Studio
-	  - Subject
-	  - System
-	  - Thesis Type
-	  - Title
-	  - Type
-	  - University
-	  - URL
-	  - Version
-	  - Video Recording Format
-	  - Volume
-	  - Website Title
-	  - Website Type
+   <details>
+     <summary>Here is a list of all supported fields</summary>
+     
+     - Abstract
+     - Accessed Date
+     - Application Number
+     - Archive
+     - Archive ID
+     - Artwork Medium
+     - Artwork Size
+     - Assignee
+     - Audio File Type
+     - Audio Format
+     - Bill Number
+     - Blog Title
+     - Book Title
+     - Call Number
+     - Case Name
+     - Citation Key
+     - Code
+     - Code Number
+     - Code Pages
+     - Code Volume
+     - Committee
+     - Company
+     - Conference Name
+     - Country
+     - Court
+     - Date
+     - Date Decided
+     - Date Enacted
+     - Dictionary Title
+     - Distributor
+     - Docket Number
+     - Document Number
+     - DOI
+     - Edition
+     - Encyclopedia Title
+     - Episode Number
+     - Extra
+     - Filing Date
+     - First Name
+     - First Page
+     - Format
+     - Forum Title
+     - Genre
+     - History
+     - Identifier
+     - Institution
+     - Interview Medium
+     - ISBN
+     - ISSN
+     - Issue
+     - Issue Date
+     - Issuing Authority
+     - Journal Abbreviation
+     - Label
+     - Language
+     - Last Name
+     - Legal Status
+     - Legislative Body
+     - Library Catalog
+     - Location in Archive
+     - Map Type
+     - Manuscript Type
+     - Meeting Name
+     - Name of Act
+     - Network
+     - Note
+     - Number
+     - Number of Pages
+     - Number of Volumes
+     - Organization
+     - Pages
+     - Patent Number
+     - Place
+     - Post Type
+     - Presentation Type
+     - Priority Numbers
+     - Proceedings Title
+     - Program Title
+     - Programming Language
+     - Public Law Number
+     - Publication Title
+     - Publisher
+     - References
+     - Report Number
+     - Report Type
+     - Reporter
+     - Reporter Volume
+     - Repository
+     - Repository Location
+     - Rights
+     - Running Time
+     - Scale
+     - Section
+     - Series
+     - Series Number
+     - Series Text
+     - Series Title
+     - Session
+     - Short Title
+     - Status
+     - Studio
+     - Subject
+     - System
+     - Thesis Type
+     - Title
+     - Type
+     - University
+     - URL
+     - Version
+     - Video Recording Format
+     - Volume
+     - Website Title
+     - Website Type
 
-	</details>
+   </details>
 
-	![Screenshot](doc/zotero_4.webp)
+   ![Screenshot](doc/zotero_4.webp)
 
-8. Your input does not have to be case-sensitive or complete. The application will offer suggestions based on your input.
+6. Your input does not have to be case-sensitive or complete. The application will offer suggestions based on your input.
 
-	![Screenshot](doc/zotero_5.webp)
+   ![Screenshot](doc/zotero_5.webp)
    
-	![Screenshot](doc/zotero_5a.webp)
+   ![Screenshot](doc/zotero_5a.webp)
 
-9. Enter the search term. The script supports regular expressions and can handle blank fields. Because the `Publisher` field of the selected items contains both blank and populated values, we will use the wildcard `*`.
+7. Enter the search term. The script supports regular expressions and can handle blank fields. Because the `Publisher` field of the selected items contains both blank and populated values, we will use the wildcard `*`.
 
-	<details>
-	  <summary>Click to expand for detailed explanations of special characters used in regular expressions</summary>
-	  
-	  - `.` : Matches any single character except newline.
-	  - `*` : Matches 0 or more of the preceding element.
-	  - `+` : Matches 1 or more of the preceding element.
-	  - `?` : Matches 0 or 1 of the preceding element (makes it optional).
-	  - `^` : Matches the start of the string.
-	  - `$` : Matches the end of the string.
-	  - `[]` : Matches any one of the enclosed characters.
-	  - `[^]` : Matches any one character not enclosed.
-	  - `\` : Escapes a special character.
-	  - `|` : Acts as a logical OR between patterns.
-	  - `()` : Groups patterns together and remembers the match.
-	  - `{}` : Matches a specified number of occurrences of the preceding element.
+   <details>
+     <summary>Click to expand for detailed explanations of special characters used in regular expressions</summary>
+     
+     - `.` : Matches any single character except newline.
+     - `*` : Matches 0 or more of the preceding element.
+     - `+` : Matches 1 or more of the preceding element.
+     - `?` : Matches 0 or 1 of the preceding element (makes it optional).
+     - `^` : Matches the start of the string.
+     - `$` : Matches the end of the string.
+     - `[]` : Matches any one of the enclosed characters.
+     - `[^]` : Matches any one character not enclosed.
+     - `\` : Escapes a special character.
+     - `|` : Acts as a logical OR between patterns.
+     - `()` : Groups patterns together and remembers the match.
+     - `{}` : Matches a specified number of occurrences of the preceding element.
 
-	</details>
+   </details>
 
-	![Screenshot](doc/zotero_6.webp)
+   ![Screenshot](doc/zotero_6.webp)
 
-10. Enter the replacement text.
+8. Enter the replacement text.
 
-	![Screenshot](doc/zotero_7.webp)
+   ![Screenshot](doc/zotero_7.webp)
    
-11. Choose whether you want to edit selected items, all items in the active collection, or items in the active saved search.
+9. Choose whether you want to edit selected items, all items in the active collection, or items in the active saved search.
 
-	<details>
-	  <summary>Click to expand for detailed explanations</summary>
-	  
-	- **Selected Items**: Edits are applied only to items you have explicitly selected in Zotero.
-	
-		![Screenshot](doc/zotero_0.webp)
-	
-	- **Active Collection**: Edits are applied to all items within the currently selected collection in Zotero.
-		
-		- For search purposes, an "active" collection means that you have the collection selected in the Collections Pane in Zotero.
-	
-		![Screenshot](doc/zotero_collection.webp)
-	
-	- **Active Saved Search**: Edits are applied to all items that match the criteria of a saved search in Zotero.
-	
-		- To create a saved search click on the magnifying glass in the `Everything` search bar on the top right task bar and then select `Advanced Search`
-	
-		![Screenshot](doc/zotero_search_1.webp)
-		
-		- Create your search and then click `Save Search`
-	   
-		![Screenshot](doc/zotero_search_2.webp)
-		
-		- The `Saved Search` will appear in the Zotero Collections Pane above `My Publication`. For search purposes, an "active" saved search means that you have it selected in the Collections Pane in Zotero.
-		  
-		![Screenshot](doc/zotero_search_3.webp)
-	
-	</details>
-
-	![Screenshot](doc/zotero_7a.webp)
-
-12. The script will provide a summary of the changes for review before making them.
-
-	![Screenshot](doc/zotero_8.webp)
+   <details>
+     <summary>Click to expand for detailed explanations</summary>
+     
+   - **Selected Items**: Edits are applied only to items you have explicitly selected in Zotero.
    
-	![Screenshot](doc/zotero_9.webp)
+     ![Screenshot](doc/zotero_0.webp)
+   
+   - **Active Collection**: Edits are applied to all items within the currently selected collection in Zotero.
+     
+     - For search purposes, an "active" collection means that you have the collection selected in the Collections Pane in Zotero.
+   
+     ![Screenshot](doc/zotero_collection.webp)
+   
+   - **Active Saved Search**: Edits are applied to all items that match the criteria of a saved search in Zotero.
+   
+     - To create a saved search, click on the magnifying glass in the `Everything` search bar on the top right task bar and then select `Advanced Search`.
+   
+     ![Screenshot](doc/zotero_search_1.webp)
+     
+     - Create your search and then click `Save Search`.
+     
+     ![Screenshot](doc/zotero_search_2.webp)
+     
+     - The `Saved Search` will appear in the Zotero Collections Pane above `My Publications`. For search purposes, an "active" saved search means that you have it selected in the Collections Pane in Zotero.
+       
+     ![Screenshot](doc/zotero_search_3.webp)
+   
+   </details>
 
-13. Here are the results.
+   ![Screenshot](doc/zotero_7a.webp)
 
-	![Screenshot](doc/zotero_10.webp)
+10. The script will provide a summary of the changes for review before making them
+
+    ![Screenshot](doc/zotero_8.webp)
+    
+    ![Screenshot](doc/zotero_9.webp)
+
+11. Here are the results.
+
+    ![Screenshot](doc/zotero_10.webp)
 
 ## Error Handling
 
@@ -280,7 +280,7 @@ Zotero handles item fields, creator names, and notes differently due to their di
 - **Rich Text Content**: Notes can contain rich text, allowing for annotations, links, and other formatted content.
 - **Distinct Type**: Notes are treated as a special type of item in Zotero, separate from general metadata fields.
 - **Multiple Notes**: An item can have multiple notes attached to it.
-- **Direct Editing**: Notes can be edited directly, but their content structure requires handling of text formatting and potential links. The script can edit Notes that are selected (i.e., selected items); it cannot edit Notes using the active collection or saved search setting.
+- **Direct Editing**: Notes can be edited directly, but their content structure requires handling of text formatting and potential links. The script can edit notes that are selected (i.e., selected items); it cannot edit notes using the active collection or saved search setting.
 
 ### Practical Implications:
 - **Item Fields**: Simplified bulk edits with standard search and replace functionality.
