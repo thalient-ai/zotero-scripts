@@ -30,6 +30,7 @@ This project builds on [Schoeneh's](https://github.com/Schoeneh) Zotero Search a
 3. **Field Selection**: When prompted, start typing the field name you want to edit. The script will show matching options for you to confirm. If multiple matches are found, you will be prompted to select the correct field. For example, if you type "date," you might see options like "Date," "Date Decided," and "Date Enacted." Simply enter the number corresponding to your choice.
 4. **Search and Replace**: Enter the search term using regular expressions for advanced search patterns, and specify the replacement value. Special characters can be escaped using `\`.
 5. **Confirm Changes**: Review the preview of the changes for the first matching record and confirm to apply the edits.
+6. **Editing many items will take time, a confirmation window will be presented at the completion**
 
 ## Example
 
