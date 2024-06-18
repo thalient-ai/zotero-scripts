@@ -208,9 +208,34 @@ In this example, we will update the `Publisher` field for a group of selected it
    
 11. Choose whether you want to edit selected items, all items in the active collection, or items in the active saved search.
 
+	<details>
+	  <summary>Click to expand for detailed explanations</summary>
+	  
 	- **Selected Items**: Edits are applied only to items you have explicitly selected in Zotero.
+	
+		![Screenshot](doc/zotero_0.webp)
+	
 	- **Active Collection**: Edits are applied to all items within the currently selected collection in Zotero.
+		
+		- For search purposes, an "active" collection means that you have the collection selected in the Collections Pane in Zotero.
+	
+		![Screenshot](doc/zotero_collection.webp)
+	
 	- **Active Saved Search**: Edits are applied to all items that match the criteria of a saved search in Zotero.
+	
+		- To create a saved search click on the magnifying glass in the `Everything` search bar on the top right task bar and then select `Advanced Search`
+	
+		![Screenshot](doc/zotero_search_1.webp)
+		
+		- Create your search and then click `Save Search`
+	   
+		![Screenshot](doc/zotero_search_2.webp)
+		
+		- The `Saved Search` will appear in the Zotero Collections Pane above `My Publication`. For search purposes, an "active" saved search means that you have it selected in the Collections Pane in Zotero.
+		  
+		![Screenshot](doc/zotero_search_3.webp)
+	
+	</details>
 
 	![Screenshot](doc/zotero_7a.webp)
 
