@@ -210,7 +210,7 @@ The script includes error handling to ensure a smooth user experience. If an err
 
 ## Other Considerations
 
-Zotero handles item fields and creator names differently due to their distinct data structures and use cases:
+Zotero handles item fields, creator names, and notes differently due to their distinct data structures and use cases:
 
 ### Item Fields:
 - **General Metadata**: Fields like `title`, `abstractNote`, `publisher`, etc., are standard metadata fields applicable to various item types (e.g., books, articles).
@@ -218,10 +218,22 @@ Zotero handles item fields and creator names differently due to their distinct d
 - **Direct Editing**: Users can directly edit these fields without special handling.
 
 ### Creator Names:
-- **Complex Structure**: Creator fields (`creatorFirstName`, `creatorLastName`) consist of multiple components (first name, last name, creator type).
+- **Complex Structure**: Creator fields (`First Name`, `Last Name`) consist of multiple components (first name, last name, creator type).
 - **Multiple Entries**: An item can have multiple creators (authors, editors, etc.).
-- **Validation**: Both `firstName` and `lastName` fields need careful handling to avoid empty values, as Zotero enforces non-empty creator names.
+- **Validation**: Both `firstName` and `lastName` fields need careful handling to avoid empty values, as Zotero enforces non-empty creator names. If you do remove the names, the script will prompt you with the option to delete the author/creator record. This will remove the author only and will not affect the item, attachment, or other metadata.
+
+### Notes:
+- **Rich Text Content**: Notes can contain rich text, allowing for annotations, links, and other formatted content.
+- **Distinct Type**: Notes are treated as a special type of item in Zotero, separate from general metadata fields.
+- **Multiple Notes**: An item can have multiple notes attached to it.
+- **Direct Editing**: Notes can be edited directly, but their content structure requires handling of text formatting and potential links. The script can edit Notes that are selected (i.e., selected items), it cannot edit Notes using the active collection or saved search setting.
 
 ### Practical Implications:
 - **Item Fields**: Simplified bulk edits with standard search and replace functionality.
 - **Creator Names**: Requires transaction management, validation checks, and potential deletion if fields are empty post-editing to maintain data integrity.
+- **Notes**: Editing notes requires careful handling of rich text content and ensuring that the formatting is preserved. Bulk editing notes follows the same search and replace principles but needs to manage potential formatting issues.
+
+### Summary:
+- **Item Fields**: Bulk edits are straightforward and involve replacing text in single-value fields.
+- **Creator Names**: Editing involves managing multiple components and ensuring data integrity through validation and transaction management.
+- **Notes**: Bulk edits require handling rich text content, preserving formatting, and managing multiple notes per item.
