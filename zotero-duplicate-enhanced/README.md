@@ -11,10 +11,7 @@ This script helps you find and manage duplicate entries in your Zotero library. 
 
 ## Installation
 
-1. Clone the repository or download the script file:
-   ```bash
-   git clone https://github.com/thalient-ai/zotero-bulk-edit.git
-   ```
+1. Download the script file:
 
 2. Open Zotero and navigate to `Tools -> Developer -> Run JavaScript`.
 
