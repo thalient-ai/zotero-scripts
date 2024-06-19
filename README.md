@@ -37,7 +37,7 @@ This script allows you to perform bulk edits on various fields of your Zotero it
 2. Enter the search term and replacement term.
 3. Select the items to edit (selected items, items in a collection, or items in a saved search).
 
-[Read more about zotero-bulk-edit](./scripts/zotero-bulk-edit/README.md)
+[Read more about zotero-bulk-edit](./zotero-bulk-edit/README.md)
 
 ### zotero-attachment-rename
 
@@ -52,7 +52,7 @@ This script renames attachment files and titles based on their parent item’s m
 1. Choose the items to rename (selected items, items in a collection, or items in a saved search).
 2. Choose whether to rename filenames, titles, or both.
 
-[Read more about zotero-attachment-rename](./scripts/zotero-attachment-rename/README.md)
+[Read more about zotero-attachment-rename](./zotero-attachment-rename/README.md)
 
 ### zotero-duplicate-similar
 
@@ -68,7 +68,7 @@ This script helps in detecting and handling potential duplicate items based on a
 2. Choose the items to compare (selected items, items in a collection, or items in a saved search).
 3. Review and handle the detected duplicates.
 
-[Read more about zotero-duplicate-similar](./scripts/zotero-duplicate-similar/README.md)
+[Read more about zotero-duplicate-similar](./zotero-duplicate-similar/README.md)
 
 ## Usage
 
@@ -78,7 +78,3 @@ This script helps in detecting and handling potential duplicate items based on a
 ## Contributing
 
 Contributions are welcome! Please read the [contributing guidelines](./CONTRIBUTING.md) for more information.
-
-## License
-
-This repository is licensed under the MIT License. See the [LICENSE](./LICENSE) file for more information.
