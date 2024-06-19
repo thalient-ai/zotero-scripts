@@ -24,7 +24,7 @@ This repository contains an assortment of javascripts for Zotero 7. These script
 
 ### zotero-bulk-edit
 
-This script allows you to perform bulk edits on various fields of your Zotero items.
+This script allows you to perform bulk edits on various fields of your Zotero items. Bulk editing means you can apply changes to multiple items at once, rather than editing each item individually. This can save time and ensure consistency across your library.
 
 **Features:**
 - Edit multiple fields at once.
@@ -40,7 +40,7 @@ This script allows you to perform bulk edits on various fields of your Zotero it
 
 ### zotero-attachment-rename
 
-This script renames attachment files and titles based on their parent item’s metadata.
+This script renames attachment filenames and titles based on their parent item’s metadata. It can be performed on selected items, all items within a collection, or all items within a saved search. 
 
 **Features:**
 - Rename attachment filenames.
