@@ -11,7 +11,7 @@ This script helps you find and manage duplicate entries in your Zotero library. 
 
 ## Installation
 
-1. Download the script file:
+1. Download the script file: [zotero-duplicate-enhanced](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-duplicate-enhanced/src/duplicate_enhanced.js)
 
 2. Open Zotero and navigate to `Tools -> Developer -> Run JavaScript`.
 
