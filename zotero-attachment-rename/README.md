@@ -43,6 +43,7 @@ This script allows you to rename attachments in Zotero using parent item metadat
 
 ## Usage
 
+0. Download the script file: [zotero-duplicate-enhanced](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-duplicate-enhanced/src/duplicate_enhanced.js)
 1. **Define File Renaming Format**:
    - Open the Zotero settings from `Edit` -> `Settings`.
    - In the `General` tab of the `Settings`, go to `Customize Filename Format`.
