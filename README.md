@@ -8,7 +8,7 @@ This repository contains an assortment of JavaScript scripts for enhancing your 
 - [Scripts](#scripts)
   - [zotero-bulk-edit](#zotero-bulk-edit)
   - [zotero-attachment-rename](#zotero-attachment-rename)
-  - [zotero-duplicate-similar](#zotero-duplicate-similar)
+  - [zotero-duplicate-enhanced](#zotero-duplicate-enhanced)
 - [Usage](#usage)
 - [Contributing](#contributing)
 
@@ -53,7 +53,7 @@ This script renames attachment files and titles based on their parent item’s m
 
 [Read more about zotero-attachment-rename](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-attachment-rename)
 
-### zotero-duplicate-similar
+### zotero-duplicate-enhanced
 
 This script helps in detecting and handling potential duplicate items based on a similarity threshold.
 
@@ -67,7 +67,7 @@ This script helps in detecting and handling potential duplicate items based on a
 2. Choose the items to compare (selected items, items in a collection, or items in a saved search).
 3. Review and handle the detected duplicates.
 
-[Read more about zotero-duplicate-similar](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-duplicate-similar)
+[Read more about zotero-duplicate-enhanced](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-duplicate-enhanced)
 
 ## Usage
 
