@@ -1,79 +1,81 @@
-# Zotero Scripts
+# Zotero Enhanced Duplicate Detector
 
-This repository contains an assortment of JavaScript scripts for enhancing your Zotero 7 experience. These scripts are designed to help with various bulk operations within Zotero, such as editing metadata, renaming attachments, and detecting similar items.
+This script helps you find and manage duplicate entries in your Zotero library. By comparing various fields such as title, creators, and publication details, it calculates the similarity between items and identifies potential duplicates.
 
-## Table of Contents
+## Features
 
-- [Installation](#installation)
-- [Scripts](#scripts)
-  - [zotero-bulk-edit](#zotero-bulk-edit)
-  - [zotero-attachment-rename](#zotero-attachment-rename)
-  - [zotero-duplicate-similar](#zotero-duplicate-similar)
-- [Usage](#usage)
-- [Contributing](#contributing)
+- **Similarity Calculation**: Compares items based on fields like title, creators, date, and more.
+- **Batch Processing**: Efficiently handles large libraries by processing items in batches.
+- **User Interaction**: Prompts you to take actions on detected duplicates.
+- **Customizable Weights**: Allows you to adjust the importance of each field in the similarity calculation.
 
 ## Installation
 
-1. Download the desired script(s) from this repository.
-2. Open Zotero.
-3. Go to `Tools > Developer > Run JavaScript`.
-4. Copy and paste the script content into the Zotero JavaScript console.
-5. Press `Run`.
+1. Clone the repository or download the script file:
+   ```bash
+   git clone https://github.com/thalient-ai/zotero-bulk-edit.git
+   ```
 
-## Scripts
+2. Open Zotero and navigate to `Tools -> Developer -> Run JavaScript`.
 
-### zotero-bulk-edit
+3. Copy and paste the contents of `similar_duplicate.js` into the console and run the script.
 
-This script allows you to perform bulk edits on various fields of your Zotero items.
+## How It Works
 
-**Features:**
-- Edit multiple fields at once.
-- Search and replace text within fields.
-- Supports a wide range of fields including titles, abstracts, and notes.
+1. **Selecting Items**:
+   - The script prompts you to choose items to process: selected items, items in the current collection, or items from a saved search.
 
-**Usage:**
-1. Choose the field you want to edit.
-2. Enter the search term and replacement term.
-3. Select the items to edit (selected items, items in a collection, or items in a saved search).
+2. **Setting the Threshold**:
+   - You'll be asked to enter a similarity threshold between 0 and 1 (e.g., 0.6 for 60% similarity). This threshold determines how similar items must be to be considered duplicates.
 
-[Read more about zotero-bulk-edit](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-bulk-edit)
+3. **Processing Items**:
+   - The script processes items in batches, calculating similarity based on the fields you specified. It logs potential duplicates for review.
 
-### zotero-attachment-rename
+4. **Handling Duplicates**:
+   - When potential duplicates are found, you can choose to:
+     - Add a tag to both items (e.g., `duplicate-pair-timestamp`).
+     - Move one of the items to the trash.
+     - Ignore the potential duplicate.
 
-This script renames attachment files and titles based on their parent item’s metadata.
+## Key Problem with Zotero's Duplicate Detection
 
-**Features:**
-- Rename attachment filenames.
-- Rename attachment titles.
-- Option to rename both filenames and titles.
+Zotero currently uses the title, DOI, and ISBN fields to determine duplicates. If these fields match (or are absent), Zotero also compares the years of publication (if they are within a year of each other) and author/creator lists (if at least one author last name plus first initial matches) to determine duplicates. This can miss duplicates where these fields differ slightly but the items are otherwise identical.
 
-**Usage:**
-1. Choose the items to rename (selected items, items in a collection, or items in a saved search).
-2. Choose whether to rename filenames, titles, or both.
+## How the Script Calculates Similarity
 
-[Read more about zotero-attachment-rename](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-attachment-rename)
+The script compares items based on the following fields:
+- Title
+- Short Title
+- Creators
+- Date
+- Publisher
+- Place
+- Journal
+- DOI
+- ISBN
 
-### zotero-duplicate-similar
+Each field is given a weight to determine its importance in the similarity calculation. By default, the weights are set as follows:
 
-This script helps in detecting and handling potential duplicate items based on a similarity threshold.
+- Title: 0.45
+- Short Title: 0.05
+- Creators: 0.2
+- Date: 0.05
+- Publisher: 0.05
+- Place: 0.05
+- Journal: 0.05
+- DOI: 0.05
+- ISBN: 0.05
 
-**Features:**
-- Set a similarity threshold for detecting duplicates.
-- Compare various fields such as titles, authors, dates, and publishers.
-- Tag or move duplicates to the trash.
+These weights can be adjusted to meet your needs. The script normalizes these weights to ensure they sum to 1. The similarity is calculated using the Jaccard similarity index, which compares the overlap between the fields of two items. The combined similarity score is then used to identify potential duplicates.
 
-**Usage:**
-1. Set the similarity threshold.
-2. Choose the items to compare (selected items, items in a collection, or items in a saved search).
-3. Review and handle the detected duplicates.
+## Example
 
-[Read more about zotero-duplicate-similar](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-duplicate-similar)
-
-## Usage
-
-1. Follow the [Installation](#installation) instructions.
-2. Refer to each script's README for detailed usage instructions.
+After running the script, you will see prompts asking you to select items and set the similarity threshold. The script will then process the items, log potential duplicates, and prompt you to take action on each detected duplicate.
 
 ## Contributing
 
-Contributions are welcome! Please read the [contributing guidelines](./CONTRIBUTING.md) for more information.
+Contributions are welcome! Please fork the repository and create a pull request with your changes.
+
+## Acknowledgements
+
+Special thanks to the Zotero community for their support and contributions.
