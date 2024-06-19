@@ -1,6 +1,6 @@
 # Zotero Scripts
 
-This repository contains an assortment of javascripts for Zotero 7. These scripts are designed to help with various bulk/batch operations within Zotero, such as editing metadata, renaming attachments, and detecting similar items.
+This repository contains an assortment of javascripts for Zotero 7. These scripts are designed to help with various bulk/batch operations within Zotero, such as editing metadata, renaming attachments, and detecting duplicate items.
 
 ## Table of Contents
 
