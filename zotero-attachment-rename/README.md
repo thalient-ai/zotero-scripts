@@ -43,8 +43,7 @@ This script allows you to rename attachments in Zotero using parent item metadat
 
 ## Usage
 
-0. Download the script file: [zotero-attachment-rename](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-rename/src/zotero_attachment_rename.js)
-1. **Define File Renaming Format**:
+0. **Define File Renaming Format**:
    - Open the Zotero settings from `Edit` -> `Settings`.
    - In the `General` tab of the `Settings`, go to `Customize Filename Format`.
    - Define your `Filename Template`:
@@ -54,19 +53,30 @@ This script allows you to rename attachments in Zotero using parent item metadat
 	 ![Screenshot](doc/filename_format.png)
 
 	</details>
+
+1. Download the script file: [zotero-attachment-rename](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-rename/src/zotero_attachment_rename.js)
+
+2. Open Zotero and navigate to `Tools -> Developer -> Run JavaScript`.
+
+3. Copy and paste the contents of `duplicate_enhanced.js` into the console and run the script.
    
-2. **Run the Script**: Execute the script using Zotero’s `Run JavaScript` option.
-3. **Select Items**: Choose the items you want to rename.
+4. **Run the Script**: Execute the script using Zotero’s `Run JavaScript` option.
+
+5. **Select Items**: Choose the items you want to rename.
    - Only selected items
    - All items in the active collection
    - All items in the saved search
-4. **Choose Renaming Option**: The script will prompt you to select what you want to update:
+
+6. **Choose Renaming Option**: The script will prompt you to select what you want to update:
    - Filename only
    - Attachment title only
    - Both filename and attachment title
-5. **Confirm and Execute**: The script will process the selected items, present a preview, and rename the attachments based on the chosen option upon user confirmation.
-6. **Editing many items will take time, a confirmation window will be presented at the completion**
-7. If you need to edit multiple attachment filenames or titles, you can use the [Zotero Bulk Edit script](https://github.com/thalient-ai/zotero-bulk-edit). Use the "Title" field option.
+
+7. **Confirm and Execute**: The script will process the selected items, present a preview, and rename the attachments based on the chosen option upon user confirmation.
+
+8. **Editing many items will take time, a confirmation window will be presented at the completion**
+
+9. If you need to edit multiple attachment filenames or titles, you can use the [Zotero Bulk Edit script](https://github.com/thalient-ai/zotero-bulk-edit). Use the "Title" field option.
 
 ## Note
 
