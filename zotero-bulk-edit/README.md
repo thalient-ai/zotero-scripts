@@ -25,6 +25,7 @@ This project builds on [Schoeneh's](https://github.com/Schoeneh) Zotero Search a
 
 ## Getting Started
 
+0. Download the script file: [zotero-duplicate-enhanced](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-duplicate-enhanced/src/duplicate_enhanced.js)
 1. **Select Items in Zotero**: Begin by selecting the items you want to edit in Zotero.
 2. **Run the Script**: Execute the script to start the bulk editing process.
 3. **Field Selection**: When prompted, start typing the field name you want to edit. The script will show matching options for you to confirm. If multiple matches are found, you will be prompted to select the correct field. For example, if you type "date," you might see options like "Date," "Date Decided," and "Date Enacted." Simply enter the number corresponding to your choice.
