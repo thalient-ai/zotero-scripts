@@ -15,7 +15,7 @@ This script helps you find and manage duplicate entries in your Zotero library. 
 
 2. Open Zotero and navigate to `Tools -> Developer -> Run JavaScript`.
 
-3. Copy and paste the contents of `similar_duplicate.js` into the console and run the script.
+3. Copy and paste the contents of `duplicate_enhanced.js` into the console and run the script.
 
 ## How It Works
 
