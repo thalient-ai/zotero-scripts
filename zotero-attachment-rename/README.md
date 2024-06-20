@@ -114,17 +114,11 @@ In this example, we will update both the attachment title and filenames for sele
 
    ![Screenshot](doc/rename_6.png)
    
-7. The script will provide a count of items affected and a summary of the changes for review before making them.
-
-    ![Screenshot](doc/rename_7.png)
+7. If an item has multiple attachments, you will be prompted to choose which attachments should be renamed.
+	
+   ![Screenshot](doc/multiple.png)
     
-    ![Screenshot](doc/rename_8.png)
-	
-	If an item has multiple attachments, you will be prompted to choose which attachments should be renamed.
-	
-	![Screenshot](doc/multiple.png)
-	
-7. Here you can see that both the attachment filename and title were updated
+8. Here you can see that both the attachment filename and title were updated
 
     ![Screenshot](doc/rename_9.png)
 
