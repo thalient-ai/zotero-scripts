@@ -55,16 +55,24 @@
         }
 
         let affectedItemsCount = 0;
-        for (let item of items) {
-            try {
-                console.log(`Adding tag "${tag}" to item: ${item.getField('title')}`);
-                item.addTag(tag);
-                await item.saveTx();
-                affectedItemsCount++;
-                await sleep(100);  // Adding a delay to avoid overwhelming the system
-            } catch (error) {
-                console.error(`Error adding tag to item ${item.id}: ${error}`);
-            }
+        const batchSize = 100;
+        for (let start = 0; start < items.length; start += batchSize) {
+            const end = Math.min(start + batchSize, items.length);
+            console.log(`Adding tag "${tag}" to items ${start + 1} to ${end}`);
+            await Zotero.DB.executeTransaction(async function() {
+                for (let i = start; i < end; i++) {
+                    try {
+                        let item = items[i];
+                        console.log(`Adding tag "${tag}" to item: ${item.getField('title')}`);
+                        item.addTag(tag);
+                        await item.saveTx();
+                        affectedItemsCount++;
+                    } catch (error) {
+                        console.error(`Error adding tag to item ${items[i].id}: ${error}`);
+                    }
+                }
+            });
+            await sleep(100);  // Adding a delay to avoid overwhelming the system
         }
         console.log(`Successfully added the tag "${tag}" to ${affectedItemsCount} item(s).`);
         alert(`Successfully added the tag "${tag}" to ${affectedItemsCount} item(s).`);
@@ -94,16 +102,24 @@
             return;
         }
 
-        for (let item of itemsToRemoveTag) {
-            try {
-                console.log(`Removing tag "${tag}" from item: ${item.getField('title')}`);
-                item.removeTag(tag);
-                await item.saveTx();
-                affectedItemsCount++;
-                await sleep(100);  // Adding a delay to avoid overwhelming the system
-            } catch (error) {
-                console.error(`Error removing tag from item ${item.id}: ${error}`);
-            }
+        const batchSize = 100;
+        for (let start = 0; start < itemsToRemoveTag.length; start += batchSize) {
+            const end = Math.min(start + batchSize, itemsToRemoveTag.length);
+            console.log(`Removing tag "${tag}" from items ${start + 1} to ${end}`);
+            await Zotero.DB.executeTransaction(async function() {
+                for (let i = start; i < end; i++) {
+                    try {
+                        let item = itemsToRemoveTag[i];
+                        console.log(`Removing tag "${tag}" from item: ${item.getField('title')}`);
+                        item.removeTag(tag);
+                        await item.saveTx();
+                        affectedItemsCount++;
+                    } catch (error) {
+                        console.error(`Error removing tag from item ${itemsToRemoveTag[i].id}: ${error}`);
+                    }
+                }
+            });
+            await sleep(100);  // Adding a delay to avoid overwhelming the system
         }
         console.log(`Tag "${tag}" removed from ${affectedItemsCount} item(s).`);
         alert(`Tag "${tag}" removed from ${affectedItemsCount} item(s).`);
@@ -117,20 +133,28 @@
         }
 
         let affectedItemsCount = 0;
-        for (let item of items) {
-            try {
-                const tags = item.getTags().map(tag => tag.tag);
-                if (tags.includes(oldTag)) {
-                    console.log(`Replacing tag "${oldTag}" with "${newTag}" in item: ${item.getField('title')}`);
-                    item.removeTag(oldTag);
-                    item.addTag(newTag);
-                    await item.saveTx();
-                    affectedItemsCount++;
-                    await sleep(100);  // Adding a delay to avoid overwhelming the system
+        const batchSize = 100;
+        for (let start = 0; start < items.length; start += batchSize) {
+            const end = Math.min(start + batchSize, items.length);
+            console.log(`Replacing tag "${oldTag}" with "${newTag}" in items ${start + 1} to ${end}`);
+            await Zotero.DB.executeTransaction(async function() {
+                for (let i = start; i < end; i++) {
+                    try {
+                        let item = items[i];
+                        const tags = item.getTags().map(tag => tag.tag);
+                        if (tags.includes(oldTag)) {
+                            console.log(`Replacing tag "${oldTag}" with "${newTag}" in item: ${item.getField('title')}`);
+                            item.removeTag(oldTag);
+                            item.addTag(newTag);
+                            await item.saveTx();
+                            affectedItemsCount++;
+                        }
+                    } catch (error) {
+                        console.error(`Error replacing tag in item ${items[i].id}: ${error}`);
+                    }
                 }
-            } catch (error) {
-                console.error(`Error replacing tag in item ${item.id}: ${error}`);
-            }
+            });
+            await sleep(100);  // Adding a delay to avoid overwhelming the system
         }
         console.log(`Tag "${oldTag}" replaced with "${newTag}" in ${affectedItemsCount} item(s).`);
         alert(`Tag "${oldTag}" replaced with "${newTag}" in ${affectedItemsCount} item(s).`);
