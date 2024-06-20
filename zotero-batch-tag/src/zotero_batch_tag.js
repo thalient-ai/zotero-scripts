@@ -160,16 +160,31 @@
             return null;
         }
 
-        const choices = tags.map((tag, index) => `${index + 1}. ${tag}`).join("\n");
-        const choice = prompt(`Select a tag by number:\n\n${choices}`);
-        const selectedIndex = parseInt(choice, 10);
+        let selectedTag = null;
+        while (!selectedTag) {
+            const choices = tags.map((tag, index) => `${index + 1}. ${tag}`).join("\n");
+            const choice = prompt(`Select a tag by number or enter a new search term:\n\n${choices}`);
+            
+            if (choice === null) {
+                alert("Operation canceled.");
+                return null;
+            }
 
-        if (!isNaN(selectedIndex) && selectedIndex > 0 && selectedIndex <= tags.length) {
-            return tags[selectedIndex - 1];
-        } else {
-            alert("Invalid selection.");
-            return null;
+            const selectedIndex = parseInt(choice, 10);
+
+            if (!isNaN(selectedIndex) && selectedIndex > 0 && selectedIndex <= tags.length) {
+                selectedTag = tags[selectedIndex - 1];
+            } else {
+                const newTags = searchTags(tags, choice);
+                if (newTags.length > 0) {
+                    tags = newTags;
+                } else {
+                    alert("Invalid selection. Please enter a valid number or search term.");
+                }
+            }
         }
+
+        return selectedTag;
     }
 
     // Main logic
@@ -199,11 +214,13 @@
         const searchTerm = prompt("Enter the tag to search for:");
         const matchingTags = searchTags(allTags, searchTerm);
         const oldTag = selectTagFromSearchResults(matchingTags);
-        const newTag = prompt("Enter the new tag:");
-        if (oldTag && newTag) {
-            await replaceTagInItems(oldTag, newTag, items);
-        } else {
-            alert("Both tags must be entered.");
+        if (oldTag) {
+            const newTag = prompt("Enter the new tag:");
+            if (newTag) {
+                await replaceTagInItems(oldTag, newTag, items);
+            } else {
+                alert("No new tag entered.");
+            }
         }
     } else {
         alert("Invalid action.");
