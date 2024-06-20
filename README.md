@@ -1,6 +1,6 @@
 # Zotero Scripts
 
-This repository contains an assortment of javascripts for Zotero 7. These scripts are designed to help with various bulk/batch operations within Zotero, such as editing metadata, renaming attachments, and detecting duplicate items.
+This repository contains an assortment of javascripts for Zotero 7. These scripts are designed to help with various bulk / batch operations within Zotero, such as editing metadata, renaming attachments, and detecting similar items.
 
 ## Table of Contents
 
@@ -9,8 +9,10 @@ This repository contains an assortment of javascripts for Zotero 7. These script
   - [zotero-bulk-edit](#zotero-bulk-edit)
   - [zotero-attachment-rename](#zotero-attachment-rename)
   - [zotero-duplicate-enhanced](#zotero-duplicate-enhanced)
+  - [zotero-batch-tag-manager](#zotero-batch-tag-manager)
 - [Usage](#usage)
 - [Contributing](#contributing)
+- [Acknowledgements](#acknowledgements)
 
 ## Installation
 
@@ -26,8 +28,6 @@ This repository contains an assortment of javascripts for Zotero 7. These script
 
 This script allows you to perform bulk edits on various fields of your Zotero items. Bulk editing means you can apply changes to multiple items at once, rather than editing each item individually. This can save time and ensure consistency across your library.
 
-**Key Problem Solved**: Manually editing multiple items in Zotero can be time-consuming and prone to inconsistencies. This script automates the process, ensuring accuracy and saving time.
-
 **Features:**
 - Edit multiple fields at once.
 - Search and replace text within fields.
@@ -38,13 +38,9 @@ This script allows you to perform bulk edits on various fields of your Zotero it
 2. Enter the search term and replacement term.
 3. Select the items to edit (selected items, items in a collection, or items in a saved search).
 
-[Read more about zotero-bulk-edit](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-bulk-edit)
-
 ### zotero-attachment-rename
 
 This script renames attachment filenames and titles based on their parent item’s metadata. It can be performed on selected items, all items within a collection, or all items within a saved search.
-
-**Key Problem Solved**: Zotero does not automatically rename attachment filenames and titles to match parent item metadata, leading to disorganized and hard-to-find attachments. This script ensures consistency and easier management of attachments.
 
 **Features:**
 - Rename attachment filenames.
@@ -55,13 +51,9 @@ This script renames attachment filenames and titles based on their parent item�
 1. Choose the items to rename (selected items, items in a collection, or items in a saved search).
 2. Choose whether to rename filenames, titles, or both.
 
-[Read more about zotero-attachment-rename](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-attachment-rename)
-
 ### zotero-duplicate-enhanced
 
 This script helps in detecting and handling potential duplicate items based on a similarity threshold.
-
-**Key Problem Solved**: Zotero’s default duplicate detection may miss duplicates due to strict matching criteria. This script enhances detection by comparing multiple fields with customizable weights.
 
 **Features:**
 - Set a similarity threshold for detecting duplicates.
@@ -73,7 +65,29 @@ This script helps in detecting and handling potential duplicate items based on a
 2. Choose the items to compare (selected items, items in a collection, or items in a saved search).
 3. Review and handle the detected duplicates.
 
-[Read more about zotero-duplicate-enhanced](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-duplicate-enhanced)
+### zotero-batch-tag
+
+This script helps manage tags within your Zotero library by allowing you to perform bulk operations, such as adding, removing, or replacing tags across multiple items. This script is designed to handle large collections efficiently while providing detailed feedback and user confirmations.
+
+**Features:**
+- Add one or more tags to multiple selected items at once.
+- Remove specific tags from multiple selected items with a confirmation prompt before execution.
+- Replace one tag with another across multiple selected items, ensuring only items with the original tag are modified.
+- Detailed Logging: Provides progress feedback and logs detailed actions taken for each item.
+- User Confirmation: Prompts for confirmation before performing significant operations like removing or replacing tags.
+
+**Usage:**
+1. **Select Items**:
+   - The script prompts you to choose items to process: selected items, items in the current collection, or items from a saved search.
+
+2. **Choose Operation**:
+   - Add a Tag: Prompts for the tag to be added and applies it to the selected items.
+   - Remove a Tag: Prompts for the tag to be removed, confirms the action, and removes it from the selected items.
+   - Replace a Tag: Prompts for the old tag and the new tag, confirms the action, and replaces the old tag with the new tag in the selected items.
+
+3. **Confirmation and Progress**:
+   - For remove and replace operations, the script provides a confirmation prompt with details on the number of items affected.
+   - The script logs detailed progress and actions taken for each item.
 
 ## Usage
 
@@ -83,3 +97,7 @@ This script helps in detecting and handling potential duplicate items based on a
 ## Contributing
 
 Contributions are welcome! Please read the [contributing guidelines](./CONTRIBUTING.md) for more information.
+
+## Acknowledgements
+
+Special thanks to the Zotero community for their support and contributions.
