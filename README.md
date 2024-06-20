@@ -1,6 +1,6 @@
 # Zotero Scripts
 
-This repository contains an assortment of javascripts for Zotero 7. These scripts are designed to help with various bulk / batch operations within Zotero, such as editing metadata, renaming attachments, and detecting similar items.
+This repository contains an assortment of javascripts for Zotero 7. These scripts are designed to help with various bulk/batch operations within Zotero, such as editing metadata, renaming attachments, and detecting duplicate items.
 
 ## Table of Contents
 
@@ -24,7 +24,9 @@ This repository contains an assortment of javascripts for Zotero 7. These script
 
 ### zotero-bulk-edit
 
-This script allows you to perform bulk edits on various fields of your Zotero items.
+This script allows you to perform bulk edits on various fields of your Zotero items. Bulk editing means you can apply changes to multiple items at once, rather than editing each item individually. This can save time and ensure consistency across your library.
+
+**Key Problem Solved**: Manually editing multiple items in Zotero can be time-consuming and prone to inconsistencies. This script automates the process, ensuring accuracy and saving time.
 
 **Features:**
 - Edit multiple fields at once.
@@ -40,7 +42,9 @@ This script allows you to perform bulk edits on various fields of your Zotero it
 
 ### zotero-attachment-rename
 
-This script renames attachment files and titles based on their parent item’s metadata.
+This script renames attachment filenames and titles based on their parent item’s metadata. It can be performed on selected items, all items within a collection, or all items within a saved search.
+
+**Key Problem Solved**: Zotero does not automatically rename attachment filenames and titles to match parent item metadata, leading to disorganized and hard-to-find attachments. This script ensures consistency and easier management of attachments.
 
 **Features:**
 - Rename attachment filenames.
@@ -56,6 +60,8 @@ This script renames attachment files and titles based on their parent item’s m
 ### zotero-duplicate-enhanced
 
 This script helps in detecting and handling potential duplicate items based on a similarity threshold.
+
+**Key Problem Solved**: Zotero’s default duplicate detection may miss duplicates due to strict matching criteria. This script enhances detection by comparing multiple fields with customizable weights.
 
 **Features:**
 - Set a similarity threshold for detecting duplicates.
