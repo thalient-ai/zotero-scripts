@@ -29,8 +29,9 @@ This repository contains an assortment of javascripts for Zotero 7. These script
 This script allows you to perform bulk edits on various fields of your Zotero items. Bulk editing means you can apply changes to multiple items at once, rather than editing each item individually. This can save time and ensure consistency across your library.
 
 **Features:**
-- Edit the fields of multiple items at once.
 - Search and replace text within fields.
+- Support regular expression and wild cards
+- Edit the fields of multiple items at once.
 - Supports a wide range of fields including titles, abstracts, creator names, and notes.
 
 **Usage:**
@@ -40,12 +41,12 @@ This script allows you to perform bulk edits on various fields of your Zotero it
 
 ### [zotero-attachment-rename](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-attachment-rename)
 
-This script renames attachment filenames and titles based on their parent item’s metadata.
+This script allows for you to perform bulk renaming of multiple attachment filenames and or titles based on their parent item’s metadata. 
 
 **Features:**
-- Rename attachment filenames.
-- Rename attachment titles.
-- Option to rename both filenames and titles.
+- Rename attachment filenames and/or titles.
+- Option to perform the renaming on all attachments of selected items, active collection, or saved search.
+- You don't need to select the attachment itself.
 
 **Usage:**
 1. Choose the items to rename (selected items, items in a collection, or items in a saved search).
@@ -53,7 +54,7 @@ This script renames attachment filenames and titles based on their parent item�
 
 ### [zotero-duplicate-enhanced](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-duplicate-enhanced)
 
-This script helps in detecting and handling potential duplicate items based on a similarity threshold.
+This script helps in detecting and handling potential duplicate items based on a similarity threshold. This approach will identify duplicates that the built-in logic does not detect.
 
 **Features:**
 - Set a similarity threshold for detecting duplicates.
@@ -77,22 +78,13 @@ This script helps manage tags within your Zotero library by allowing you to perf
 - User Confirmation: Prompts for confirmation before performing significant operations like removing or replacing tags.
 
 **Usage:**
-1. **Select Items**:
-   - The script prompts you to choose items to process: selected items, items in the current collection, or items from a saved search.
-
-2. **Choose Operation**:
-   - Add a Tag: Prompts for the tag to be added and applies it to the selected items.
-   - Remove a Tag: Prompts for the tag to be removed, confirms the action, and removes it from the selected items.
-   - Replace a Tag: Prompts for the old tag and the new tag, confirms the action, and replaces the old tag with the new tag in the selected items.
-
-3. **Confirmation and Progress**:
-   - For remove and replace operations, the script provides a confirmation prompt with details on the number of items affected.
-   - The script logs detailed progress and actions taken for each item.
+1. The script prompts you to choose items to process: selected items, items in the current collection, or items from a saved search.
+2. Add, Remove, or Replace a Tag
+3. Autosuggests tags to choose from for remove or replace operations
 
 ## Usage
 
-1. Follow the [Installation](#installation) instructions.
-2. Refer to each script's README for detailed usage instructions.
+Refer to each script's README for detailed usage instructions.
 
 ## Contributing
 
