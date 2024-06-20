@@ -40,7 +40,7 @@ This script allows you to perform bulk edits on various fields of your Zotero it
 
 ### [zotero-attachment-rename](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-attachment-rename)
 
-This script renames attachment filenames and titles based on their parent item’s metadata. \
+This script renames attachment filenames and titles based on their parent item’s metadata.
 
 **Features:**
 - Rename attachment filenames.
@@ -51,7 +51,7 @@ This script renames attachment filenames and titles based on their parent item�
 1. Choose the items to rename (selected items, items in a collection, or items in a saved search).
 2. Choose whether to rename filenames, titles, or both.
 
-### zotero-duplicate-enhanced
+### [zotero-duplicate-enhanced](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-duplicate-enhanced)
 
 This script helps in detecting and handling potential duplicate items based on a similarity threshold.
 
@@ -65,7 +65,7 @@ This script helps in detecting and handling potential duplicate items based on a
 2. Choose the items to compare (selected items, items in a collection, or items in a saved search).
 3. Review and handle the detected duplicates.
 
-### zotero-batch-tag
+### [zotero-batch-tag](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-batch-tag)
 
 This script helps manage tags within your Zotero library by allowing you to perform bulk operations, such as adding, removing, or replacing tags across multiple items. This script is designed to handle large collections efficiently while providing detailed feedback and user confirmations.
 
