@@ -1,4 +1,6 @@
 (async function() {
+  const startTime = performance.now();
+  
   try {
     const items = await getItemsToEdit();
     if (!items) {
@@ -23,18 +25,36 @@
     const threshold = getUserInputThreshold(weights);
     if (threshold === null) return;
 
+    const weightsConfirmedTime = performance.now();
+    logTime("Time to confirm weights", weightsConfirmedTime - startTime);
+
     console.log(`Using similarity threshold: ${threshold}`);
     console.log(`Number of items to process: ${items.length}`);
 
-    const potentialDuplicates = await detectPotentialDuplicates(items, threshold, weights);
+    const potentialDuplicates = await detectPotentialDuplicatesOptimized(items, threshold, weights);
+    
+    const duplicatesDetectedTime = performance.now();
+    logTime("Time to detect duplicates", duplicatesDetectedTime - weightsConfirmedTime);
+
     await handleDetectedDuplicates(potentialDuplicates);
 
     alert("Duplicate detection process completed.");
   } catch (error) {
     console.error(`Error in findAndHandleDuplicates: ${error.message}`);
     alert(`An error occurred: ${error.message}`);
+  } finally {
+    const endTime = performance.now();
+    logTime("Total time", endTime - startTime);
   }
 })();
+
+function logTime(label, time) {
+  try {
+    console.log(`${label}: ${(time / 1000).toFixed(2)} seconds`);
+  } catch (error) {
+    console.error(`Failed to log time for ${label}: ${error.message}`);
+  }
+}
 
 function normalizeWeights(weights) {
   const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
@@ -51,10 +71,11 @@ function getUserInputThreshold(weights) {
     alert("Invalid threshold value. Please enter a number between 0 and 1.");
     return null;
   }
+  console.log(`User input similarity threshold: ${threshold}`);
   return threshold;
 }
 
-async function detectPotentialDuplicates(items, threshold, weights) {
+async function detectPotentialDuplicatesOptimized(items, threshold, weights) {
   const potentialDuplicates = [];
   const itemMap = new Map();
 
@@ -64,9 +85,11 @@ async function detectPotentialDuplicates(items, threshold, weights) {
     itemMap.set(item.id, normalized);
   }
 
-  for (const [id1, item1] of itemMap) {
-    for (const [id2, item2] of itemMap) {
-      if (id1 >= id2) continue; // Avoid duplicate comparisons
+  const itemEntries = Array.from(itemMap.entries());
+  for (let i = 0; i < itemEntries.length; i++) {
+    const [id1, item1] = itemEntries[i];
+    for (let j = i + 1; j < itemEntries.length; j++) {
+      const [id2, item2] = itemEntries[j];
       const similarity = calculateSimilarity(item1, item2, weights);
       if (similarity > threshold) {
         potentialDuplicates.push({ item1, item2, similarity });
@@ -141,13 +164,22 @@ async function handleDetectedDuplicates(duplicates) {
   };
 
   const timestamp = Date.now();
+  let stopProcessing = false;
+
   for (const { item1, item2, similarity } of duplicates) {
-    const action = prompt(`Potential duplicate found with similarity ${similarity.toFixed(2)}:\n\nItem 1: ${item1.title}\nItem 2: ${item2.title}\n\nChoose an action:\n1. Add a tag to both Items (e.g., duplicate-pair-${timestamp})\n2. Move Item 2 to Trash\n3. Ignore\n\n(Press Cancel to skip)`);
+    if (stopProcessing) {
+      console.log("Processing stopped by the user.");
+      break;
+    }
+    
+    const action = prompt(`Potential duplicate found with similarity ${similarity.toFixed(2)}:\n\nItem 1: ${item1.title}\nItem 2: ${item2.title}\n\nChoose an action:\n1. Add a tag to both Items (e.g., duplicate-pair-${timestamp})\n2. Move Item 2 to Trash\n3. Ignore\n4. Stop Processing\n\n(Press Cancel to skip)`);
 
     if (action === '1') {
       await actions.tag(item1, item2, `duplicate-pair-${timestamp}`);
     } else if (action === '2') {
       await actions.trash(item2);
+    } else if (action === '4') {
+      stopProcessing = true;
     } else {
       console.log(`Ignored potential duplicate:\nItem 1: ${item1.title}\nItem 2: ${item2.title}`);
     }
@@ -196,7 +228,7 @@ async function getItemsToEdit() {
       searchOption = "Selected Items";
     }
 
-    items.searchOption = searchOption;
+    console.log(`User selected search option: ${searchOption}`);
     return items;
   } catch (error) {
     console.error(`Error getting items to edit: ${error.message}`);
