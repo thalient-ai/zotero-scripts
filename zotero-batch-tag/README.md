@@ -12,10 +12,7 @@ This script helps manage tags within your Zotero library by allowing you to perf
 
 ## Installation
 
-1. Clone the repository or download the script file.
-   ```bash
-   git clone https://github.com/thalient-ai/zotero-batch-tag-manager.git
-   ```
+1. Clone the repository or (download)[https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-batch-tag/src/zotero_batch_tag.js] the script
 
 2. Open Zotero and navigate to `Tools -> Developer -> Run JavaScript`.
 
