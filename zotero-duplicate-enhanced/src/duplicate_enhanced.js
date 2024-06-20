@@ -1,4 +1,4 @@
-async function findAndHandleDuplicates() {
+(async function() {
   try {
     const items = await getItemsToEdit();
     if (!items) {
@@ -20,66 +20,79 @@ async function findAndHandleDuplicates() {
 
     normalizeWeights(weights);
 
-    const weightsInfo = `Weights used in the similarity calculation:\nTitle: ${weights.title.toFixed(2)}\nShort Title: ${weights.shortTitle.toFixed(2)}\nCreators: ${weights.creators.toFixed(2)}\nDate: ${weights.date.toFixed(2)}\nPublisher: ${weights.publisher.toFixed(2)}\nPlace: ${weights.place.toFixed(2)}\nJournal: ${weights.journal.toFixed(2)}\nDOI: ${weights.DOI.toFixed(2)}\nISBN: ${weights.ISBN.toFixed(2)}\n\n`;
-
-    const thresholdInput = prompt(weightsInfo + "Enter the similarity threshold for detecting duplicates (a number between 0 and 1, e.g., 0.6 for 60% similarity):", "0.6");
-    const threshold = parseFloat(thresholdInput);
-
-    if (isNaN(threshold) || threshold < 0 || threshold > 1) {
-      alert("Invalid threshold value. Please enter a number between 0 and 1.");
-      return;
-    }
-
-    const searchOption = items.searchOption;
+    const threshold = getUserInputThreshold(weights);
+    if (threshold === null) return;
 
     console.log(`Using similarity threshold: ${threshold}`);
     console.log(`Number of items to process: ${items.length}`);
 
-    const batchSize = 100; // Define a batch size
-    for (let start = 0; start < items.length; start += batchSize) {
-      const end = Math.min(start + batchSize, items.length);
-      console.log(`Processing batch ${start + 1} to ${end}`);
-      await processBatch(items.slice(start, end), threshold, weights);
-    }
+    const potentialDuplicates = await detectPotentialDuplicates(items, threshold, weights);
+    await handleDetectedDuplicates(potentialDuplicates);
 
     alert("Duplicate detection process completed.");
   } catch (error) {
     console.error(`Error in findAndHandleDuplicates: ${error.message}`);
     alert(`An error occurred: ${error.message}`);
   }
-}
+})();
 
 function normalizeWeights(weights) {
   const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
-  if (totalWeight !== 1) {
-    for (let key in weights) {
-      weights[key] /= totalWeight;
-    }
+  for (let key in weights) {
+    weights[key] /= totalWeight;
   }
 }
 
-async function processBatch(items, threshold, weights) {
-  const potentialDuplicates = [];
+function getUserInputThreshold(weights) {
+  const weightsInfo = `Weights used in the similarity calculation:\nTitle: ${weights.title.toFixed(2)}\nShort Title: ${weights.shortTitle.toFixed(2)}\nCreators: ${weights.creators.toFixed(2)}\nDate: ${weights.date.toFixed(2)}\nPublisher: ${weights.publisher.toFixed(2)}\nPlace: ${weights.place.toFixed(2)}\nJournal: ${weights.journal.toFixed(2)}\nDOI: ${weights.DOI.toFixed(2)}\nISBN: ${weights.ISBN.toFixed(2)}\n\n`;
+  const thresholdInput = prompt(weightsInfo + "Enter the similarity threshold for detecting duplicates (a number between 0 and 1, e.g., 0.6 for 60% similarity):", "0.6");
+  const threshold = parseFloat(thresholdInput);
+  if (isNaN(threshold) || threshold < 0 || threshold > 1) {
+    alert("Invalid threshold value. Please enter a number between 0 and 1.");
+    return null;
+  }
+  return threshold;
+}
 
-  for (let i = 0; i < items.length; i++) {
-    for (let j = i + 1; j < items.length; j++) {
-      const similarity = calculateSimilarity(items[i], items[j], weights);
+async function detectPotentialDuplicates(items, threshold, weights) {
+  const potentialDuplicates = [];
+  const itemMap = new Map();
+
+  // Preprocess items into map for faster lookup
+  for (const item of items) {
+    const normalized = normalizeItemFields(item, weights);
+    itemMap.set(item.id, normalized);
+  }
+
+  for (const [id1, item1] of itemMap) {
+    for (const [id2, item2] of itemMap) {
+      if (id1 >= id2) continue; // Avoid duplicate comparisons
+      const similarity = calculateSimilarity(item1, item2, weights);
       if (similarity > threshold) {
-        potentialDuplicates.push([items[i], items[j], similarity]);
-        console.log(`Potential duplicate found:\nItem 1: ${items[i].getField('title')}\nItem 2: ${items[j].getField('title')}\nSimilarity: ${similarity}`);
+        potentialDuplicates.push({ item1, item2, similarity });
+        console.log(`Potential duplicate found:\nItem 1: ${item1.title}\nItem 2: ${item2.title}\nSimilarity: ${similarity}`);
       }
     }
   }
+  return potentialDuplicates;
+}
 
-  if (potentialDuplicates.length > 0) {
-    await handleDuplicates(potentialDuplicates);
-  } else {
-    console.log("No duplicates found in this batch.");
-  }
+function normalizeItemFields(item, weights) {
+  const fields = ['title', 'shortTitle', 'date', 'publisher', 'place', 'journal', 'DOI', 'ISBN'];
+  const normalizedItem = {};
+  fields.forEach(field => {
+    normalizedItem[field] = normalizeField(item.getField(field));
+  });
+  normalizedItem.creators = normalizeCreators(item.getCreators());
+  return normalizedItem;
 }
 
 function normalizeField(field) {
   return (field || "").replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "").toLowerCase().trim();
+}
+
+function normalizeCreators(creators) {
+  return creators.map(creator => `${creator.firstName || ""} ${creator.lastName || creator.name || ""}`.toLowerCase().trim()).join(' ');
 }
 
 function calculateSimilarity(item1, item2, weights) {
@@ -89,31 +102,16 @@ function calculateSimilarity(item1, item2, weights) {
   let combinedSimilarity = 0;
 
   fields.forEach(field => {
-    const field1 = normalizeField(item1.getField(field));
-    const field2 = normalizeField(item2.getField(field));
-    if (field1 || field2) {
-      const similarity = jaccardSimilarity(field1, field2);
-      console.log(`Comparing ${field}:\nField 1: ${field1}\nField 2: ${field2}\nSimilarity: ${similarity}`);
-      combinedSimilarity += similarity * weights[field];
-      totalWeight += weights[field];
-    }
+    const similarity = jaccardSimilarity(item1[field], item2[field]);
+    combinedSimilarity += similarity * weights[field];
+    totalWeight += weights[field];
   });
 
-  const creators1 = normalizeCreators(item1.getCreators());
-  const creators2 = normalizeCreators(item2.getCreators());
-  console.log(`Creators for Item 1: ${creators1}`);
-  console.log(`Creators for Item 2: ${creators2}`);
-  const creatorSimilarity = jaccardSimilarity(creators1, creators2);
-  console.log(`Creator Jaccard similarity: ${creatorSimilarity}`);
+  const creatorSimilarity = jaccardSimilarity(item1.creators, item2.creators);
   combinedSimilarity += creatorSimilarity * weights.creators;
   totalWeight += weights.creators;
 
-  if (totalWeight > 0) {
-    combinedSimilarity /= totalWeight;
-  }
-
-  console.log(`Combined similarity: ${combinedSimilarity}`);
-  return combinedSimilarity;
+  return combinedSimilarity / totalWeight;
 }
 
 function jaccardSimilarity(str1, str2) {
@@ -124,75 +122,35 @@ function jaccardSimilarity(str1, str2) {
   return intersection.size / union.size;
 }
 
-function normalizeCreators(creators) {
-  return creators.map(creator => `${creator.firstName || ""} ${creator.lastName || creator.name || ""}`.toLowerCase().trim()).join(' ');
-}
+async function handleDetectedDuplicates(duplicates) {
+  if (duplicates.length === 0) {
+    console.log("No duplicates found.");
+    return;
+  }
 
-async function handleDuplicates(duplicates) {
-  const timestamp = Date.now();
-  for (const [item1, item2, similarity] of duplicates) {
-    let userChoice;
-    const firstAuthor1 = getFirstAuthor(item1);
-    const firstAuthor2 = getFirstAuthor(item2);
-    do {
-      userChoice = prompt(`Potential duplicate found with similarity ${similarity.toFixed(2)}:\n\nItem 1:\nTitle: ${item1.getField('title')}\nShort Title: ${item1.getField('shortTitle')}\nFirst Author: ${firstAuthor1}\nPublisher: ${item1.getField('publisher')}\nDate: ${item1.getField('date')}\n\nItem 2:\nTitle: ${item2.getField('title')}\nShort Title: ${item2.getField('shortTitle')}\nFirst Author: ${firstAuthor2}\nPublisher: ${item2.getField('publisher')}\nDate: ${item2.getField('date')}\n\nChoose an action:\n1. Add a tag to both Items (e.g., duplicate-pair-timestamp)\n2. Move Item 2 to Trash\n3. Ignore\n\n(Press Cancel to skip)`);
-      if (userChoice === null) {
-        console.log(`Skipped potential duplicate:\nItem 1: ${item1.getField('title')}\nItem 2: ${item2.getField('title')}`);
-        break; // Skip current pair and move to the next
-      }
-    } while (!['1', '2', '3'].includes(userChoice));
-
-    switch (userChoice) {
-      case '1':
-        groupTagAsDuplicate(item1, item2, duplicates.indexOf([item1, item2, similarity]), timestamp);
-        break;
-      case '2':
-        await moveToTrash(item2);
-        break;
-      case '3':
-        console.log(`Ignored potential duplicate:\nItem 1: ${item1.getField('title')}\nItem 2: ${item2.getField('title')}`);
-        break;
+  const actions = {
+    tag: async (item1, item2, tag) => {
+      item1.addTag(tag);
+      item2.addTag(tag);
+      await item1.saveTx();
+      await item2.saveTx();
+    },
+    trash: async (item) => {
+      await Zotero.Items.trashTx(item.id);
     }
-  }
-}
+  };
 
-function getFirstAuthor(item) {
-  if (!item.getCreators().length) {
-    return "N/A";
-  }
-  const creator = item.getCreators()[0];
-  if (creator.fieldMode === 1) {
-    return creator.lastName; // 'name' is stored in lastName when fieldMode is 1
-  } else if (creator.firstName && creator.lastName) {
-    return `${creator.firstName} ${creator.lastName}`;
-  } else if (creator.lastName) {
-    return creator.lastName;
-  } else {
-    return "N/A";
-  }
-}
+  const timestamp = Date.now();
+  for (const { item1, item2, similarity } of duplicates) {
+    const action = prompt(`Potential duplicate found with similarity ${similarity.toFixed(2)}:\n\nItem 1: ${item1.title}\nItem 2: ${item2.title}\n\nChoose an action:\n1. Add a tag to both Items (e.g., duplicate-pair-${timestamp})\n2. Move Item 2 to Trash\n3. Ignore\n\n(Press Cancel to skip)`);
 
-function groupTagAsDuplicate(item1, item2, index, timestamp) {
-  const tag = `duplicate-pair-${timestamp}-${index + 1}`;
-  try {
-    item1.addTag(tag);
-    item2.addTag(tag);
-    item1.saveTx();
-    item2.saveTx();
-    console.log(`Tagged as duplicate pair: ${tag}`);
-  } catch (error) {
-    console.error(`Error tagging items as duplicates: ${error.message}`);
-    alert(`An error occurred while tagging items as duplicates: ${error.message}`);
-  }
-}
-
-async function moveToTrash(item) {
-  try {
-    await Zotero.Items.trashTx(item.id);
-    console.log(`Moved item to trash: ${item.getField('title')}`);
-  } catch (error) {
-    console.error(`Error moving item to trash: ${error.message}`);
-    alert(`An error occurred while moving the item to trash: ${error.message}`);
+    if (action === '1') {
+      await actions.tag(item1, item2, `duplicate-pair-${timestamp}`);
+    } else if (action === '2') {
+      await actions.trash(item2);
+    } else {
+      console.log(`Ignored potential duplicate:\nItem 1: ${item1.title}\nItem 2: ${item2.title}`);
+    }
   }
 }
 
@@ -210,7 +168,6 @@ async function getItemsToEdit() {
         alert("No collection selected.");
         return null;
       }
-      console.log(`Collection selected: ${collection.name}`);
       items = await collection.getChildItems();
       searchOption = "Current Collection";
     } else if (editOption === '3') {
@@ -219,34 +176,24 @@ async function getItemsToEdit() {
         alert("No saved search selected.");
         return null;
       }
-      
-      console.log(`Saved search selected: ${savedSearch.name}`);
-      
       const search = new Zotero.Search();
       search.libraryID = savedSearch.libraryID;
       search.addCondition('savedSearchID', 'is', savedSearch.id);
-      
       const itemIDs = await search.search();
-      console.log(`Number of items found in saved search: ${itemIDs.length}`);
       if (itemIDs.length === 0) {
         alert("No items found in the saved search.");
         return null;
       }
-
       items = await Zotero.Items.getAsync(itemIDs);
       searchOption = "Saved Search";
-    } else if (editOption === '1') {
+    } else {
       const selectedItems = zoteroPane.getSelectedItems();
       if (!selectedItems.length) {
         alert("No items selected.");
         return null;
       }
-      console.log(`Number of selected items: ${selectedItems.length}`);
       items = selectedItems;
       searchOption = "Selected Items";
-    } else {
-      alert("Invalid option. Please enter '1', '2', or '3'.");
-      return null;
     }
 
     items.searchOption = searchOption;
@@ -257,6 +204,3 @@ async function getItemsToEdit() {
     return null;
   }
 }
-
-// Run the script
-findAndHandleDuplicates();
