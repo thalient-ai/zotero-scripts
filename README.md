@@ -24,7 +24,7 @@ This repository contains an assortment of javascripts for Zotero 7. These script
 
 ## Scripts
 
-### (zotero-bulk-edit)[https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-bulk-edit]
+### [zotero-bulk-edit](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-bulk-edit)
 
 This script allows you to perform bulk edits on various fields of your Zotero items. Bulk editing means you can apply changes to multiple items at once, rather than editing each item individually. This can save time and ensure consistency across your library.
 
@@ -38,7 +38,7 @@ This script allows you to perform bulk edits on various fields of your Zotero it
 2. Enter the search term and replacement term.
 3. Select the items to edit (selected items, items in a collection, or items in a saved search).
 
-### (zotero-attachment-rename)[https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-attachment-rename]
+### [zotero-attachment-rename](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-attachment-rename)
 
 This script renames attachment filenames and titles based on their parent item’s metadata. \
 
