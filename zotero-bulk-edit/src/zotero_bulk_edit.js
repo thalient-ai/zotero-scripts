@@ -1,6 +1,8 @@
 (async function() {
+  const startTime = performance.now();
+	
     // Field definitions
-    var fields = [
+    const fields = [
         { "field": "abstractNote", "localized": "Abstract" },
         { "field": "accessDate", "localized": "Accessed Date" },
         { "field": "applicationNumber", "localized": "Application Number" },
@@ -115,287 +117,299 @@
         { "field": "websiteTitle", "localized": "Website Title" },
         { "field": "websiteType", "localized": "Website Type" }
     ];
+  
+  // Sort fields alphabetically by localized name
+  fields.sort((a, b) => a.localized.localeCompare(b.localized));
 
-    // Sort fields alphabetically by localized name
-    fields.sort((a, b) => a.localized.localeCompare(b.localized));
+  // Function to escape special characters for regular expressions
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
 
-    // Function to escape special characters for regular expressions
-    function escapeRegExp(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
+  // Function to prompt user to select a field with autocomplete suggestions
+  function autocompletePrompt(promptText, suggestions) {
+    let input = "";
+    while (true) {
+      input = prompt(promptText + "\n\nCurrent input: " + input + "\n\nStart typing the name of the field you want to edit (e.g., 'title', 'publisher', 'type', 'name', etc.).");
+      if (input === null) return null;
 
-    // Function to prompt user to select a field with autocomplete suggestions
-    function autocompletePrompt(promptText, suggestions) {
-        let input = "";
-        while (true) {
-            input = prompt(promptText + "\n\nCurrent input: " + input + "\n\nStart typing the name of the field you want to edit (e.g., 'title', 'publisher', 'type', 'name', etc.).");
-            if (input === null) return null;  // Handle cancel button
-
-            let matches = suggestions.filter(suggestion => suggestion.localized.toLowerCase().includes(input.toLowerCase()));
-            if (matches.length === 0) {
-                alert("No matches found. Please try again.");
-                continue;
-            } else {
-                let suggestionText = matches.map((match, index) => `${index + 1}. ${match.localized}`).join("\n");
-                let choice = prompt(`Multiple matches found:\n\n${suggestionText}\n\nType the number to select the field:`);
-                if (choice === null || choice === "") {
-                    alert("Input canceled. Please start over.");
-                    return null;
-                }
-                let selectedIndex = parseInt(choice, 10);
-                if (!isNaN(selectedIndex) && selectedIndex > 0 && selectedIndex <= matches.length) {
-                    return matches[selectedIndex - 1];
-                } else {
-                    alert("Invalid selection. Please enter a number between 1 and " + matches.length + ".");
-                }
-            }
+      let matches = suggestions.filter(suggestion => suggestion.localized.toLowerCase().includes(input.toLowerCase()));
+      if (matches.length === 0) {
+        alert("No matches found. Please try again.");
+        continue;
+      } else {
+        let suggestionText = matches.map((match, index) => `${index + 1}. ${match.localized}`).join("\n");
+        let choice = prompt(`Multiple matches found:\n\n${suggestionText}\n\nType the number to select the field:`);
+        if (choice === null || choice === "") {
+          alert("Input canceled. Please start over.");
+          return null;
         }
-    }
-
-    // Function to get items to edit based on user selection
-    async function getItemsToEdit(editOption) {
-        const zoteroPane = Zotero.getActiveZoteroPane();
-        
-        if (editOption === '2') {
-            let collection = zoteroPane.getSelectedCollection();
-            if (!collection) {
-                alert("No collection selected.");
-                return null;
-            }
-            return await collection.getChildItems();
-        } else if (editOption === '3') {
-            let savedSearch = zoteroPane.getSelectedSavedSearch();
-            if (!savedSearch) {
-                alert("No saved search selected.");
-                return null;
-            }
-            
-            console.log(`Saved search found: ${savedSearch.name} (ID: ${savedSearch.id})`);
-            
-            // Perform the saved search and get the item IDs
-            let search = new Zotero.Search();
-            search.libraryID = savedSearch.libraryID;
-            search.addCondition('savedSearchID', 'is', savedSearch.id);
-            
-            let itemIDs = await search.search();
-            
-            console.log(`Number of items found in saved search: ${itemIDs.length}`);
-            
-            if (itemIDs.length === 0) {
-                alert("No items found in the saved search.");
-                return null;
-            }
-
-            // Fetch the actual items from their IDs
-            let items = await Zotero.Items.getAsync(itemIDs);
-            return items;
+        let selectedIndex = parseInt(choice, 10);
+        if (!isNaN(selectedIndex) && selectedIndex > 0 && selectedIndex <= matches.length) {
+          return matches[selectedIndex - 1];
         } else {
-            let selectedItems = zoteroPane.getSelectedItems();
-            if (!selectedItems.length) {
-                alert("No items selected.");
-                return null;
-            }
-            return selectedItems;
+          alert("Invalid selection. Please enter a number between 1 and " + matches.length + ".");
         }
+      }
     }
+  }
 
-    // Function to update creator names
-    async function updateCreators(fieldName, itemsToEdit, searchRegex, replace) {
+  // Function to get items to edit based on user selection
+  async function getItemsToEdit(editOption) {
+    const zoteroPane = Zotero.getActiveZoteroPane();
+
+    if (editOption === '2') {
+      let collection = zoteroPane.getSelectedCollection();
+      if (!collection) {
+        alert("No collection selected.");
+        return null;
+      }
+      return await collection.getChildItems();
+    } else if (editOption === '3') {
+      let savedSearch = zoteroPane.getSelectedSavedSearch();
+      if (!savedSearch) {
+        alert("No saved search selected.");
+        return null;
+      }
+
+      console.log(`Saved search found: ${savedSearch.name} (ID: ${savedSearch.id})`);
+
+      let search = new Zotero.Search();
+      search.libraryID = savedSearch.libraryID;
+      search.addCondition('savedSearchID', 'is', savedSearch.id);
+
+      let itemIDs = await search.search();
+      console.log(`Number of items found in saved search: ${itemIDs.length}`);
+      if (itemIDs.length === 0) {
+        alert("No items found in the saved search.");
+        return null;
+      }
+
+      return await Zotero.Items.getAsync(itemIDs);
+    } else {
+      let selectedItems = zoteroPane.getSelectedItems();
+      if (!selectedItems.length) {
+        alert("No items selected.");
+        return null;
+      }
+      return selectedItems;
+    }
+  }
+
+  // Function to update creator names
+  async function updateCreators(fieldName, itemsToEdit, searchRegex, replace) {
     let deletionConfirmed = false;
     let toBeDeletedItems = [];
     let originalCreatorsMap = new Map();
 
     await Zotero.DB.executeTransaction(async function() {
-        for (let item of itemsToEdit) {
-            let creators = item.getCreators();
-            originalCreatorsMap.set(item.id, JSON.parse(JSON.stringify(creators)));
-            let updated = false;
-            let newCreators = [];
+      for (let item of itemsToEdit) {
+        let creators = item.getCreators();
+        originalCreatorsMap.set(item.id, JSON.parse(JSON.stringify(creators)));
+        let updated = false;
+        let newCreators = [];
 
-            for (let creator of creators) {
-                let nameToSearch = (creator.fieldMode === 1) ? creator.lastName : (fieldName === "creatorFirstName") ? creator.firstName : creator.lastName;
+        for (let creator of creators) {
+          let nameToSearch = (creator.fieldMode === 1) ? creator.lastName : (fieldName === "creatorFirstName") ? creator.firstName : creator.lastName;
 
-                if (searchRegex.test(nameToSearch)) {
-                    if (creator.fieldMode === 1 || fieldName === "creatorLastName") {
-                        creator.lastName = nameToSearch.replace(searchRegex, replace);
-                    } else if (fieldName === "creatorFirstName") {
-                        creator.firstName = nameToSearch.replace(searchRegex, replace);
-                    }
-
-                    // Check if both names are empty and the field mode is for individual names
-                    if (creator.fieldMode === 0 && !creator.firstName && !creator.lastName) {
-                        // Mark the item for deletion if both names are empty
-                        toBeDeletedItems.push(item);
-                    } else {
-                        newCreators.push(creator);
-                    }
-                    updated = true;
-                } else {
-                    newCreators.push(creator);
-                }
+          if (searchRegex.test(nameToSearch)) {
+            if (creator.fieldMode === 1 || fieldName === "creatorLastName") {
+              creator.lastName = nameToSearch.replace(searchRegex, replace);
+            } else if (fieldName === "creatorFirstName") {
+              creator.firstName = nameToSearch.replace(searchRegex, replace);
             }
 
-            // Ensure that new creators are added only if they have non-empty names or are corporate names
-            newCreators = newCreators.filter(creator => (creator.fieldMode === 1) || (creator.firstName || creator.lastName));
-
-            if (updated) {
-                console.log(`Updating item ${item.id} with new creators:`, newCreators);
-                item.setCreators(newCreators);
-                await item.save();
+            if (creator.fieldMode === 0 && !creator.firstName && !creator.lastName) {
+              toBeDeletedItems.push(item);
+            } else {
+              newCreators.push(creator);
             }
+            updated = true;
+          } else {
+            newCreators.push(creator);
+          }
         }
+
+        newCreators = newCreators.filter(creator => (creator.fieldMode === 1) || (creator.firstName || creator.lastName));
+
+        if (updated) {
+          console.log(`Updating item ${item.id} with new creators:`, newCreators);
+          item.setCreators(newCreators);
+          await item.save();
+        }
+      }
     });
 
     if (toBeDeletedItems.length && !deletionConfirmed) {
-        deletionConfirmed = confirm("Some author names (first and last names) will be blank after this update. Do you want to delete these author entries? Note: This will not delete the entire item or attached files, only the blank author names.");
-        if (deletionConfirmed) {
-            await Zotero.DB.executeTransaction(async function() {
-                for (let item of toBeDeletedItems) {
-                    let creators = item.getCreators().filter(creator => creator.fieldMode === 1 || creator.firstName || creator.lastName);
-                    item.setCreators(creators);
-                    await item.save();
-                }
-            });
-        } else {
-            await Zotero.DB.executeTransaction(async function() {
-                for (let item of toBeDeletedItems) {
-                    let originalCreators = originalCreatorsMap.get(item.id);
-                    item.setCreators(originalCreators);
-                    await item.save();
-                }
-            });
-        }
+      deletionConfirmed = confirm("Some author names (first and last names) will be blank after this update. Do you want to delete these author entries? Note: This will not delete the entire item or attached files, only the blank author names.");
+      if (deletionConfirmed) {
+        await Zotero.DB.executeTransaction(async function() {
+          for (let item of toBeDeletedItems) {
+            let creators = item.getCreators().filter(creator => creator.fieldMode === 1 || creator.firstName || creator.lastName);
+            item.setCreators(creators);
+            await item.save();
+          }
+        });
+      } else {
+        await Zotero.DB.executeTransaction(async function() {
+          for (let item of toBeDeletedItems) {
+            let originalCreators = originalCreatorsMap.get(item.id);
+            item.setCreators(originalCreators);
+            await item.save();
+          }
+        });
+      }
     }
 
     alert("The names were successfully updated.");
-    return;
-}
+  }
 
+  // Function to update notes
+  async function updateNotes(itemsToEdit, searchRegex, replace) {
+    await Zotero.DB.executeTransaction(async function() {
+      for (let item of itemsToEdit) {
+        if (item.isNote()) {
+          let noteContent = item.getNote();
+          let newNoteContent = noteContent.replace(searchRegex, replace);
+          if (newNoteContent !== noteContent) {
+            await item.setNote(newNoteContent);
+            await item.save();
+          }
+        }
+      }
+    });
+    alert("Notes updated.");
+  }
 
-    // Function to update notes
-    async function updateNotes(itemsToEdit, searchRegex, replace) {
-        await Zotero.DB.executeTransaction(async function() {
-            for (let item of itemsToEdit) {
-                if (item.isNote()) {
-                    let noteContent = item.getNote();
-                    let newNoteContent = noteContent.replace(searchRegex, replace);
-                    if (newNoteContent !== noteContent) {
-                        await item.setNote(newNoteContent);
-                        await item.save();
-                    }
-                }
-            }
-        });
-        alert("Notes updated.");
+  // Function to update field values
+  async function updateFieldValues(fieldName, itemsToEdit, searchRegex, replace) {
+    let idsCorrect = [];
+    for (let item of itemsToEdit) {
+      let fieldValue = item.getField(fieldName) || "";
+      if (searchRegex.test(fieldValue)) {
+        idsCorrect.push(item.id);
+      }
     }
 
-    // Function to update field values
-    async function updateFieldValues(fieldName, itemsToEdit, searchRegex, replace) {
-        var idsCorrect = [];
-        for (let item of itemsToEdit) {
-            var fieldValue = item.getField(fieldName) || "";
-            if (searchRegex.test(fieldValue)) {
-                idsCorrect.push(item.id);
-            }
-        }
-
-        if (!idsCorrect.length) {
-            alert("No items found with the specified search term.");
-            return;
-        }
-
-        // Preview of Edit
-        if (idsCorrect.length > 0) {
-            var previewItem = await Zotero.Items.getAsync(idsCorrect[0]);
-            let previewOldValue = previewItem.getField(fieldName) || "";
-            let previewNewValue = previewOldValue.replace(searchRegex, replace);
-            var confirmed = confirm(`${idsCorrect.length} item(s) found with the specified search term in the field "${selectedField.localized}".\n\nExample of change:\nOld: ${previewOldValue}\nNew: ${previewNewValue}\n\nDo you want to apply these changes to all items?`);
-        }
-
-        // Replace values in selected items
-        if (confirmed) {
-            await Zotero.DB.executeTransaction(async function() {
-                for (let id of idsCorrect) {
-                    let item = await Zotero.Items.getAsync(id);
-                    let oldValue = item.getField(fieldName) || "";
-                    let newValue = oldValue.replace(searchRegex, replace);
-                    console.log(`Updating item ${item.id} field "${fieldName}" from "${oldValue}" to "${newValue}"`);
-                    item.setField(fieldName, newValue);
-                    await item.save();
-                }
-            });
-            alert(`${idsCorrect.length} item(s) updated successfully.\n\nThe specified search term was replaced in the "${selectedField.localized}" field.`);
-        }
+    if (!idsCorrect.length) {
+      alert("No items found with the specified search term.");
+      return;
     }
 
-    // Start the field selection process
-    let selectedField = autocompletePrompt("Start typing the field name:", fields);
-    if (!selectedField) {
-        alert("Field selection canceled or invalid.");
+    // Preview of Edit
+    if (idsCorrect.length > 0) {
+      let previewItem = await Zotero.Items.getAsync(idsCorrect[0]);
+      let previewOldValue = previewItem.getField(fieldName) || "";
+      let previewNewValue = previewOldValue.replace(searchRegex, replace);
+      let confirmed = confirm(`${idsCorrect.length} item(s) found with the specified search term in the field "${selectedField.localized}".\n\nExample of change:\nOld: ${previewOldValue}\nNew: ${previewNewValue}\n\nDo you want to apply these changes to all items?`);
+
+      if (!confirmed) {
+        alert("Update operation canceled.");
         return;
+      }
     }
-    var fieldName = selectedField.field;
+
+    // Replace values in selected items
+    await Zotero.DB.executeTransaction(async function() {
+      for (let id of idsCorrect) {
+        let item = await Zotero.Items.getAsync(id);
+        let oldValue = item.getField(fieldName) || "";
+        let newValue = oldValue.replace(searchRegex, replace);
+        console.log(`Updating item ${item.id} field "${fieldName}" from "${oldValue}" to "${newValue}"`);
+        item.setField(fieldName, newValue);
+        await item.save();
+      }
+    });
+    alert(`${idsCorrect.length} item(s) updated successfully.\n\nThe specified search term was replaced in the "${selectedField.localized}" field.`);
+  }
+
+  function logTime(label, time) {
+    try {
+      console.log(`${label}: ${(time / 1000).toFixed(2)} seconds`);
+    } catch (error) {
+      console.error(`Failed to log time for ${label}: ${error.message}`);
+    }
+  }
+
+  try {
+    // Start the field selection process
+    const selectedField = autocompletePrompt("Start typing the field name:", fields);
+    if (!selectedField) {
+      alert("Field selection canceled or invalid.");
+      return;
+    }
+    const fieldName = selectedField.field;
     alert(`Field "${selectedField.localized}" selected.`);
 
-    // Display warning if "Note" field is selected
     if (fieldName === "note") {
-        alert("Warning: Only selected Notes can be edited. Ensure you have selected the notes you wish to edit.");
+      alert("Warning: Only selected Notes can be edited. Ensure you have selected the notes you wish to edit.");
     }
 
-    // Prompt user for search term
-    var search = prompt("Enter the characters or words to search for. Use * as a wildcard. Leave empty to search for blank fields. Use \\ to escape special characters (e.g., C++ becomes C\\+\\+).", "");
+    const search = prompt("Enter the characters or words to search for. Use * as a wildcard. Leave empty to search for blank fields. Use \\ to escape special characters (e.g., C++ becomes C\\+\\+).", "");
     if (search === null) {
-        alert("Search operation canceled.");
-        return;
+      alert("Search operation canceled.");
+      return;
     }
 
-    // Prompt user for replacement term
-    var replace = prompt("Enter the replacement term:", "");
+    const replace = prompt("Enter the replacement term:", "");
     if (replace === null) {
-        alert("Replace operation canceled.");
-        return;
+      alert("Replace operation canceled.");
+      return;
     }
 
-    // Convert the search term into a regular expression
-    var searchRegex;
+    let searchRegex;
     if (search === "") {
-        searchRegex = /^$/;
+      searchRegex = /^$/;
     } else {
-        var regexPattern = search.split("*").map(escapeRegExp).join(".*");
-        searchRegex = new RegExp(regexPattern, "i");  // "i" for case-insensitive matching
+      const regexPattern = search.split("*").map(escapeRegExp).join(".*");
+      searchRegex = new RegExp(regexPattern, "i");
     }
 
-    // Prompt user for edit option if not "Note"
     let itemsToEdit;
     if (fieldName === "note") {
-        itemsToEdit = Zotero.getActiveZoteroPane().getSelectedItems().filter(item => item.isNote());
-        if (!itemsToEdit.length) {
-            alert("No Notes selected.");
-            return;
-        }
+      itemsToEdit = Zotero.getActiveZoteroPane().getSelectedItems().filter(item => item.isNote());
+      if (!itemsToEdit.length) {
+        alert("No Notes selected.");
+        return;
+      }
     } else {
-        var editOption = prompt("Enter '1' to edit only selected items, '2' to edit all items in the current collection, or '3' to edit all items in a saved search:");
-        try {
-            itemsToEdit = await getItemsToEdit(editOption);
-            if (!itemsToEdit) {
-                return;
-            }
-        } catch (error) {
-            alert(`An error occurred while retrieving items: ${error.message}`);
-            return;
+      const editOption = prompt("Enter '1' to edit only selected items, '2' to edit all items in the current collection, or '3' to edit all items in a saved search:");
+      try {
+        itemsToEdit = await getItemsToEdit(editOption);
+        if (!itemsToEdit) {
+          return;
         }
+      } catch (error) {
+        alert(`An error occurred while retrieving items: ${error.message}`);
+        return;
+      }
     }
 
-    // Update creator names if necessary
-    try {
-        if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
-            await updateCreators(fieldName, itemsToEdit, searchRegex, replace);
-        } else if (fieldName === "note") {
-            await updateNotes(itemsToEdit, searchRegex, replace);
-        } else {
-            await updateFieldValues(fieldName, itemsToEdit, searchRegex, replace);
-        }
-    } catch (error) {
-        alert(`An error occurred during the update process: ${error.message}`);
+    const confirmationMessage = `You have chosen to edit ${itemsToEdit.length} records.\n\nField: ${selectedField.localized}\nSearch term: ${search}\nReplace term: ${replace}\n\nDo you want to proceed?`;
+    const confirmation = confirm(confirmationMessage);
+    if (!confirmation) {
+      console.log("User cancelled the editing process.");
+      return;
     }
+    console.log(confirmationMessage);
+
+    try {
+      if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
+        await updateCreators(fieldName, itemsToEdit, searchRegex, replace);
+      } else if (fieldName === "note") {
+        await updateNotes(itemsToEdit, searchRegex, replace);
+      } else {
+        await updateFieldValues(fieldName, itemsToEdit, searchRegex, replace);
+      }
+    } catch (error) {
+      alert(`An error occurred during the update process: ${error.message}`);
+      console.error(`Error in bulk edit script: ${error.message}`);
+    }
+  } catch (error) {
+    console.error(`Error in bulk edit script: ${error.message}`);
+    alert(`An error occurred: ${error.message}`);
+  } finally {
+    const endTime = performance.now();
+    logTime("Total time", endTime - startTime);
+  }
 })();
