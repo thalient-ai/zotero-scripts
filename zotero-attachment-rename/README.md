@@ -90,7 +90,7 @@ In this example, we will update both the attachment title and filenames for sele
 
 	![Screenshot](doc/filename_format.png)	
 
-1. Select the items in Zotero whose attachments you wish to rename. You can select the parent items whose child attachments you wish to rename. You do not need to select the attachments directly.
+1. Select the items in Zotero whose attachments you wish to rename. You can select the parent items whose child attachments you wish to rename. You do not need to select the attachments directly. You will also be presented options to update all items within a collection or saved search.
 
 	![Screenshot](doc/rename_1.png)
 	
