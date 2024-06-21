@@ -120,7 +120,7 @@ In this example, we will update both the attachment title and filenames for sele
    
    ![Screenshot](doc/multiple.png)
    
-   ![Screenshot](doc/rename_10.png)
+   ![Screenshot](doc/rename_confirm.png)
     
 8. Here you can see that both the attachment filename and title were updated
 
