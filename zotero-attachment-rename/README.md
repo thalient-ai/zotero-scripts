@@ -116,11 +116,11 @@ In this example, we will update both the attachment title and filenames for sele
    
 7. If an item has multiple attachments, you will be prompted to choose which attachments should be renamed.
 	
-   ![Screenshot](doc/rename_11.png)
+   ![Screenshot](doc/rename_confirm.png)
    
    ![Screenshot](doc/multiple.png)
    
-   ![Screenshot](doc/rename_confirm.png)
+   ![Screenshot](doc/rename_10.png)
     
 8. Here you can see that both the attachment filename and title were updated
 
