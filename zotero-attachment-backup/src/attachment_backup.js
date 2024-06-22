@@ -144,7 +144,7 @@
                 const filePath = await attachment.getFilePathAsync();
                 if (filePath) {
                     const fileName = filePath.replace(/^.*[\\\/]/, ''); // Extract file name from path
-                    const newFilePath = normalizePath(folderPath + '\\' + fileName); // Use Windows path separator
+                    const newFilePath = normalizePath(`${folderPath}\\${fileName}`); // Use Windows path separator
                     await handleFileCopy(filePath, newFilePath);
                 } else {
                     console.warn(`Attachment ${attachment.id} is not available locally.`);
