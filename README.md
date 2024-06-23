@@ -1,6 +1,6 @@
 # Zotero Scripts
 
-This repository contains a collection of custom scripts designed to enhance the functionality of [Zotero](https://www.zotero.org/), a free, easy-to-use tool to help you collect, organize, cite, and share your research sources. All of the scripts are support bulk or batch editing of multiple Zotero items. All of the scripts have detailed logging, are optimized for performance, and include input validation and error handling.
+This repository contains a collection of custom scripts designed to enhance the functionality of [Zotero](https://www.zotero.org/), a free, easy-to-use tool to help you collect, organize, cite, and share your research sources. All of the scripts are support bulk or batch editing of multiple Zotero items. All of the scripts have detailed logging, are optimized for performance (especially large libraries), and include input validation and error handling.
 
 ## Scripts Included
 
@@ -20,6 +20,8 @@ This repository contains a collection of custom scripts designed to enhance the 
 3. Go to `Tools > Developer > Run JavaScript`.
 4. Copy and paste the script content into the Zotero JavaScript console.
 5. Press `Run`.
+
+If you clone or fork the repository, you can add the scripts (.js) to your Zotero library by `File` -> `Add Attachment` -> `Add Link to File...`. This will add the script to your library, but pull it from your local github directory.
 
 ### Short Descriptions
 
