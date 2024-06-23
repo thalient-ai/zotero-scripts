@@ -1,7 +1,3 @@
-Based on the style of the provided README.md and the contents of the `attachment_backup.js` script, here is a sample README for `attachment_backup.js`:
-
----
-
 # Attachment Backup Script
 
 This script backs up attachments from selected Zotero items to a specified folder.
@@ -62,7 +58,3 @@ Contributions are welcome! Please feel free to submit a Pull Request or open an 
 ## License
 
 This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
-
----
-
-Feel free to customize the content further based on your specific needs and preferences.
