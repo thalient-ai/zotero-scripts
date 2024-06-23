@@ -87,9 +87,9 @@
         };
 
         // Utility function to convert a string to title case based on specified rules
-        function toTitleCase(str) {
+        function toTitleCase(str, title, currentIndex, totalCount) {
             const lowerCaseWords = ["a", "an", "and", "as", "at", "but", "by", "for", "if", "nor", "of", "on", "or", "so", "the", "to", "up", "yet"];
-            const separators = ['-', ':', '–', '/'];
+            const separators = ['-', ':', '–', '/', '/'];
 
             let words = str.split(' ');
 
@@ -104,23 +104,33 @@
                 }
 
                 // Capitalize the first and last word, words following a special character, and major words
-                if (i === 0 || i === words.length - 1 || !lowerCaseWords.includes(lowerWord) || isFollowingSpecialChar(words, i) || word.length >= 4) {
-                    words[i] = capitalizeHyphenated(word);
+                if (i === 0 || i === words.length - 1 || !lowerCaseWords.includes(lowerWord) || isFollowingSpecialChar(words, i, separators) || word.length >= 4) {
+                    words[i] = capitalizeHyphenatedAndSlashed(word);
                 } else {
                     words[i] = lowerWord;
                 }
             }
 
-            return words.join(' ');
+            // Check for text within parentheses and prompt user if not already uppercase
+            return words.join(' ').replace(/\(([^)]+)\)/g, function(match, p1) {
+                if (p1 !== p1.toUpperCase()) {
+                    const userResponse = confirm(`Do you want to convert "${p1}" to uppercase in the title "${title}"? (Prompt ${currentIndex} of ${totalCount})`);
+                    if (userResponse) {
+                        return `(${p1.toUpperCase()})`;
+                    }
+                }
+                return match;
+            });
         }
 
-        // Function to capitalize both parts of a hyphenated word
-        function capitalizeHyphenated(word) {
-            return word.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join('-');
+        // Function to capitalize both parts of a hyphenated or slashed word
+        function capitalizeHyphenatedAndSlashed(word) {
+            const separators = ['-', '/'];
+            return word.split(new RegExp(`(${separators.join('|')})`)).map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join('');
         }
 
         // Check if the word follows a special character (-, :, –, or /)
-        function isFollowingSpecialChar(arr, index) {
+        function isFollowingSpecialChar(arr, index, separators) {
             if (index > 0) {
                 const prevWord = arr[index - 1];
                 return separators.some(separator => prevWord.endsWith(separator));
@@ -137,8 +147,6 @@
         function toSentenceCase(str) {
             return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase().replace(/(\.\s*\w)/g, function(c) {
                 return c.toUpperCase();
-            }).replace(new RegExp(`\\b(?:${Object.keys(customCapitalization).map(escapeRegExp).join('|')})\\b`, 'gi'), function(match) {
-                return customCapitalization[match.toLowerCase()];
             });
         }
 
@@ -192,7 +200,7 @@
         let caseFunction;
         switch (caseOption) {
             case '1':
-                caseFunction = toTitleCase;
+                caseFunction = (str, currentIndex, totalCount) => toTitleCase(str, str, currentIndex, totalCount);
                 break;
             case '2':
                 caseFunction = toSentenceCase;
@@ -215,11 +223,12 @@
         console.log(confirmationMessage);
 
         const batchEditPromises = [];
-        for (const item of itemsToEdit) {
+        for (let index = 0; index < itemsToEdit.length; index++) {
+            const item = itemsToEdit[index];
             if (!item.isNote() && item.getField('title')) {
                 batchEditPromises.push((async () => {
                     const oldTitle = item.getField('title');
-                    const newTitle = caseFunction(oldTitle);
+                    const newTitle = caseFunction(oldTitle, index + 1, itemsToEdit.length);
                     item.setField('title', newTitle);
                     await item.saveTx();
                     console.log(`Updated item ${item.id}: "${oldTitle}" to "${newTitle}"`);
@@ -285,4 +294,3 @@
         }
     }
 })();
-
