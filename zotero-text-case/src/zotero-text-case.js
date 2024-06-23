@@ -6,7 +6,8 @@
 
         // Dictionary of specific words or terms that should be capitalized
         const customCapitalization = {
-            'nist': 'NIST',
+			// General Terms 
+			'nist': 'NIST',
             'nerc': 'NERC',
             'fips': 'FIPS',
             'sha-3': 'SHA-3',
@@ -30,7 +31,6 @@
             'iso': 'ISO',
             'iec': 'IEC',
             'iacs': 'IACS',
-            // Programming languages and additional terms
             'c': 'C',
             'cpu': 'CPU',
             'ram': 'RAM',
