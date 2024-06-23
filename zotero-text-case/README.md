@@ -1,32 +1,37 @@
-# Attachment Backup Script
+Based on the style of the provided README.md and the contents of the `zotero-text-case.js` script, here is a detailed README for `zotero-text-case.js`:
 
-This script backs up attachments from selected Zotero items to a specified folder.
+---
+
+# Text Case Conversion Script
+
+This script converts the case of titles for selected Zotero items to Title Case, Sentence Case, Upper Case, or Lower Case.
 
 ## Features
 
 - **Scope Selection**: Prompts the user to select the scope of items to process (selected items, items in the current collection, or items in a saved search).
-- **Backup Destination**: Allows the user to select a folder where the attachments will be copied.
-- **Attachment Handling**: Handles multiple attachments per item and supports renaming to avoid duplicate filenames.
+- **Case Conversion Options**: Allows the user to choose between Title Case, Sentence Case, Upper Case, or Lower Case.
+- **Custom Capitalization Dictionary**: Handles specific terms and acronyms that should always be capitalized.
+- **User Prompts**: Asks for user confirmation when encountering text within parentheses.
 - **Detailed Logging**: Logs the time taken for each operation and provides detailed error handling and messages.
 
 ## Usage
 
-1. **Download the Script**: Download `attachment_backup.js` from the repository.
+1. **Download the Script**: Download `zotero-text-case.js` from the repository.
 2. **Open Zotero**: Launch the Zotero application.
 3. **Run JavaScript**:
     - Go to `Tools > Developer > Run JavaScript`.
-    - Copy and paste the content of `attachment_backup.js` into the Zotero JavaScript console.
+    - Copy and paste the content of `zotero-text-case.js` into the Zotero JavaScript console.
     - Press `Run`.
 
 ### Example
 
-To back up attachments from selected items:
+To convert the case of titles in selected items:
 
 1. Select the items in Zotero.
 2. Run the script.
 3. Choose the option to process selected items.
-4. Select the destination folder for the backup.
-5. Confirm the backup operation.
+4. Select the desired case conversion (Title Case, Sentence Case, Upper Case, or Lower Case).
+5. Confirm the operation.
 
 ## Detailed Script Description
 
@@ -36,32 +41,31 @@ The script performs the following steps:
 2. **Scope Selection**: Prompts the user to select the scope of items to process.
     - Options: Selected items, items in the current collection, or items in a saved search.
 3. **Retrieve Items**: Retrieves items based on the user’s selection.
-4. **Separate Items**: Separates parent items and orphan attachments.
-5. **Destination Folder**: Prompts the user to select a backup folder.
-6. **Confirmation**: Asks the user to confirm the backup operation.
-7. **Backup Process**:
-    - Counts total attachments.
-    - Backs up attachments by copying files to the selected folder.
-    - Handles file name conflicts by appending a counter to duplicate file names.
-8. **Completion**: Logs completion time and alerts the user that the backup process is complete.
+4. **Case Conversion Option**: Prompts the user to select the desired case conversion (Title Case, Sentence Case, Upper Case, or Lower Case).
+5. **Case Conversion Process**:
+    - Converts the titles of the selected items to the chosen case.
+    - Handles custom capitalization for specific terms and acronyms.
+    - Prompts the user for confirmation when encountering text within parentheses.
+6. **Completion**: Logs completion time and alerts the user that the conversion process is complete.
 
 ## Error Handling
 
 - Provides detailed error messages and logs them to the console.
 - Prompts the user if invalid options are selected.
-- Ensures valid folder paths are selected and handles long path names.
 
 ## Functions Overview
 
 - `getValidEditOption()`: Prompts the user to select the scope of items to process.
 - `getItemsToEdit(editOption, zoteroPane)`: Retrieves items based on the user's selection.
-- `getFolderPath()`: Prompts the user to select a folder for the backup.
-- `countAttachments(parentItems, orphanAttachments)`: Counts the total number of attachments.
-- `backupAttachments(parentItems, orphanAttachments, folderPath)`: Backs up the attachments to the specified folder.
-- `processAttachments(attachmentIDs, folderPath)`: Processes and copies each attachment to the backup folder.
-- `handleFileCopy(source, destination)`: Handles the file copy process, including managing duplicate filenames.
-- `handleDuplicateFile(file)`: Handles duplicate filenames by appending a counter.
-- `normalizePath(path)`: Normalizes the file path for consistency.
+- `getValidCaseOption()`: Prompts the user to select the desired case conversion.
+- `toTitleCase(str, title, currentIndex, totalCount)`: Converts a string to Title Case based on specified rules.
+- `toSentenceCase(str)`: Converts a string to Sentence Case.
+- `toUpperCase(str)`: Converts a string to Upper Case.
+- `toLowerCase(str)`: Converts a string to Lower Case.
+- `capitalizeHyphenatedAndSlashed(word)`: Capitalizes both parts of a hyphenated or slashed word.
+- `isFollowingSpecialChar(arr, index, separators)`: Checks if a word follows a special character.
+- `escapeRegExp(string)`: Escapes special characters for regular expressions.
+- `logTime(label, time)`: Logs the time taken for each operation.
 
 ## Contributing
 
@@ -70,3 +74,7 @@ Contributions are welcome! Please feel free to submit a Pull Request or open an 
 ## License
 
 This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+Feel free to customize the content further based on your specific needs and preferences.
