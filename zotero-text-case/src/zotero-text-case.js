@@ -19,14 +19,21 @@
             '5g': '5G',
             'it': 'IT',
             'sp': 'SP',
-            'cmvp': 'CMVP'
+            'cmvp': 'CMVP',
+			'lte': 'LTE',
+			'v2x': 'V2X',
+			'v2v': 'V2V',
+			'stpa': 'STPA',
+			'asil': 'ASIL',
+			'eee': 'EEE',
+			'nacs': 'NACS',
             // Add more terms as needed
         };
 
         // Utility function to convert a string to title case based on specified rules
         function toTitleCase(str) {
             const lowerCaseWords = ["a", "an", "and", "as", "at", "but", "by", "for", "if", "in", "nor", "of", "on", "or", "so", "the", "to", "up", "yet"];
-            const separators = ['-', ':', '–'];
+            const separators = ['-', ':', '–', '/'];
             let result = str.split(' ').map((word, index, arr) => {
                 const lowerWord = word.toLowerCase();
                 if (customCapitalization[lowerWord]) {
