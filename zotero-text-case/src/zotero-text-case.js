@@ -30,7 +30,61 @@
             'iso': 'ISO',
             'iec': 'IEC',
             'iacs': 'IACS',
-            // Add more terms as needed
+            // Programming languages and additional terms
+            'c': 'C',
+            'cpu': 'CPU',
+            'ram': 'RAM',
+            'rom': 'ROM',
+            'usb': 'USB',
+            'led': 'LED',
+            'lcd': 'LCD',
+            'hdd': 'HDD',
+            'ssd': 'SSD',
+            'http': 'HTTP',
+            'https': 'HTTPS',
+            'html': 'HTML',
+            'css': 'CSS',
+            'json': 'JSON',
+            'xml': 'XML',
+            'api': 'API',
+            'sql': 'SQL',
+            'db': 'DB',
+            'ai': 'AI',
+            'ml': 'ML',
+            'iot': 'IoT',
+            'gps': 'GPS',
+            'pdf': 'PDF',
+            'gif': 'GIF',
+            'jpeg': 'JPEG',
+            'png': 'PNG',
+            'svg': 'SVG',
+            'url': 'URL',
+            'ip': 'IP',
+            'tcp': 'TCP',
+            'udp': 'UDP',
+            'vpn': 'VPN',
+            'wifi': 'WiFi',
+            'rfid': 'RFID',
+            'nfc': 'NFC',
+            'gpu': 'GPU',
+            'javascript': 'JavaScript',
+            'python': 'Python',
+            'java': 'Java',
+            'c++': 'C++',
+            'c#': 'C#',
+            'ruby': 'Ruby',
+            'go': 'Go',
+            'swift': 'Swift',
+            'kotlin': 'Kotlin',
+            'rust': 'Rust',
+            'php': 'PHP',
+            'perl': 'Perl',
+            'r': 'R',
+            'scala': 'Scala',
+            'typescript': 'TypeScript',
+            'matlab': 'MATLAB',
+            'dart': 'Dart',
+            'objective-c': 'Objective-C',
         };
 
         // Utility function to convert a string to title case based on specified rules
@@ -102,7 +156,11 @@
 
         // Utility function to convert a string to sentence case
         function toSentenceCase(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase().replace(/(\.\s*\w)/g, function(c) {
+                return c.toUpperCase();
+            }).replace(new RegExp(`\\b(?:${Object.keys(customCapitalization).map(escapeRegExp).join('|')})\\b`, 'gi'), function(match) {
+                return customCapitalization[match.toLowerCase()];
+            });
         }
 
         // Utility function to convert a string to upper case
