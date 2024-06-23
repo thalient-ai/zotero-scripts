@@ -1,6 +1,6 @@
 # Zotero Scripts
 
-This repository contains a collection of custom scripts designed to enhance the functionality of [Zotero](https://www.zotero.org/), a free, easy-to-use tool to help you collect, organize, cite, and share your research sources. All of the scripts are support bulk or batch editing of multiple Zotero items. All of the scripts have detailed logging, are optimized for performance (especially large libraries), and include input validation and error handling.
+This repository contains a collection of custom scripts designed to enhance the functionality of [Zotero](https://www.zotero.org/), a free, easy-to-use tool to help you collect, organize, cite, and share your research sources. All of the scripts support bulk or batch editing of multiple Zotero items. All of the scripts have detailed logging, are optimized for performance (especially for large libraries), and include input validation and error handling.
 
 ## Scripts Included
 
@@ -21,24 +21,24 @@ This repository contains a collection of custom scripts designed to enhance the 
 4. Copy and paste the script content into the Zotero JavaScript console.
 5. Press `Run`.
 
-If you clone or fork the repository, you can add the scripts (.js) to your Zotero library by `File` -> `Add Attachment` -> `Add Link to File...`. This will add the script to your library, but pull it from your local github directory.
+If you clone or fork the repository, you can add the scripts (.js) to your Zotero library by going to `File` -> `Add Attachment` -> `Add Link to File...`. This will add the script to your library, but pull it from your local GitHub directory.
 
 ### Short Descriptions
 
 #### Attachment Backup (`attachment_backup.js`)
-- Have you ever wanted to backup or download multiple attachments from Zotero? Only to realize that Zotero stores attachments in individual folders meaning that you'll have to go to each folder to copy the .pdf or other attachment.
+- Have you ever wanted to back up or download multiple attachments from Zotero, only to realize that Zotero stores attachments in individual folders, meaning that you'll have to go to each folder to copy the .pdf or other attachment?
 - This script solves that problem by allowing you to select multiple items within Zotero, run the script, and create a copy of the attachment file(s) to a folder of your choosing.
 
 #### Duplicate Enhanced (`duplicate_enhanced.js`)
-- Have you found the [built-in duplicate detection](https://www.zotero.org/support/duplicate_detection) Zotero a bit too limited? Items that are duplicates but have slight differences in metadata fields, are not detected as duplicates.
+- Have you found the [built-in duplicate detection](https://www.zotero.org/support/duplicate_detection) in Zotero a bit too limited? Items that are duplicates but have slight differences in metadata fields are not detected as duplicates.
 - This script detects duplicates using a similarity calculation of key metadata fields. The user can modify the script to set weights as well as set the similarity threshold through prompts. When a duplicate is detected, the script presents the items and their metadata to the user along with the calculated similarity. The user can then add a unique tag to both, move a duplicate to the trash, or ignore the duplicates.
 
 #### Batch Tagging (`zotero_batch_tag.js`)
-- Tags are a very useful feature of Zotero and managing them can become very complicated.
+- Tags are a very useful feature of Zotero, and managing them can become very complicated.
 - This script allows users to add, remove, or replace tags on multiple items, with options to select items from the current collection, saved searches, or selected items.
 
 #### Text Case Conversion (`zotero-text-case.js`)
-- Zotero has a built-in feature to change an item's title to `Title Case` or `Sentence Case`. However, these options do not handle edge cases well such as abbreviations and acronyms. Additionally, there is no option for `Upper Case` or `Lower Case`.
+- Zotero has a built-in feature to change an item's title to `Title Case` or `Sentence Case`. However, these options do not handle edge cases well, such as abbreviations and acronyms. Additionally, there is no option for `Upper Case` or `Lower Case`.
 - This script converts the titles of multiple items to `Title Case`, `Sentence Case`, `Upper Case`, or `Lower Case`, using a custom capitalization dictionary for specific terms and acronyms. The user can add and remove terms from the custom dictionary in the script. The script conforms to the APA rules for `Title Case`. 
 
 #### Attachment Rename (`zotero_attachment_rename.js`)
@@ -56,5 +56,3 @@ Contributions are welcome! Please feel free to submit a Pull Request or open an 
 ## License
 
 This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
-
-Here is the updated README with short descriptions for each of the scripts:
