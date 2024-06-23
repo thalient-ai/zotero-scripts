@@ -6,8 +6,7 @@
 
         // Dictionary of specific words or terms that should be capitalized
         const customCapitalization = {
-			// General Terms 
-			'nist': 'NIST',
+            'nist': 'NIST',
             'nerc': 'NERC',
             'fips': 'FIPS',
             'sha-3': 'SHA-3',
@@ -89,13 +88,11 @@
 
         // Utility function to convert a string to title case based on specified rules
         function toTitleCase(str) {
-            const lowerCaseWords = ["a", "an", "and", "as", "at", "but", "by", "for", "if", "in", "nor", "of", "on", "or", "so", "the", "to", "up", "yet"];
+            const lowerCaseWords = ["a", "an", "and", "as", "at", "but", "by", "for", "if", "nor", "of", "on", "or", "so", "the", "to", "up", "yet"];
             const separators = ['-', ':', '–', '/'];
 
-            // Split by spaces to process each word
             let words = str.split(' ');
 
-            // Process each word in the title
             for (let i = 0; i < words.length; i++) {
                 let word = words[i];
                 const lowerWord = word.toLowerCase();
@@ -106,45 +103,27 @@
                     continue;
                 }
 
-                // Capitalize the first word, words following a special character, and words not in the lowercase words list
-                if (i === 0 || !lowerCaseWords.includes(lowerWord) || isFollowingSpecialChar(words, i)) {
-                    // Handle parentheses content
-                    if (word.includes('(') || word.includes(')')) {
-                        let parts = word.split(/([()])/);
-                        words[i] = parts.map(part => part.match(/[()]/) ? part : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join('');
-                    } else {
-                        words[i] = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-                    }
+                // Capitalize the first and last word, words following a special character, and major words
+                if (i === 0 || i === words.length - 1 || !lowerCaseWords.includes(lowerWord) || isFollowingSpecialChar(words, i) || word.length >= 4) {
+                    words[i] = capitalizeHyphenated(word);
                 } else {
-                    words[i] = word.toLowerCase();
+                    words[i] = lowerWord;
                 }
             }
 
-            // Ensure capitalization after separators without adding or removing spaces
-            for (let sep of separators) {
-                let regex = new RegExp(`(${escapeRegExp(sep)})(\\w+)`, 'g');
-                str = words.join(' ').replace(regex, (match, p1, p2) => {
-                    const replacement = p1 + (customCapitalization[p2.toLowerCase()] || p2.charAt(0).toUpperCase() + p2.slice(1));
-                    return replacement;
-                });
-            }
+            return words.join(' ');
+        }
 
-            // Handle custom capitalization explicitly for terms with separators
-            str = str.split(' ').map(word => {
-                return word.split(/([-/])/).map(part => {
-                    const lowerPart = part.toLowerCase();
-                    return customCapitalization[lowerPart] || part;
-                }).join('');
-            }).join(' ');
-
-            return str;
+        // Function to capitalize both parts of a hyphenated word
+        function capitalizeHyphenated(word) {
+            return word.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join('-');
         }
 
         // Check if the word follows a special character (-, :, –, or /)
         function isFollowingSpecialChar(arr, index) {
             if (index > 0) {
                 const prevWord = arr[index - 1];
-                return ['-', ':', '–', '/'].some(separator => prevWord.endsWith(separator));
+                return separators.some(separator => prevWord.endsWith(separator));
             }
             return false;
         }
@@ -306,3 +285,4 @@
         }
     }
 })();
+
