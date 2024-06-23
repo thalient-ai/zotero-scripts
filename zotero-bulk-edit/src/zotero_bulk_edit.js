@@ -1,6 +1,6 @@
 (async function() {
     const startTime = performance.now();
-    
+
     // Field definitions
     const fields = [
         { "field": "abstractNote", "localized": "Abstract" },
@@ -117,15 +117,15 @@
         { "field": "websiteTitle", "localized": "Website Title" },
         { "field": "websiteType", "localized": "Website Type" }
     ];
-    
+
     // Sort fields alphabetically by localized name
     fields.sort((a, b) => a.localized.localeCompare(b.localized));
-    
+
     // Function to escape special characters for regular expressions
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
-    
+
     // Function to prompt user to select a field with autocomplete suggestions
     function autocompletePrompt(promptText, suggestions) {
         let input = "";
@@ -153,7 +153,7 @@
             }
         }
     }
-    
+
     // Function to get items to edit based on user selection
     async function getItemsToEdit(editOption) {
         const zoteroPane = Zotero.getActiveZoteroPane();
@@ -195,7 +195,7 @@
             return selectedItems;
         }
     }
-    
+
     // Function to update creator names
     async function updateCreators(fieldName, itemsToEdit, searchRegex, replace) {
         let deletionConfirmed = false;
@@ -263,7 +263,7 @@
 
         alert("The names were successfully updated.");
     }
-    
+
     // Function to update notes
     async function updateNotes(itemsToEdit, searchRegex, replace) {
         await Zotero.DB.executeTransaction(async function() {
@@ -280,9 +280,9 @@
         });
         alert("Notes updated.");
     }
-    
+
     // Function to update field values
-    async function updateFieldValues(fieldName, itemsToEdit, searchRegex, replace) {
+    async function updateFieldValues(fieldName, selectedField, itemsToEdit, searchRegex, replace) {
         let idsCorrect = [];
         for (let item of itemsToEdit) {
             let fieldValue = item.getField(fieldName) || "";
@@ -322,7 +322,7 @@
         });
         alert(`${idsCorrect.length} item(s) updated successfully.\n\nThe specified search term was replaced in the "${selectedField.localized}" field.`);
     }
-    
+
     function logTime(label, time) {
         try {
             console.log(`${label}: ${(time / 1000).toFixed(2)} seconds`);
@@ -330,7 +330,7 @@
             console.error(`Failed to log time for ${label}: ${error.message}`);
         }
     }
-    
+
     try {
         // Start the field selection process
         const selectedField = autocompletePrompt("Start typing the field name:", fields);
@@ -340,7 +340,7 @@
         }
         const fieldName = selectedField.field;
         alert(`Field "${selectedField.localized}" selected.`);
-        
+
         if (fieldName === "note") {
             alert("Warning: Only selected Notes can be edited. Ensure you have selected the notes you wish to edit.");
         }
@@ -399,7 +399,7 @@
             } else if (fieldName === "note") {
                 await updateNotes(itemsToEdit, searchRegex, replace);
             } else {
-                await updateFieldValues(fieldName, itemsToEdit, searchRegex, replace);
+                await updateFieldValues(fieldName, selectedField, itemsToEdit, searchRegex, replace);
             }
         } catch (error) {
             alert(`An error occurred during the update process: ${error.message}`);
