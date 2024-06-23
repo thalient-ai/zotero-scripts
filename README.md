@@ -6,12 +6,12 @@ This repository contains a collection of custom scripts designed to enhance the 
 
 | Script | Description | Script README | Script Link |
 | --- | --- | --- | --- |
-| **Attachment Backup (`attachment_backup.js`)** | Backs up attachments from selected Zotero items to a specified folder. | [README](link-to-attachment-backup-readme) | [Script](link-to-attachment-backup-script) |
-| **Duplicate Enhanced (`duplicate_enhanced.js`)** | Detects and handles duplicate items in your Zotero library based on customizable similarity thresholds and weights. | [README](link-to-duplicate-enhanced-readme) | [Script](link-to-duplicate-enhanced-script) |
-| **Batch Tagging (`zotero_batch_tag.js`)** | Allows batch tagging operations on selected Zotero items. | [README](link-to-batch-tagging-readme) | [Script](link-to-batch-tagging-script) |
-| **Text Case Conversion (`zotero-text-case.js`)** | Converts the case of titles for selected Zotero items. | [README](link-to-text-case-conversion-readme) | [Script](link-to-text-case-conversion-script) |
-| **Attachment Rename (`zotero_attachment_rename.js`)** | Renames attachment filenames and/or titles based on the parent item's metadata. | [README](link-to-attachment-rename-readme) | [Script](link-to-attachment-rename-script) |
-| **Bulk Edit (`zotero_bulk_edit.js`)** | Facilitates bulk editing of Zotero item fields. | [README](link-to-bulk-edit-readme) | [Script](link-to-bulk-edit-script) |
+| **Attachment Backup (`attachment_backup.js`)** | Backs up attachments from selected Zotero items to a specified folder. | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-attachment-backup) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-backup/src/attachment_backup.js) |
+| **Duplicate Enhanced (`duplicate_enhanced.js`)** | Detects and handles duplicate items in your Zotero library based on customizable similarity thresholds and weights. | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-duplicate-enhanced) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-duplicate-enhanced/src/duplicate_enhanced.js) |
+| **Batch Tagging (`zotero_batch_tag.js`)** | Allows batch tagging operations on selected Zotero items. | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-batch-tag) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-batch-tag/src/zotero_batch_tag.js) |
+| **Text Case Conversion (`zotero-text-case.js`)** | Converts the case of titles for selected Zotero items. | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-text-case) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-text-case/src/zotero-text-case.js) |
+| **Attachment Rename (`zotero_attachment_rename.js`)** | Renames attachment filenames and/or titles based on the parent item's metadata. | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-attachment-rename) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-rename/src/zotero_attachment_rename.js) |
+| **Bulk Edit (`zotero_bulk_edit.js`)** | Facilitates bulk editing of Zotero item fields. | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-bulk-edit) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-bulk-edit/src/zotero_bulk_edit.js) |
 
 ## Usage
 
