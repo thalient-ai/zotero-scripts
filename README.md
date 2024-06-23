@@ -18,7 +18,7 @@ This repository contains a collection of custom scripts designed to enhance the 
 1. Download the desired script(s) from this repository.
 2. Open Zotero.
 3. Go to `Tools > Developer > Run JavaScript`.
-4. Copy and paste the script content into the Zotero JavaScript console.
+4. Copy and paste the script content into the Zotero JavaScript console. The `.js` files can be opened in a text editor like Notepad++.
 5. Press `Run`.
 
 If you clone or fork the repository, you can add the scripts (.js) to your Zotero library by going to `File` -> `Add Attachment` -> `Add Link to File...`. This will add the script to your library, but pull it from your local GitHub directory.
