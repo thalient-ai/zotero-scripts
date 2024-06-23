@@ -22,15 +22,27 @@ This script helps manage tags within your Zotero library by allowing you to perf
 
 1. **Select Items**:
    - The script prompts you to choose items to process: selected items, items in the current collection, or items from a saved search.
+   
+![Screenshot](doc/tag_01.png)
 
 2. **Choose Operation**:
    - Add a Tag: Prompts for the tag to be added and applies it to the selected items.
    - Remove a Tag: Prompts for the tag to be removed, confirms the action, and removes it from the selected items.
    - Replace a Tag: Prompts for the old tag and the new tag, confirms the action, and replaces the old tag with the new tag in the selected items.
+   
+![Screenshot](doc/tag_02.png)
+
+![Screenshot](doc/tag_03.png)
+
+![Screenshot](doc/tag_04.png)
+
+![Screenshot](doc/tag_05.png)
 
 3. **Confirmation and Progress**:
    - For remove and replace operations, the script provides a confirmation prompt with details on the number of items affected.
    - The script logs detailed progress and actions taken for each item.
+   
+![Screenshot](doc/tag_06.png)
 
 ## Example
 

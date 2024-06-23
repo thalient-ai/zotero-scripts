@@ -25,8 +25,20 @@ To back up attachments from selected items:
 1. Select the items in Zotero.
 2. Run the script.
 3. Choose the option to process selected items.
+
+![Screenshot](doc/backup_01.png)
+
 4. Select the destination folder for the backup.
+
+![Screenshot](doc/backup_02.png)
+
 5. Confirm the backup operation.
+
+![Screenshot](doc/backup_03.png)
+
+![Screenshot](doc/backup_04.png)
+
+![Screenshot](doc/backup_05.png)
 
 ## Detailed Script Description
 
