@@ -49,7 +49,12 @@ The script performs the following steps:
 
 - Provides detailed error messages and logs them to the console.
 - Prompts the user if invalid options are selected.
-- Ensures valid folder paths are selected and handles long path names.
+- Ensures valid folder paths are selected and handles long path names
+
+## Compatibility
+All scripts were written for Zotero 7
+
+![Screenshot](doc/zotero_version.png)
 
 ## Contributing
 

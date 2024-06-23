@@ -126,6 +126,15 @@ In this example, we will update both the attachment title and filenames for sele
 
     ![Screenshot](doc/rename_9.png)
 
+## Compatibility
+All scripts were written for Zotero 7
+
+![Screenshot](doc/zotero_version.png)
+
 ## Contributing
 
-Contributions are welcome! Feel free to open an issue or submit a pull request.
+Contributions are welcome! Please feel free to submit a Pull Request or open an issue if you have any suggestions or find any bugs.
+
+## License
+
+This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.

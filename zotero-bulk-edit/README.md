@@ -289,7 +289,15 @@ Zotero handles item fields, creator names, and notes differently due to their di
 - **Creator Names**: Requires transaction management, validation checks, and potential deletion if fields are empty post-editing to maintain data integrity.
 - **Notes**: Bulk edits require handling rich text content, preserving formatting, and managing multiple notes per item. Bulk editing notes follows the same search and replace principles but needs to manage potential formatting issues.
 
-### Summary:
-- **Item Fields**: Bulk edits are straightforward and involve replacing text in single-value fields.
-- **Creator Names**: Editing involves managing multiple components and ensuring data integrity through validation and transaction management.
-- **Notes**: Bulk edits require handling rich text content, preserving formatting, and managing multiple notes per item.
+## Compatibility
+All scripts were written for Zotero 7
+
+![Screenshot](doc/zotero_version.png)
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request or open an issue if you have any suggestions or find any bugs.
+
+## License
+
+This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.

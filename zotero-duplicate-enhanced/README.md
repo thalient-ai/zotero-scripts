@@ -69,10 +69,15 @@ These weights can be adjusted to meet your needs. The script normalizes these we
 
 After running the script, you will see prompts asking you to select items and set the similarity threshold. The script will then process the items, log potential duplicates, and prompt you to take action on each detected duplicate.
 
+## Compatibility
+All scripts were written for Zotero 7
+
+![Screenshot](doc/zotero_version.png)
+
 ## Contributing
 
-Contributions are welcome! Please fork the repository and create a pull request with your changes.
+Contributions are welcome! Please feel free to submit a Pull Request or open an issue if you have any suggestions or find any bugs.
 
-## Acknowledgements
+## License
 
-Special thanks to the Zotero community for their support and contributions.
+This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.

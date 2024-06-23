@@ -49,10 +49,15 @@ This script helps manage tags within your Zotero library by allowing you to perf
    - Script prompts for the old tag and the new tag.
    - Script confirms the action, replaces the old tag with the new tag in all relevant items, and logs the progress.
 
+## Compatibility
+All scripts were written for Zotero 7
+
+![Screenshot](doc/zotero_version.png)
+
 ## Contributing
 
-Contributions are welcome! Please fork the repository and create a pull request with your changes. For major changes, please open an issue first to discuss what you would like to change.
+Contributions are welcome! Please feel free to submit a Pull Request or open an issue if you have any suggestions or find any bugs.
 
-## Acknowledgements
+## License
 
-Special thanks to the Zotero community for their support and contributions.
+This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.

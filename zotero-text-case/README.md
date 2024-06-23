@@ -101,6 +101,11 @@ The script performs the following steps:
 - `escapeRegExp(string)`: Escapes special characters for regular expressions.
 - `logTime(label, time)`: Logs the time taken for each operation.
 
+## Compatibility
+All scripts were written for Zotero 7
+
+![Screenshot](doc/zotero_version.png)
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request or open an issue if you have any suggestions or find any bugs.
