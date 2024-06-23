@@ -49,6 +49,11 @@ If you clone or fork the repository, you can add the scripts (.js) to your Zoter
 - In Zotero, there is no option to edit the fields or metadata of multiple items simultaneously. If you have a large library, you have to edit each item one by one.
 - This script allows you to bulk or batch edit the fields, notes, and authors for multiple items. The script allows users to choose the scope of items to edit (i.e., selected items, items in a collection, or items in a saved search). The script offers suggestions and autocomplete when choosing the field to edit. It also supports regular expressions for search and replace. 
 
+## Compatibility
+All scripts were written for Zotero 7
+
+![Screenshot](doc/zotero_version.png)
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request or open an issue if you have any suggestions or find any bugs.
