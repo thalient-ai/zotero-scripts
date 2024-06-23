@@ -20,13 +20,16 @@
             'it': 'IT',
             'sp': 'SP',
             'cmvp': 'CMVP',
-			'lte': 'LTE',
-			'v2x': 'V2X',
-			'v2v': 'V2V',
-			'stpa': 'STPA',
-			'asil': 'ASIL',
-			'eee': 'EEE',
-			'nacs': 'NACS',
+            'lte': 'LTE',
+            'v2x': 'V2X',
+            'v2v': 'V2V',
+            'stpa': 'STPA',
+            'asil': 'ASIL',
+            'eee': 'EEE',
+            'nacs': 'NACS',
+            'iso': 'ISO',
+            'iec': 'IEC',
+            'iacs': 'IACS',
             // Add more terms as needed
         };
 
@@ -34,44 +37,67 @@
         function toTitleCase(str) {
             const lowerCaseWords = ["a", "an", "and", "as", "at", "but", "by", "for", "if", "in", "nor", "of", "on", "or", "so", "the", "to", "up", "yet"];
             const separators = ['-', ':', '–', '/'];
-            let result = str.split(' ').map((word, index, arr) => {
+
+            // Split by spaces to process each word
+            let words = str.split(' ');
+
+            // Process each word in the title
+            for (let i = 0; i < words.length; i++) {
+                let word = words[i];
                 const lowerWord = word.toLowerCase();
+
+                // Handle custom capitalization
                 if (customCapitalization[lowerWord]) {
-                    return customCapitalization[lowerWord];
+                    words[i] = customCapitalization[lowerWord];
+                    continue;
                 }
-                if (index === 0 || !lowerCaseWords.includes(lowerWord) || isFollowingSpecialChar(arr, index)) {
+
+                // Capitalize the first word, words following a special character, and words not in the lowercase words list
+                if (i === 0 || !lowerCaseWords.includes(lowerWord) || isFollowingSpecialChar(words, i)) {
                     // Handle parentheses content
                     if (word.includes('(') || word.includes(')')) {
                         let parts = word.split(/([()])/);
-                        return parts.map(part => {
-                            return part.match(/[()]/) ? part : part.toUpperCase();
-                        }).join('');
+                        words[i] = parts.map(part => part.match(/[()]/) ? part : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join('');
                     } else {
-                        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                        words[i] = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
                     }
                 } else {
-                    return word.toLowerCase();
+                    words[i] = word.toLowerCase();
                 }
-            }).join(' ');
+            }
 
             // Ensure capitalization after separators without adding or removing spaces
-            separators.forEach(separator => {
-                let regex = new RegExp(`(${separator}\\s*)(\\w)`, 'g');
-                result = result.replace(regex, (match, p1, p2) => {
-                    return p1 + p2.toUpperCase();
+            for (let sep of separators) {
+                let regex = new RegExp(`(${escapeRegExp(sep)})(\\w+)`, 'g');
+                str = words.join(' ').replace(regex, (match, p1, p2) => {
+                    const replacement = p1 + (customCapitalization[p2.toLowerCase()] || p2.charAt(0).toUpperCase() + p2.slice(1));
+                    return replacement;
                 });
-            });
+            }
 
-            return result;
+            // Handle custom capitalization explicitly for terms with separators
+            str = str.split(' ').map(word => {
+                return word.split(/([-/])/).map(part => {
+                    const lowerPart = part.toLowerCase();
+                    return customCapitalization[lowerPart] || part;
+                }).join('');
+            }).join(' ');
+
+            return str;
         }
 
-        // Check if the word follows a special character (-, :, or –)
+        // Check if the word follows a special character (-, :, –, or /)
         function isFollowingSpecialChar(arr, index) {
             if (index > 0) {
                 const prevWord = arr[index - 1];
-                return prevWord.endsWith('-') || prevWord.endsWith(':') || prevWord.endsWith('–');
+                return ['-', ':', '–', '/'].some(separator => prevWord.endsWith(separator));
             }
             return false;
+        }
+
+        // Utility function to escape special characters for regular expressions
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
 
         // Utility function to convert a string to sentence case
