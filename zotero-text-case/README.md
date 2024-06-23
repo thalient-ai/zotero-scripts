@@ -1,7 +1,3 @@
-Based on the style of the provided README.md and the contents of the `zotero-text-case.js` script, here is a detailed README for `zotero-text-case.js`:
-
----
-
 # Text Case Conversion Script
 
 This script converts the case of titles for selected Zotero items to Title Case, Sentence Case, Upper Case, or Lower Case.
@@ -74,7 +70,3 @@ Contributions are welcome! Please feel free to submit a Pull Request or open an 
 ## License
 
 This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
-
----
-
-Feel free to customize the content further based on your specific needs and preferences.
