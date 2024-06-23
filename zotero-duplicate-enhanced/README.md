@@ -1,42 +1,65 @@
-# Zotero Enhanced Duplicate Detector
+# Duplicate Enhanced Script
 
-This script helps you find and manage duplicate entries in your Zotero library. By comparing various fields such as title, creators, and publication details, it calculates the similarity between items and identifies potential duplicates.
+This script detects and handles duplicate items in your Zotero library based on customizable similarity thresholds and weights.
 
 ## Features
 
-- **Similarity Calculation**: Compares items based on fields like title, creators, date, and more.
-- **Batch Processing**: Efficiently handles large libraries by processing items in batches.
-- **User Interaction**: Prompts you to take actions on detected duplicates.
-- **Customizable Weights**: Allows you to adjust the importance of each field in the similarity calculation.
+- **Scope Selection**: Prompts the user to select the scope of items to process (selected items, items in the current collection, or items in a saved search).
+- **Customizable Weights**: Allows the user to set weights for different metadata fields used in the similarity calculation.
+- **Similarity Threshold**: Prompts the user to set a similarity threshold for detecting duplicates.
+- **Detailed Logging**: Logs the time taken for each operation and provides detailed error handling and messages.
+- **User Actions**: Prompts the user to choose actions for detected duplicates (tagging, moving to trash, ignoring, or stopping processing).
 
-## Installation
+## Usage
 
-1. Download the script file: [zotero-duplicate-enhanced](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-duplicate-enhanced/src/duplicate_enhanced.js)
+1. **Download the Script**: Download `duplicate_enhanced.js` from the repository.
+2. **Open Zotero**: Launch the Zotero application.
+3. **Run JavaScript**:
+    - Go to `Tools > Developer > Run JavaScript`.
+    - Copy and paste the content of `duplicate_enhanced.js` into the Zotero JavaScript console.
+    - Press `Run`.
 
-2. Open Zotero and navigate to `Tools -> Developer -> Run JavaScript`.
+### Example
 
-3. Copy and paste the contents of `duplicate_enhanced.js` into the console and run the script.
+To detect and handle duplicates in selected items:
 
-## How It Works
+1. Select the items in Zotero.
+2. Run the script.
+3. Choose the option to process selected items.
 
-1. **Selecting Items**:
-   - The script prompts you to choose items to process: selected items, items in the current collection, or items from a saved search.
+![Screenshot](doc/dup_01.png)
 
-2. **Setting the Threshold**:
-   - You'll be asked to enter a similarity threshold between 0 and 1 (e.g., 0.6 for 60% similarity). This threshold determines how similar items must be to be considered duplicates.
+4. Set the similarity threshold for detecting duplicates and review weights used for similarity calculation.
 
-3. **Processing Items**:
-   - The script processes items in batches, calculating similarity based on the fields you specified. It logs potential duplicates for review.
+![Screenshot](doc/dup_02.png)
 
-4. **Handling Duplicates**:
-   - When potential duplicates are found, you can choose to:
-     - Add a tag to both items (e.g., `duplicate-pair-timestamp`).
-     - Move one of the items to the trash.
-     - Ignore the potential duplicate.
+5. If you need to adjust the weights, edit the script here and re-run.
 
-## Key Problem with Zotero's Duplicate Detection
+![Screenshot](doc/dup_05.png)
 
-Zotero currently uses the title, DOI, and ISBN fields to determine duplicates. If these fields match (or are absent), Zotero also compares the years of publication (if they are within a year of each other) and author/creator lists (if at least one author last name plus first initial matches) to determine duplicates. This can miss duplicates where these fields differ slightly but the items are otherwise identical.
+6. Handle detected duplicates by choosing actions (tagging, moving to trash, ignoring, or stopping processing).
+
+![Screenshot](doc/dup_03.png)
+
+![Screenshot](doc/dup_04.png)
+
+
+## Detailed Script Description
+
+The script performs the following steps:
+
+1. **Initialization**: Logs the start time and sets up the Zotero pane.
+2. **Scope Selection**: Prompts the user to select the scope of items to process.
+    - Options: Selected items, items in the current collection, or items in a saved search.
+3. **Retrieve Items**: Retrieves items based on the user’s selection.
+4. **Set Weights**: Allows the user to set weights for different metadata fields used in the similarity calculation.
+5. **Similarity Threshold**: Prompts the user to set a similarity threshold for detecting duplicates.
+6. **Duplicate Detection**:
+    - Normalizes item fields.
+    - Calculates similarity between items using Jaccard similarity for each field.
+    - Detects potential duplicates based on the similarity threshold.
+7. **User Actions**: Prompts the user to choose actions for detected duplicates (tagging, moving to trash, ignoring, or stopping processing).
+8. **Completion**: Logs completion time and alerts the user that the duplicate detection process is complete.
 
 ## How the Script Calculates Similarity
 
@@ -65,9 +88,19 @@ Each field is given a weight to determine its importance in the similarity calcu
 
 These weights can be adjusted to meet your needs. The script normalizes these weights to ensure they sum to 1. The similarity is calculated using the Jaccard similarity index, which compares the overlap between the fields of two items. The combined similarity score is then used to identify potential duplicates.
 
-## Example
+## Functions Overview
 
-After running the script, you will see prompts asking you to select items and set the similarity threshold. The script will then process the items, log potential duplicates, and prompt you to take action on each detected duplicate.
+- `logTime(label, time)`: Logs the time taken for each operation.
+- `normalizeWeights(weights)`: Normalizes the weights for different metadata fields.
+- `getUserInputThreshold(weights)`: Prompts the user to set the similarity threshold.
+- `detectPotentialDuplicatesOptimized(items, threshold, weights)`: Detects potential duplicates based on the similarity threshold and weights.
+- `normalizeItemFields(item, weights)`: Normalizes the fields of an item.
+- `normalizeField(field)`: Normalizes a single field.
+- `normalizeCreators(creators)`: Normalizes the creators' field.
+- `calculateSimilarity(item1, item2, weights)`: Calculates the similarity between two items.
+- `jaccardSimilarity(str1, str2)`: Calculates the Jaccard similarity between two strings.
+- `handleDetectedDuplicates(duplicates)`: Handles detected duplicates based on user actions.
+- `getItemsToEdit()`: Retrieves items based on the user's scope selection.
 
 ## Compatibility
 All scripts were written for Zotero 7
