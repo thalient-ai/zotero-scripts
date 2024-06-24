@@ -1,6 +1,6 @@
 # Text Case Conversion Script
 
-This script converts the case of titles for selected Zotero items to Title Case, Sentence Case, Upper Case, or Lower Case.
+This script converts the case of titles and/or short titles for selected items to Title Case, Sentence Case, Upper Case, or Lower Case.
 
 ## Features
 
