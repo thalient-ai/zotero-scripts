@@ -44,6 +44,10 @@ To convert the case of titles in selected items:
 
 ![Screenshot](doc/tcase_02.png)
 
+5. Select whether you wish to apply the changes to the Title field, Short Title field, or both.
+
+![Screenshot](doc/tcase_05.png)
+
 ![Screenshot](doc/tcase_03.png)
 
 There is logic in the script to treat any text within `( )` as a potential abbreviation or acronym. When this is detected, you'll be prompted if the entirety of that text should be upper case.
