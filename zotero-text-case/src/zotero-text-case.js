@@ -1,6 +1,6 @@
 (async function() {
     const startTime = performance.now();
-    const promptedValues = new Set(); // Set to keep track of prompted values
+    const promptedValues = new Map(); // Map to keep track of prompted values and user responses
 
     try {
         const zoteroPane = Zotero.getActiveZoteroPane();
@@ -131,12 +131,14 @@
                 if (customCapitalization[lowerP1]) {
                     return `(${customCapitalization[lowerP1]})`;
                 }
-                if (p1 !== p1.toUpperCase() && !promptedValues.has(lowerP1)) {
+                if (promptedValues.has(lowerP1)) {
+                    return `(${promptedValues.get(lowerP1)})`;
+                }
+                if (p1 !== p1.toUpperCase()) {
                     const userResponse = confirm(`Do you want to convert "${p1}" to uppercase in the title "${title}"? (Prompt ${currentIndex} of ${totalCount})`);
-                    promptedValues.add(lowerP1);
-                    if (userResponse) {
-                        return `(${p1.toUpperCase()})`;
-                    }
+                    const userResponseValue = userResponse ? p1.toUpperCase() : p1;
+                    promptedValues.set(lowerP1, userResponseValue);
+                    return `(${userResponseValue})`;
                 }
                 return match;
             });
