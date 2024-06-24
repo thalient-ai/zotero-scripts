@@ -1,5 +1,6 @@
 (async function() {
     const startTime = performance.now();
+    const promptedValues = new Set(); // Set to keep track of prompted values
 
     try {
         const zoteroPane = Zotero.getActiveZoteroPane();
@@ -130,8 +131,9 @@
                 if (customCapitalization[lowerP1]) {
                     return `(${customCapitalization[lowerP1]})`;
                 }
-                if (p1 !== p1.toUpperCase()) {
+                if (p1 !== p1.toUpperCase() && !promptedValues.has(lowerP1)) {
                     const userResponse = confirm(`Do you want to convert "${p1}" to uppercase in the title "${title}"? (Prompt ${currentIndex} of ${totalCount})`);
+                    promptedValues.add(lowerP1);
                     if (userResponse) {
                         return `(${p1.toUpperCase()})`;
                     }
@@ -207,6 +209,18 @@
             }
         }
 
+        // Function to get a valid input for the field(s) to edit
+        async function getValidFieldOption() {
+            while (true) {
+                const fieldOption = prompt("Enter '1' to edit Title field, '2' to edit Short Title field, '3' to edit both:");
+                if (['1', '2', '3'].includes(fieldOption)) {
+                    return fieldOption;
+                } else {
+                    alert(`Invalid option: "${fieldOption}". Please enter '1', '2', or '3'.`);
+                }
+            }
+        }
+
         const editOption = await getValidEditOption();
         logTime("Time to get valid edit option", performance.now() - startTime);
 
@@ -219,6 +233,9 @@
 
         const caseOption = await getValidCaseOption();
         logTime("Time to get valid case option", performance.now() - startTime);
+
+        const fieldOption = await getValidFieldOption();
+        logTime("Time to get valid field option", performance.now() - startTime);
 
         let caseFunction;
         switch (caseOption) {
@@ -248,14 +265,20 @@
         const batchEditPromises = [];
         for (let index = 0; index < itemsToEdit.length; index++) {
             const item = itemsToEdit[index];
-            if (!item.isNote() && item.getField('title')) {
-                batchEditPromises.push((async () => {
+            if (!item.isNote()) {
+                if (fieldOption === '1' || fieldOption === '3') {
                     const oldTitle = item.getField('title');
                     const newTitle = caseFunction(oldTitle, index + 1, itemsToEdit.length);
                     item.setField('title', newTitle);
-                    await item.saveTx();
-                    console.log(`Updated item ${item.id}: "${oldTitle}" to "${newTitle}"`);
-                })());
+                    console.log(`Updated title of item ${item.id}: "${oldTitle}" to "${newTitle}"`);
+                }
+                if (fieldOption === '2' || fieldOption === '3') {
+                    const oldShortTitle = item.getField('shortTitle');
+                    const newShortTitle = caseFunction(oldShortTitle, index + 1, itemsToEdit.length);
+                    item.setField('shortTitle', newShortTitle);
+                    console.log(`Updated short title of item ${item.id}: "${oldShortTitle}" to "${newShortTitle}"`);
+                }
+                batchEditPromises.push(item.saveTx());
             }
         }
 
