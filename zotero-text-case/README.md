@@ -22,7 +22,8 @@ This script converts the case of titles for selected Zotero items to Title Case,
 ### Example
 
 To convert the case of titles in selected items:
-0. If needed, edit the script with the terms, abbreviations, acronyms, or other text that should be fully upper case.
+
+0. If needed, edit the script with the terms, abbreviations, acronyms, or other text that should have customized capitalization.
 
 ![Screenshot](doc/tcase_dic.png)
 
