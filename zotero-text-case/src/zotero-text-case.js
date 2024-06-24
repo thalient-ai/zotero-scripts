@@ -9,6 +9,12 @@
         const customCapitalization = {
             'nist': 'NIST',
             'nerc': 'NERC',
+			'bgp': 'BGP',
+			'ipsec': 'IPSec',
+			'vpns': 'VPNs',
+			'vpn': 'VPN',
+			'csf': 'CSF',
+			'piv': 'PIV',
             'fips': 'FIPS',
             'sha-3': 'SHA-3',
             'iscma': 'ISCMA',
@@ -125,23 +131,23 @@
                 }
             }
 
-            // Check for text within parentheses and prompt user if not already uppercase, except for custom capitalization terms
-            return words.join(' ').replace(/\(([^)]+)\)/g, function(match, p1) {
-                const lowerP1 = p1.toLowerCase();
-                if (customCapitalization[lowerP1]) {
-                    return `(${customCapitalization[lowerP1]})`;
-                }
-                if (promptedValues.has(lowerP1)) {
-                    return `(${promptedValues.get(lowerP1)})`;
-                }
-                if (p1 !== p1.toUpperCase()) {
-                    const userResponse = confirm(`Do you want to convert "${p1}" to uppercase in the title "${title}"? (Prompt ${currentIndex} of ${totalCount})`);
-                    const userResponseValue = userResponse ? p1.toUpperCase() : p1;
-                    promptedValues.set(lowerP1, userResponseValue);
-                    return `(${userResponseValue})`;
-                }
-                return match;
-            });
+			// Check for text within parentheses and prompt user if not already uppercase, except for custom capitalization terms
+			return words.join(' ').replace(/\(([^)]+)\)/g, function(match, p1) {
+				const lowerP1 = p1.toLowerCase();
+				if (customCapitalization[lowerP1]) {
+					return `(${customCapitalization[lowerP1]})`;
+				}
+				if (promptedValues.has(lowerP1)) {
+					return `(${promptedValues.get(lowerP1)})`;
+				}
+				if (p1 !== p1.toUpperCase()) {
+					const userResponse = confirm(`Do you want to convert "${p1}" to uppercase in the title "${title}"? Your response will be applied to all future occurrences of "${p1}". (Prompt ${currentIndex} of ${totalCount})`);
+					const userResponseValue = userResponse ? p1.toUpperCase() : p1;
+					promptedValues.set(lowerP1, userResponseValue);
+					return `(${userResponseValue})`;
+				}
+				return match;
+			});
         }
 
         // Function to capitalize both parts of a hyphenated or slashed word
