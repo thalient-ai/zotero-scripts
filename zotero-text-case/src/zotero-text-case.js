@@ -89,7 +89,7 @@
         // Utility function to convert a string to title case based on specified rules
         function toTitleCase(str, title, currentIndex, totalCount) {
             const lowerCaseWords = ["a", "an", "and", "as", "at", "but", "by", "for", "if", "nor", "of", "on", "or", "so", "the", "to", "up", "yet"];
-            const separators = ['-', ':', '–', '/', '/'];
+            const separators = ['-', ':', '–', '/', '"', '“', '”'];
 
             let words = str.split(' ');
 
@@ -97,22 +97,39 @@
                 let word = words[i];
                 const lowerWord = word.toLowerCase();
 
+                console.log(`Processing word: "${word}"`);
+
                 // Handle custom capitalization
                 if (customCapitalization[lowerWord]) {
                     words[i] = customCapitalization[lowerWord];
+                    console.log(`Custom capitalization applied: "${words[i]}"`);
                     continue;
                 }
 
                 // Capitalize the first and last word, words following a special character, and major words
                 if (i === 0 || i === words.length - 1 || !lowerCaseWords.includes(lowerWord) || isFollowingSpecialChar(words, i, separators) || word.length >= 4) {
                     words[i] = capitalizeHyphenatedAndSlashed(word);
+                    console.log(`Capitalized: "${words[i]}"`);
                 } else {
                     words[i] = lowerWord;
+                    console.log(`Lowercased: "${words[i]}"`);
                 }
             }
 
-            // Check for text within parentheses and prompt user if not already uppercase
+            // Ensure words following quotation marks are capitalized
+            for (let i = 0; i < words.length; i++) {
+                if (words[i].startsWith('"') && words[i].length > 1) {
+                    words[i] = '"' + capitalizeFirstLetter(words[i].slice(1));
+                    console.log(`Capitalized after quotation: "${words[i]}"`);
+                }
+            }
+
+            // Check for text within parentheses and prompt user if not already uppercase, except for custom capitalization terms
             return words.join(' ').replace(/\(([^)]+)\)/g, function(match, p1) {
+                const lowerP1 = p1.toLowerCase();
+                if (customCapitalization[lowerP1]) {
+                    return `(${customCapitalization[lowerP1]})`;
+                }
                 if (p1 !== p1.toUpperCase()) {
                     const userResponse = confirm(`Do you want to convert "${p1}" to uppercase in the title "${title}"? (Prompt ${currentIndex} of ${totalCount})`);
                     if (userResponse) {
@@ -129,10 +146,16 @@
             return word.split(new RegExp(`(${separators.join('|')})`)).map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join('');
         }
 
-        // Check if the word follows a special character (-, :, –, or /)
+        // Capitalize the first letter of a word
+        function capitalizeFirstLetter(word) {
+            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        }
+
+        // Check if the word follows a special character (-, :, –, /, ")
         function isFollowingSpecialChar(arr, index, separators) {
             if (index > 0) {
                 const prevWord = arr[index - 1];
+                console.log(`Previous word: "${prevWord}"`);
                 return separators.some(separator => prevWord.endsWith(separator));
             }
             return false;
