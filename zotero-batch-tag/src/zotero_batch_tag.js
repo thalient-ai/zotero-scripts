@@ -1,11 +1,6 @@
 (async function() {
     const startTime = performance.now();
 
-    // Utility function to sleep for a specified time (in milliseconds)
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
     // Function to get items to edit based on user selection
     async function getItemsToEdit() {
         const zoteroPane = Zotero.getActiveZoteroPane();
@@ -17,7 +12,6 @@
                 alert("No collection selected.");
                 return null;
             }
-            console.log(`Selected collection: ${collection.name}`);
             return await collection.getChildItems();
         } else if (editOption === '3') {
             let savedSearch = zoteroPane.getSelectedSavedSearch();
@@ -25,18 +19,14 @@
                 alert("No saved search selected.");
                 return null;
             }
-            console.log(`Selected saved search: ${savedSearch.name}`);
-
             let search = new Zotero.Search();
             search.libraryID = savedSearch.libraryID;
             search.addCondition('savedSearchID', 'is', savedSearch.id);
-
             let itemIDs = await search.search();
             if (itemIDs.length === 0) {
                 alert("No items found in the saved search.");
                 return null;
             }
-
             return await Zotero.Items.getAsync(itemIDs);
         } else {
             let selectedItems = zoteroPane.getSelectedItems();
@@ -44,9 +34,16 @@
                 alert("No items selected.");
                 return null;
             }
-            console.log(`Selected items: ${selectedItems.length}`);
             return selectedItems;
         }
+    }
+
+    // Function to log tags for items
+    function logTags(items) {
+        items.forEach(item => {
+            const tags = item.getTags().map(tag => tag.tag);
+            console.log(`Item ${item.id} has tags: ${tags.join(', ')}`);
+        });
     }
 
     // Function to add a tag to items
@@ -56,20 +53,20 @@
             return;
         }
 
-        let affectedItemsCount = 0;
-        for (let item of items) {
+        console.log(`Adding tag "${tag}" to ${items.length} item(s).`);
+
+        const promises = items.map(async item => {
             try {
-                console.log(`Adding tag "${tag}" to item: ${item.getField('title')}`);
                 item.addTag(tag);
                 await item.saveTx();
-                affectedItemsCount++;
-                await sleep(100);  // Adding a delay to avoid overwhelming the system
+                console.log(`Tag "${tag}" added to item ${item.id}.`);
             } catch (error) {
                 console.error(`Error adding tag to item ${item.id}: ${error.message}`);
             }
-        }
-        console.log(`Successfully added the tag "${tag}" to ${affectedItemsCount} item(s).`);
-        alert(`Successfully added the tag "${tag}" to ${affectedItemsCount} item(s).`);
+        });
+
+        await Promise.all(promises);
+        alert(`Successfully added the tag "${tag}" to ${items.length} item(s).`);
     }
 
     // Function to remove a tag from items
@@ -79,7 +76,6 @@
             return;
         }
 
-        let affectedItemsCount = 0;
         const itemsToRemoveTag = items.filter(item => {
             const tags = item.getTags().map(t => t.tag);
             return tags.includes(tag);
@@ -96,19 +92,20 @@
             return;
         }
 
-        for (let item of itemsToRemoveTag) {
+        console.log(`Removing tag "${tag}" from ${itemsToRemoveTag.length} item(s).`);
+
+        const promises = itemsToRemoveTag.map(async item => {
             try {
-                console.log(`Removing tag "${tag}" from item: ${item.getField('title')}`);
                 item.removeTag(tag);
                 await item.saveTx();
-                affectedItemsCount++;
-                await sleep(100);  // Adding a delay to avoid overwhelming the system
+                console.log(`Tag "${tag}" removed from item ${item.id}.`);
             } catch (error) {
                 console.error(`Error removing tag from item ${item.id}: ${error.message}`);
             }
-        }
-        console.log(`Tag "${tag}" removed from ${affectedItemsCount} item(s).`);
-        alert(`Tag "${tag}" removed from ${affectedItemsCount} item(s).`);
+        });
+
+        await Promise.all(promises);
+        alert(`Tag "${tag}" removed from ${itemsToRemoveTag.length} item(s).`);
     }
 
     // Function to replace a tag in items
@@ -118,24 +115,58 @@
             return;
         }
 
-        let affectedItemsCount = 0;
-        for (let item of items) {
+        const itemsToReplaceTag = items.filter(item => {
+            const tags = item.getTags().map(t => t.tag);
+            return tags.includes(oldTag);
+        });
+
+        if (itemsToReplaceTag.length === 0) {
+            alert(`No items found with the tag "${oldTag}".`);
+            return;
+        }
+
+        console.log(`Replacing tag "${oldTag}" with "${newTag}" in ${itemsToReplaceTag.length} item(s).`);
+
+        const promises = itemsToReplaceTag.map(async item => {
             try {
-                const tags = item.getTags().map(tag => tag.tag);
-                if (tags.includes(oldTag)) {
-                    console.log(`Replacing tag "${oldTag}" with "${newTag}" in item: ${item.getField('title')}`);
-                    item.removeTag(oldTag);
-                    item.addTag(newTag);
-                    await item.saveTx();
-                    affectedItemsCount++;
-                    await sleep(100);  // Adding a delay to avoid overwhelming the system
-                }
+                item.removeTag(oldTag);
+                item.addTag(newTag);
+                await item.saveTx();
+                console.log(`Tag "${oldTag}" replaced with "${newTag}" in item ${item.id}.`);
             } catch (error) {
                 console.error(`Error replacing tag in item ${item.id}: ${error.message}`);
             }
+        });
+
+        await Promise.all(promises);
+        alert(`Tag "${oldTag}" replaced with "${newTag}" in ${itemsToReplaceTag.length} item(s).`);
+    }
+
+    // Function to remove all tags from items
+    async function removeAllTagsFromItems(items) {
+        const confirmation = confirm(`You are about to remove all tags from ${items.length} item(s). Do you want to proceed?`);
+        if (!confirmation) {
+            alert("Operation canceled.");
+            return;
         }
-        console.log(`Tag "${oldTag}" replaced with "${newTag}" in ${affectedItemsCount} item(s).`);
-        alert(`Tag "${oldTag}" replaced with "${newTag}" in ${affectedItemsCount} item(s).`);
+
+        console.log(`Removing all tags from ${items.length} item(s).`);
+
+        const promises = items.map(async item => {
+            try {
+                const tags = item.getTags().map(tag => tag.tag);
+                for (const tag of tags) {
+                    item.removeTag(tag);
+                }
+                await item.saveTx();
+                console.log(`All tags removed from item ${item.id}.`);
+            } catch (error) {
+                console.error(`Error removing tags from item ${item.id}: ${error.message}`);
+            }
+        });
+
+        await Promise.all(promises);
+        alert(`All tags removed from ${items.length} item(s).`);
     }
 
     // Function to get all unique tags from items
@@ -166,7 +197,7 @@
         while (!selectedTag) {
             const choices = tags.map((tag, index) => `${index + 1}. ${tag}`).join("\n");
             const choice = prompt(`Select a tag by number or enter a new search term:\n\n${choices}`);
-            
+
             if (choice === null) {
                 alert("Operation canceled.");
                 return null;
@@ -203,7 +234,10 @@
             return;
         }
 
-        const action = prompt("Enter '1' to add a tag, '2' to remove a tag, or '3' to replace a tag:");
+        console.log(`Total items to edit: ${items.length}`);
+        logTags(items);
+
+        const action = prompt("Enter '1' to add a tag, '2' to remove a tag, '3' to replace a tag, or '4' to remove all tags:");
         if (action === '1') {
             const tag = prompt("Enter the tag to add:");
             if (tag) {
@@ -232,6 +266,8 @@
                     alert("No new tag entered.");
                 }
             }
+        } else if (action === '4') {
+            await removeAllTagsFromItems(items);
         } else {
             alert("Invalid action.");
         }
