@@ -254,6 +254,40 @@
         alert(`Tags "${tags.join(', ')}" removed from ${contextDescription}.`);
     }
 
+    // Function to remove all tags except specified ones
+    async function removeAllExceptTagsFromItems(tagsToKeep, items, contextDescription) {
+        if (!tagsToKeep || tagsToKeep.length === 0) {
+            alert("No tags specified to keep.");
+            return;
+        }
+
+        const confirmation = confirm(`You are about to remove all tags except the following from ${contextDescription}: ${tagsToKeep.join(', ')}. Do you want to proceed?`);
+        if (!confirmation) {
+            alert("Operation canceled.");
+            return;
+        }
+
+        console.log(`Removing all tags except "${tagsToKeep.join(', ')}" from ${contextDescription}.`);
+
+        const promises = items.map(async item => {
+            try {
+                const itemTags = item.getTags().map(tag => tag.tag);
+                for (const tag of itemTags) {
+                    if (!tagsToKeep.includes(tag)) {
+                        item.removeTag(tag);
+                    }
+                }
+                await item.saveTx();
+                console.log(`Tags except "${tagsToKeep.join(', ')}" removed from item ${item.id}.`);
+            } catch (error) {
+                console.error(`Error removing tags from item ${item.id}: ${error.message}`);
+            }
+        });
+
+        await Promise.all(promises);
+        alert(`All tags except "${tagsToKeep.join(', ')}" removed from ${contextDescription}.`);
+    }
+
     function logTime(label, time) {
         try {
             console.log(`${label}: ${(time / 1000).toFixed(2)} seconds`);
@@ -270,7 +304,7 @@
 
         console.log(`Total items to edit: ${items.length}`);
 
-        const action = prompt("Enter '1' to add a tag, '2' to remove a tag, '3' to replace a tag, '4' to remove all tags, or '5' to remove multiple tags by search:");
+        const action = prompt("Enter '1' to add a tag, '2' to remove a tag, '3' to replace a tag, '4' to remove all tags, '5' to remove multiple tags by search, or '6' to remove all tags except specified ones:");
         if (action === '1') {
             const tag = prompt("Enter the tag to add:");
             if (tag) {
@@ -303,11 +337,19 @@
             await removeAllTagsFromItems(items);
         } else if (action === '5') {
             const allTags = getAllTags(items);
-            const searchTerm = prompt("Enter the tag search term or regular expression (e.g., 'temp*' to match 'temp', 'temporary', etc.):");
+            const searchTerm = prompt("Enter the tag search term (e.g., 'temp*' to match 'temp', 'temporary', etc.):");
             const matchingTags = searchTags(allTags, searchTerm);
             const selectedTags = selectTagsFromSearchResults(matchingTags);
             if (selectedTags) {
                 await removeSelectedTagsFromItems(selectedTags, items, contextDescription);
+            }
+        } else if (action === '6') {
+            const allTags = getAllTags(items);
+            const searchTerm = prompt("Enter the tag search term to keep (e.g., 'temp*' to match 'temp', 'temporary', etc.):");
+            const matchingTags = searchTags(allTags, searchTerm);
+            const tagsToKeep = selectTagsFromSearchResults(matchingTags);
+            if (tagsToKeep) {
+                await removeAllExceptTagsFromItems(tagsToKeep, items, contextDescription);
             }
         } else {
             alert("Invalid action.");
