@@ -303,7 +303,7 @@
             await removeAllTagsFromItems(items);
         } else if (action === '5') {
             const allTags = getAllTags(items);
-            const searchTerm = prompt("Enter the regex pattern to search for tags:");
+            const searchTerm = prompt("Enter the tag search term or regular expression (e.g., 'temp*' to match 'temp', 'temporary', etc.):");
             const matchingTags = searchTags(allTags, searchTerm);
             const selectedTags = selectTagsFromSearchResults(matchingTags);
             if (selectedTags) {
