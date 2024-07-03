@@ -6,13 +6,17 @@
         const zoteroPane = Zotero.getActiveZoteroPane();
         const editOption = prompt("Enter '1' to edit selected items, '2' to edit items in the current collection, or '3' to edit items in a saved search:");
 
+        let contextDescription = '';
+        let items;
+
         if (editOption === '2') {
             let collection = zoteroPane.getSelectedCollection();
             if (!collection) {
                 alert("No collection selected.");
                 return null;
             }
-            return await collection.getChildItems();
+            contextDescription = `items in the collection "${collection.name}"`;
+            items = await collection.getChildItems();
         } else if (editOption === '3') {
             let savedSearch = zoteroPane.getSelectedSavedSearch();
             if (!savedSearch) {
@@ -27,23 +31,70 @@
                 alert("No items found in the saved search.");
                 return null;
             }
-            return await Zotero.Items.getAsync(itemIDs);
+            contextDescription = `items in the saved search "${savedSearch.name}"`;
+            items = await Zotero.Items.getAsync(itemIDs);
         } else {
             let selectedItems = zoteroPane.getSelectedItems();
             if (!selectedItems.length) {
                 alert("No items selected.");
                 return null;
             }
-            return selectedItems;
+            contextDescription = 'selected items';
+            items = selectedItems;
         }
+
+        return { items, contextDescription };
     }
 
-    // Function to log tags for items
-    function logTags(items) {
-        items.forEach(item => {
-            const tags = item.getTags().map(tag => tag.tag);
-            console.log(`Item ${item.id} has tags: ${tags.join(', ')}`);
-        });
+    // Function to get all unique tags from items
+    function getAllTags(items) {
+        const tagSet = new Set();
+        for (const item of items) {
+            const tags = item.getTags();
+            for (const tag of tags) {
+                tagSet.add(tag.tag);
+            }
+        }
+        return Array.from(tagSet);
+    }
+
+    // Function to search for tags using regex
+    function searchTags(allTags, searchTerm) {
+        let regex;
+        if (searchTerm === "*") {
+            regex = new RegExp(".*", 'i');  // match all tags
+        } else {
+            regex = new RegExp(searchTerm, 'i');  // 'i' for case-insensitive search
+        }
+        return allTags.filter(tag => regex.test(tag));
+    }
+
+    // Function to prompt user to select tags from search results
+    function selectTagsFromSearchResults(tags) {
+        if (tags.length === 0) {
+            alert("No matching tags found.");
+            return null;
+        }
+
+        const choices = tags.map((tag, index) => `${index + 1}. ${tag}`).join("\n");
+        const choice = prompt(`Select tags by numbers separated by commas or enter a new search term:\n\n${choices}`);
+
+        if (choice === null) {
+            alert("Operation canceled.");
+            return null;
+        }
+
+        const selectedIndices = choice.split(',').map(str => parseInt(str.trim(), 10) - 1);
+        const selectedTags = selectedIndices
+            .filter(index => !isNaN(index) && index >= 0 && index < tags.length)
+            .map(index => tags[index]);
+
+        if (selectedTags.length === 0) {
+            alert("No valid tags selected.");
+            return null;
+        }
+
+        return selectedTags;
     }
 
     // Function to add a tag to items
@@ -169,55 +220,38 @@
         alert(`All tags removed from ${items.length} item(s).`);
     }
 
-    // Function to get all unique tags from items
-    function getAllTags(items) {
-        const tagSet = new Set();
-        for (const item of items) {
-            const tags = item.getTags();
-            for (const tag of tags) {
-                tagSet.add(tag.tag);
-            }
-        }
-        return Array.from(tagSet);
-    }
-
-    // Function to search for tags
-    function searchTags(allTags, searchTerm) {
-        return allTags.filter(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    }
-
-    // Function to prompt user to select a tag from search results
-    function selectTagFromSearchResults(tags) {
-        if (tags.length === 0) {
-            alert("No matching tags found.");
-            return null;
+    // Function to remove selected tags from items
+    async function removeSelectedTagsFromItems(tags, items, contextDescription) {
+        if (!tags || tags.length === 0) {
+            alert("No tags selected.");
+            return;
         }
 
-        let selectedTag = null;
-        while (!selectedTag) {
-            const choices = tags.map((tag, index) => `${index + 1}. ${tag}`).join("\n");
-            const choice = prompt(`Select a tag by number or enter a new search term:\n\n${choices}`);
+        const confirmation = confirm(`You are about to remove the following tags from ${contextDescription}: ${tags.join(', ')}. Do you want to proceed?`);
+        if (!confirmation) {
+            alert("Operation canceled.");
+            return;
+        }
 
-            if (choice === null) {
-                alert("Operation canceled.");
-                return null;
-            }
+        console.log(`Removing tags "${tags.join(', ')}" from ${contextDescription}.`);
 
-            const selectedIndex = parseInt(choice, 10);
-
-            if (!isNaN(selectedIndex) && selectedIndex > 0 && selectedIndex <= tags.length) {
-                selectedTag = tags[selectedIndex - 1];
-            } else {
-                const newTags = searchTags(tags, choice);
-                if (newTags.length > 0) {
-                    tags = newTags;
-                } else {
-                    alert("Invalid selection. Please enter a valid number or search term.");
+        const promises = items.map(async item => {
+            try {
+                const itemTags = item.getTags().map(tag => tag.tag);
+                for (const tag of tags) {
+                    if (itemTags.includes(tag)) {
+                        item.removeTag(tag);
+                    }
                 }
+                await item.saveTx();
+                console.log(`Tags "${tags.join(', ')}" removed from item ${item.id}.`);
+            } catch (error) {
+                console.error(`Error removing tags from item ${item.id}: ${error.message}`);
             }
-        }
+        });
 
-        return selectedTag;
+        await Promise.all(promises);
+        alert(`Tags "${tags.join(', ')}" removed from ${contextDescription}.`);
     }
 
     function logTime(label, time) {
@@ -229,15 +263,14 @@
     }
 
     try {
-        const items = await getItemsToEdit();
+        const { items, contextDescription } = await getItemsToEdit();
         if (!items) {
             return;
         }
 
         console.log(`Total items to edit: ${items.length}`);
-        logTags(items);
 
-        const action = prompt("Enter '1' to add a tag, '2' to remove a tag, '3' to replace a tag, or '4' to remove all tags:");
+        const action = prompt("Enter '1' to add a tag, '2' to remove a tag, '3' to replace a tag, '4' to remove all tags, or '5' to remove multiple tags by search:");
         if (action === '1') {
             const tag = prompt("Enter the tag to add:");
             if (tag) {
@@ -249,25 +282,33 @@
             const allTags = getAllTags(items);
             const searchTerm = prompt("Enter the tag to search for:");
             const matchingTags = searchTags(allTags, searchTerm);
-            const tag = selectTagFromSearchResults(matchingTags);
+            const tag = selectTagsFromSearchResults(matchingTags);
             if (tag) {
-                await removeTagFromItems(tag, items);
+                await removeTagFromItems(tag[0], items);
             }
         } else if (action === '3') {
             const allTags = getAllTags(items);
             const searchTerm = prompt("Enter the tag to search for:");
             const matchingTags = searchTags(allTags, searchTerm);
-            const oldTag = selectTagFromSearchResults(matchingTags);
+            const oldTag = selectTagsFromSearchResults(matchingTags);
             if (oldTag) {
                 const newTag = prompt("Enter the new tag:");
                 if (newTag) {
-                    await replaceTagInItems(oldTag, newTag, items);
+                    await replaceTagInItems(oldTag[0], newTag, items);
                 } else {
                     alert("No new tag entered.");
                 }
             }
         } else if (action === '4') {
             await removeAllTagsFromItems(items);
+        } else if (action === '5') {
+            const allTags = getAllTags(items);
+            const searchTerm = prompt("Enter the regex pattern to search for tags:");
+            const matchingTags = searchTags(allTags, searchTerm);
+            const selectedTags = selectTagsFromSearchResults(matchingTags);
+            if (selectedTags) {
+                await removeSelectedTagsFromItems(selectedTags, items, contextDescription);
+            }
         } else {
             alert("Invalid action.");
         }
