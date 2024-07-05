@@ -218,10 +218,10 @@
         if (deleteOption === '3') selectionScope = "the saved search";
         if (deleteOption === '4') selectionScope = "the entire library";
 
-        const confirmationMessage = `You have chosen to delete attachment files for ${selectionScope}. This includes:\n\n` +
+        const confirmationMessage = `You have chosen to delete attachment files for ${selectionScope}. This scope includes:\n\n` +
                                     `Number of items: ${countObj.itemCount}\n` +
                                     `Number of attachments: ${countObj.attachmentCount}\n` +
-                                    `Number of attachment files: ${countObj.fileCount}\n` +
+                                    `Number of attachment files that will be deleted: ${countObj.fileCount}\n` +
                                     `Number of linked attachments that will be skipped: ${linkedAttachments.size}\n\n` +
                                     "Do you want to proceed?";
         const confirmation = confirm(confirmationMessage);
