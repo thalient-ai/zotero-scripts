@@ -120,10 +120,7 @@
         if (item.isAttachment()) {
             if (item.attachmentLinkMode === Zotero.Attachments.LINK_MODE_LINKED_FILE || 
                 item.attachmentLinkMode === Zotero.Attachments.LINK_MODE_LINKED_URL) {
-                linkedAttachments.push({ 
-                    id: item.id, 
-                    title: item.getField('title') 
-                });
+                linkedAttachments.add(item.id);
                 logMessage(`Skipping linked attachment (ID: ${item.id}, Title: ${item.getField('title')})`, "info");
                 return deletionPromises;  // Skip linked files and web links
             }
@@ -157,15 +154,16 @@
     }
 
     // Function to count attachments for a given item
-    async function countAttachments(item, countObj, linkedAttachments) {
+    async function countAttachments(item, countObj, linkedAttachments, processedItems = new Set()) {
+        // Skip if item already processed
+        if (processedItems.has(item.id)) return;
+        processedItems.add(item.id);
+
         // If the item is an attachment, count it if it exists
         if (item.isAttachment()) {
             if (item.attachmentLinkMode === Zotero.Attachments.LINK_MODE_LINKED_FILE || 
                 item.attachmentLinkMode === Zotero.Attachments.LINK_MODE_LINKED_URL) {
-                linkedAttachments.push({ 
-                    id: item.id, 
-                    title: item.getField('title') 
-                });
+                linkedAttachments.add(item.id);
                 logMessage(`Skipping linked attachment (ID: ${item.id}, Title: ${item.getField('title')})`, "info");
                 return;
             }
@@ -183,7 +181,7 @@
             const attachments = await item.getAttachments();
             for (const attachment of attachments) {
                 const attachmentItem = await Zotero.Items.getAsync(attachment);
-                await countAttachments(attachmentItem, countObj, linkedAttachments);
+                await countAttachments(attachmentItem, countObj, linkedAttachments, processedItems);
             }
             countObj.itemCount++;
         }
@@ -208,9 +206,10 @@
 
         // Count the number of attachments and files
         const countObj = { itemCount: 0, attachmentCount: 0, fileCount: 0 };
-        const linkedAttachments = [];
+        const linkedAttachments = new Set();
+        const processedItems = new Set();
         for (const item of itemsToDelete) {
-            await countAttachments(item, countObj, linkedAttachments);
+            await countAttachments(item, countObj, linkedAttachments, processedItems);
         }
 
         // Confirm the deletion with the user
@@ -223,7 +222,7 @@
                                     `Number of items: ${countObj.itemCount}\n` +
                                     `Number of attachments: ${countObj.attachmentCount}\n` +
                                     `Number of attachment files: ${countObj.fileCount}\n` +
-                                    `Number of linked attachments that will be skipped: ${linkedAttachments.length}\n\n` +
+                                    `Number of linked attachments that will be skipped: ${linkedAttachments.size}\n\n` +
                                     "Do you want to proceed?";
         const confirmation = confirm(confirmationMessage);
         if (!confirmation) {
@@ -247,7 +246,7 @@
                              `Number of items processed: ${countObj.itemCount}\n` +
                              `Number of attachments processed: ${countObj.attachmentCount}\n` +
                              `Number of attachment files deleted: ${deleteCount.fileCount}\n` +
-                             `Number of linked attachments skipped: ${linkedAttachments.length}\n`;
+                             `Number of linked attachments skipped: ${linkedAttachments.size}\n`;
 
         if (skippedAttachments.length > 0) {
             summaryMessage += `\nThe following attachments were skipped because they had no file path:\n`;
@@ -265,3 +264,12 @@
         logMessage("Script ended");
     }
 })();
+
+/*
+Usage Instructions:
+1. Open Zotero and go to Tools > Developer > Run JavaScript.
+2. Copy and paste this entire script into the Run JavaScript console.
+3. Execute the script.
+4. Follow the prompts to select the items whose attachments you want to delete.
+5. Confirm the deletion when prompted.
+*/
