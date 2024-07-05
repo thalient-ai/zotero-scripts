@@ -3,7 +3,6 @@
     function logMessage(message, type = "info") {
         if (type === "error") {
             console.error(message);
-            Zotero.alert(null, "Error", message);
         } else {
             console.log(message);
         }
@@ -114,11 +113,25 @@
     }
 
     // Function to delete attachments for a given item
-    async function deleteAttachments(item, deleteCount) {
+    async function deleteAttachments(item, deleteCount, skippedAttachments, linkedAttachments, processedItems) {
         const deletionPromises = [];
 
         // If the item is an attachment, delete it
         if (item.isAttachment()) {
+            if (processedItems.has(item.id)) {
+                return deletionPromises; // Skip already processed items
+            }
+            processedItems.add(item.id);
+
+            if (item.attachmentLinkMode === Zotero.Attachments.LINK_MODE_LINKED_FILE || 
+                item.attachmentLinkMode === Zotero.Attachments.LINK_MODE_LINKED_URL) {
+                linkedAttachments.push({ 
+                    id: item.id, 
+                    title: item.getField('title') 
+                });
+                logMessage(`Skipping linked attachment (ID: ${item.id}, Title: ${item.getField('title')})`, "info");
+                return deletionPromises;  // Skip linked files and web links
+            }
             const filePath = item.getFilePath();
             if (filePath) {
                 logMessage(`Deleting local file: ${filePath}`);
@@ -126,14 +139,21 @@
                 if (deleted) deleteCount.fileCount++;
                 deleteCount.attachmentCount++;
             } else {
-                logMessage("No file path found for attachment", "error");
+                const parentItemID = item.getField('parentItemID');
+                const parentItem = parentItemID ? await Zotero.Items.getAsync(parentItemID) : null;
+                skippedAttachments.push({ 
+                    id: item.id, 
+                    title: item.getField('title'), 
+                    parentTitle: parentItem ? parentItem.getField('title') : 'No Parent' 
+                });
+                logMessage(`No file path found for attachment (ID: ${item.id}, Title: ${item.getField('title')}, Parent Title: ${parentItem ? parentItem.getField('title') : 'No Parent'})`, "error");
             }
         } else {
             // If the item is not an attachment, check its child attachments
             const attachments = await item.getAttachments();
             for (const attachment of attachments) {
                 const attachmentItem = await Zotero.Items.getAsync(attachment);
-                deletionPromises.push(...await deleteAttachments(attachmentItem, deleteCount));
+                deletionPromises.push(...await deleteAttachments(attachmentItem, deleteCount, skippedAttachments, linkedAttachments, processedItems));
             }
             deleteCount.itemCount++;
         }
@@ -142,9 +162,23 @@
     }
 
     // Function to count attachments for a given item
-    async function countAttachments(item, countObj) {
+    async function countAttachments(item, countObj, linkedAttachments, processedItems) {
         // If the item is an attachment, count it if it exists
         if (item.isAttachment()) {
+            if (processedItems.has(item.id)) {
+                return; // Skip already processed items
+            }
+            processedItems.add(item.id);
+
+            if (item.attachmentLinkMode === Zotero.Attachments.LINK_MODE_LINKED_FILE || 
+                item.attachmentLinkMode === Zotero.Attachments.LINK_MODE_LINKED_URL) {
+                linkedAttachments.push({ 
+                    id: item.id, 
+                    title: item.getField('title') 
+                });
+                logMessage(`Skipping linked attachment (ID: ${item.id}, Title: ${item.getField('title')})`, "info");
+                return;
+            }
             const filePath = item.getFilePath();
             if (filePath) {
                 const file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsIFile);
@@ -159,7 +193,7 @@
             const attachments = await item.getAttachments();
             for (const attachment of attachments) {
                 const attachmentItem = await Zotero.Items.getAsync(attachment);
-                await countAttachments(attachmentItem, countObj);
+                await countAttachments(attachmentItem, countObj, linkedAttachments, processedItems);
             }
             countObj.itemCount++;
         }
@@ -184,8 +218,10 @@
 
         // Count the number of attachments and files
         const countObj = { itemCount: 0, attachmentCount: 0, fileCount: 0 };
+        const linkedAttachments = [];
+        const processedItems = new Set();
         for (const item of itemsToDelete) {
-            await countAttachments(item, countObj);
+            await countAttachments(item, countObj, linkedAttachments, processedItems);
         }
 
         // Confirm the deletion with the user
@@ -197,7 +233,8 @@
         const confirmationMessage = `You have chosen to delete attachment files for ${selectionScope}. This includes:\n\n` +
                                     `Number of items: ${countObj.itemCount}\n` +
                                     `Number of attachments: ${countObj.attachmentCount}\n` +
-                                    `Number of attachment files: ${countObj.fileCount}\n\n` +
+                                    `Number of attachment files: ${countObj.fileCount}\n` +
+                                    `Number of linked attachments that will be skipped: ${linkedAttachments.length}\n\n` +
                                     "Do you want to proceed?";
         const confirmation = confirm(confirmationMessage);
         if (!confirmation) {
@@ -207,14 +244,31 @@
         logMessage(confirmationMessage);
 
         const deleteCount = { fileCount: 0, attachmentCount: 0 };
+        const skippedAttachments = [];
         const deletionPromises = [];
         for (const item of itemsToDelete) {
-            deletionPromises.push(...await deleteAttachments(item, deleteCount));
+            deletionPromises.push(...await deleteAttachments(item, deleteCount, skippedAttachments, linkedAttachments, processedItems));
         }
 
         await Promise.all(deletionPromises);
-        Zotero.alert(null, "Local Attachment Deletion Complete", `${deleteCount.fileCount} local attachment files have been deleted.`);
         logMessage(`${deleteCount.fileCount} local attachment files have been deleted.`);
+
+        // Summary prompt
+        let summaryMessage = `Deletion Summary:\n\n` +
+                             `Number of items processed: ${countObj.itemCount}\n` +
+                             `Number of attachments processed: ${countObj.attachmentCount}\n` +
+                             `Number of attachment files deleted: ${deleteCount.fileCount}\n` +
+                             `Number of linked attachments skipped: ${linkedAttachments.length}\n`;
+
+        if (skippedAttachments.length > 0) {
+            summaryMessage += `\nThe following attachments were skipped because they had no file path:\n`;
+            skippedAttachments.forEach(att => {
+                summaryMessage += `ID: ${att.id}, Title: ${att.title}, Parent Title: ${att.parentTitle}\n`;
+            });
+        }
+
+        Zotero.alert(null, "Deletion Summary", summaryMessage);
+        logMessage(summaryMessage, "info");
 
     } catch (error) {
         logMessage(`Error in deleting local attachment files: ${error.message}`, "error");
