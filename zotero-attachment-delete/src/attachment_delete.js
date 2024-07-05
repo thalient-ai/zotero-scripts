@@ -113,16 +113,11 @@
     }
 
     // Function to delete attachments for a given item
-    async function deleteAttachments(item, deleteCount, skippedAttachments, linkedAttachments, processedItems) {
+    async function deleteAttachments(item, deleteCount, skippedAttachments, linkedAttachments) {
         const deletionPromises = [];
 
         // If the item is an attachment, delete it
         if (item.isAttachment()) {
-            if (processedItems.has(item.id)) {
-                return deletionPromises; // Skip already processed items
-            }
-            processedItems.add(item.id);
-
             if (item.attachmentLinkMode === Zotero.Attachments.LINK_MODE_LINKED_FILE || 
                 item.attachmentLinkMode === Zotero.Attachments.LINK_MODE_LINKED_URL) {
                 linkedAttachments.push({ 
@@ -153,7 +148,7 @@
             const attachments = await item.getAttachments();
             for (const attachment of attachments) {
                 const attachmentItem = await Zotero.Items.getAsync(attachment);
-                deletionPromises.push(...await deleteAttachments(attachmentItem, deleteCount, skippedAttachments, linkedAttachments, processedItems));
+                deletionPromises.push(...await deleteAttachments(attachmentItem, deleteCount, skippedAttachments, linkedAttachments));
             }
             deleteCount.itemCount++;
         }
@@ -162,14 +157,9 @@
     }
 
     // Function to count attachments for a given item
-    async function countAttachments(item, countObj, linkedAttachments, processedItems) {
+    async function countAttachments(item, countObj, linkedAttachments) {
         // If the item is an attachment, count it if it exists
         if (item.isAttachment()) {
-            if (processedItems.has(item.id)) {
-                return; // Skip already processed items
-            }
-            processedItems.add(item.id);
-
             if (item.attachmentLinkMode === Zotero.Attachments.LINK_MODE_LINKED_FILE || 
                 item.attachmentLinkMode === Zotero.Attachments.LINK_MODE_LINKED_URL) {
                 linkedAttachments.push({ 
@@ -193,7 +183,7 @@
             const attachments = await item.getAttachments();
             for (const attachment of attachments) {
                 const attachmentItem = await Zotero.Items.getAsync(attachment);
-                await countAttachments(attachmentItem, countObj, linkedAttachments, processedItems);
+                await countAttachments(attachmentItem, countObj, linkedAttachments);
             }
             countObj.itemCount++;
         }
@@ -219,9 +209,8 @@
         // Count the number of attachments and files
         const countObj = { itemCount: 0, attachmentCount: 0, fileCount: 0 };
         const linkedAttachments = [];
-        const processedItems = new Set();
         for (const item of itemsToDelete) {
-            await countAttachments(item, countObj, linkedAttachments, processedItems);
+            await countAttachments(item, countObj, linkedAttachments);
         }
 
         // Confirm the deletion with the user
@@ -247,7 +236,7 @@
         const skippedAttachments = [];
         const deletionPromises = [];
         for (const item of itemsToDelete) {
-            deletionPromises.push(...await deleteAttachments(item, deleteCount, skippedAttachments, linkedAttachments, processedItems));
+            deletionPromises.push(...await deleteAttachments(item, deleteCount, skippedAttachments, linkedAttachments));
         }
 
         await Promise.all(deletionPromises);
