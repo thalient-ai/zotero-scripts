@@ -1,6 +1,10 @@
 # Zotero Scripts
 
-This repository contains a collection of custom scripts designed to enhance the functionality of [Zotero](https://www.zotero.org/), a free, easy-to-use tool to help you collect, organize, cite, and share your research sources. All of the scripts support bulk or batch editing of multiple Zotero items. All of the scripts have detailed logging, are optimized for performance (for especially large libraries), and include input validation and error handling.
+This repository contains a collection of custom scripts designed to enhance the functionality of [Zotero](https://www.zotero.org/), a free, easy-to-use tool to help you collect, organize, cite, and share your research sources.
+
+These are scripts that I use to manage my own Zotero library. They provide various functionality that are not currently available in Zotero but may be a planned feature at a later date.
+
+I haved tried to incorporate detailed logging, optimization, error handling and input validation into each script. I can't make any assurances that they will work for all versions of Zotero and each user's library, but I'm happy to help.
 
 ## Compatibility
 All scripts were written for Zotero 7
