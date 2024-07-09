@@ -44,11 +44,11 @@ Here are the short descriptions for all of the scripts, sorted alphabetically by
 - This script solves that problem by allowing you to select multiple items within Zotero, run the script, and create a copy of the attachment file(s) to a folder of your choosing.
 
 #### Attachment Date Added (`attachment_dateAdded.js`)
-- Keeping track of when files were added to your Zotero library can be important for organization and research.
+- Keeping track of when files were added to your Zotero library can be important for organization and research. An issue arises when you add files to your library on one date only then to create the parent item of that those files at a later date. 
 - This script updates the "Date Added" field of parent items to match the earliest "Date Added" date of their attachments, ensuring that your metadata reflects the earliest associated date.
 
 #### Attachment Delete (`attachment_delete.js`)
-- Managing storage and ensuring that only necessary files are kept can be a hassle in large Zotero libraries, especially when you have limited local storage. This script is for those who are using Zotero Sync and would like to remove local files that are already backed up.
+- Managing storage and ensuring that only necessary files are kept can be a hassle in large Zotero libraries, especially when you have limited local storage. This script is for those who are using Zotero Sync and would like to remove files locally that are already backed up.
 - This script allows you to delete local attachment files for selected items, items in a collection, items in a saved search, or all items in the library, with user prompts and confirmations to prevent accidental deletions.
 
 #### Attachment Rename (`zotero_attachment_rename.js`)
