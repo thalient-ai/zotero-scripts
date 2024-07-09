@@ -35,8 +35,6 @@ All scripts were written for Zotero 7
 
 If you clone or fork the repository, you can add the scripts (.js) to your Zotero library by going to `File` -> `Add Attachment` -> `Add Link to File...`. This will add the script to your library, but pull it from your local GitHub directory.
 
-Here are the short descriptions for all of the scripts, sorted alphabetically by script name:
-
 ## Short Descriptions
 
 #### Attachment Backup (`attachment_backup.js`)
