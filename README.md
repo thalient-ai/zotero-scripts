@@ -2,7 +2,7 @@
 
 This repository contains a collection of custom scripts designed to enhance the functionality of [Zotero](https://www.zotero.org/), a free, easy-to-use tool to help you collect, organize, cite, and share your research sources.
 
-These are scripts that I use to manage my own Zotero library. They provide various functionality that are not currently available in Zotero but may be a planned feature at a later date.
+These are scripts that I use to manage my own Zotero library. They provide various functionalities that are not currently available in Zotero but may be a planned feature at a later date.
 
 I haved tried to incorporate detailed logging, optimization, error handling and input validation into each script. I can't make any assurances that they will work for all versions of Zotero and each user's library, but I'm happy to help.
 
