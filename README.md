@@ -6,6 +6,11 @@ These are scripts that I use to manage my own Zotero library. They provide vario
 
 I have incorporated detailed logging, optimization, error handling, and input validation into each script. While I cannot guarantee compatibility with all versions of Zotero, cover all edge cases, or ensure flawless operation for every user's library, I am happy to assist with any issues that may arise.
 
+The advantage of these scripts is that they support bulk and batch operations:
+
+- **Bulk Editing**: This involves selecting multiple items and applying changes to fields such as titles, tags, authors, or notes all at once. For example, if you need to add the same tag to 50 items, bulk editing allows you to do this in a single action.
+- **Batch Editing**: Similar to bulk editing, batch editing typically implies a sequence of edits or a series of automated steps that are applied to a group of selected items. It can involve more complex modifications, such as using regular expressions to find and replace text across multiple fields.
+
 ## Compatibility
 All scripts were written for Zotero 7
 
