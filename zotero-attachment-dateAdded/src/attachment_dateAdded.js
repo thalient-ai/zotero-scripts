@@ -61,6 +61,11 @@
     async function getItemsToEdit() {
         const zoteroPane = Zotero.getActiveZoteroPane();
         const editOption = prompt("Enter '1' to edit selected items, '2' to edit items in the current collection, or '3' to edit items in a saved search:");
+        
+        if (editOption === null) {
+            alert("Operation canceled.");
+            return null;
+        }
 
         let items;
         if (editOption === '2') {
@@ -85,12 +90,15 @@
                 return null;
             }
             items = await Zotero.Items.getAsync(itemIDs);
-        } else {
+        } else if (editOption === '1') {
             items = zoteroPane.getSelectedItems();
             if (!items.length) {
                 alert("No items selected.");
                 return null;
             }
+        } else {
+            alert("Invalid option selected.");
+            return null;
         }
 
         return items;
