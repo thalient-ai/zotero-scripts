@@ -2,6 +2,8 @@
 
 This script allows you to rename attachments in Zotero using parent item metadata. It offers options to update either the attachment's filename, the attachment title, or both. This is particularly useful for handling large collections where you need to perform bulk or batch renaming of attachments.
 
+> Attachment filenames can only be updated if the file is stored locally on your device. However, attachment titles can be updated regardless of the file's local presence.
+
 ## Key Problems Addressed
 
 - **Separate Names for Attachments**: In Zotero, attachments have two separate names: an attachment title and a filename. For more details, see the [Zotero File Renaming documentation](https://www.zotero.org/support/file_renaming).
