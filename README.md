@@ -42,7 +42,7 @@ If you clone or fork the repository, you can add the scripts (.js) to your Zoter
 
 ## Short Descriptions
 
-#### Attachment Backup (`attachment_backup.js`)
+#### [Attachment Backup (`attachment_backup.js`)](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-backup/src/attachment_backup.js)
 - Have you ever wanted to back up or download multiple attachments from Zotero, only to realize that Zotero stores attachments in individual folders, meaning that you'll have to go to each folder to copy the .pdf or other attachment?
 - This script solves that problem by allowing you to select multiple items within Zotero, run the script, and create a copy of the attachment file(s) to a folder of your choosing.
 
