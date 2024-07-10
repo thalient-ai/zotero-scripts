@@ -73,10 +73,11 @@ The script compares items based on the following fields:
 - Journal
 - DOI
 - ISBN
+- Item Type
 
 Each field is given a weight to determine its importance in the similarity calculation. By default, the weights are set as follows:
 
-- Title: 0.45
+- Title: 0.40
 - Short Title: 0.05
 - Creators: 0.2
 - Date: 0.05
@@ -85,6 +86,7 @@ Each field is given a weight to determine its importance in the similarity calcu
 - Journal: 0.05
 - DOI: 0.05
 - ISBN: 0.05
+- Item Type: 0.05
 
 These weights can be adjusted to meet your needs. The script normalizes these weights to ensure they sum to 1. The similarity is calculated using the Jaccard similarity index, which compares the overlap between the fields of two items. The combined similarity score is then used to identify potential duplicates.
 
