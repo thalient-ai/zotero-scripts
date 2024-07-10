@@ -12,14 +12,19 @@
     async function getValidDeleteOption() {
         while (true) {
             const deleteOption = prompt("Enter '1' to delete attachments for selected items, '2' for all items in the current collection, '3' for all items in a saved search, or '4' for all items in the library:");
-            if (deleteOption === null) {
+
+            // Sanitize the user input
+            const sanitizedDeleteOption = deleteOption ? deleteOption.trim() : null;
+
+            if (sanitizedDeleteOption === null) {
                 logMessage("User cancelled the deletion process.");
                 return null;
             }
-            if (['1', '2', '3', '4'].includes(deleteOption)) {
-                return deleteOption;
+
+            if (['1', '2', '3', '4'].includes(sanitizedDeleteOption)) {
+                return sanitizedDeleteOption;
             } else {
-                alert(`Invalid option: "${deleteOption}". Please enter '1', '2', '3', or '4'.`);
+                alert(`Invalid option: "${sanitizedDeleteOption}". Please enter '1', '2', '3', or '4'.`);
             }
         }
     }
@@ -264,12 +269,3 @@
         logMessage("Script ended");
     }
 })();
-
-/*
-Usage Instructions:
-1. Open Zotero and go to Tools > Developer > Run JavaScript.
-2. Copy and paste this entire script into the Run JavaScript console.
-3. Execute the script.
-4. Follow the prompts to select the items whose attachments you want to delete.
-5. Confirm the deletion when prompted.
-*/

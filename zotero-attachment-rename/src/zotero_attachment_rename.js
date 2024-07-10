@@ -8,10 +8,19 @@
         async function getValidEditOption() {
             while (true) {
                 const editOption = prompt("Enter '1' to rename only selected items, '2' to rename all items in the current collection, or '3' to rename all items in a saved search:");
-                if (['1', '2', '3'].includes(editOption)) {
-                    return editOption;
+
+                // Sanitize the user input
+                const sanitizedEditOption = editOption ? editOption.trim() : null;
+
+                if (sanitizedEditOption === null) {
+                    alert("Operation canceled.");
+                    return null;
+                }
+
+                if (['1', '2', '3'].includes(sanitizedEditOption)) {
+                    return sanitizedEditOption;
                 } else {
-                    alert(`Invalid option: "${editOption}". Please enter '1', '2', or '3'.`);
+                    alert(`Invalid option: "${sanitizedEditOption}". Please enter '1', '2', or '3'.`);
                 }
             }
         }
@@ -20,10 +29,19 @@
         async function getValidRenameOption() {
             while (true) {
                 const renameOption = prompt("Enter '1' to rename attachment filenames, '2' to rename attachment titles, '3' to rename both filenames and titles:");
-                if (['1', '2', '3'].includes(renameOption)) {
-                    return renameOption;
+
+                // Sanitize the user input
+                const sanitizedRenameOption = renameOption ? renameOption.trim() : null;
+
+                if (sanitizedRenameOption === null) {
+                    alert("Operation canceled.");
+                    return null;
+                }
+
+                if (['1', '2', '3'].includes(sanitizedRenameOption)) {
+                    return sanitizedRenameOption;
                 } else {
-                    alert(`Invalid option: "${renameOption}". Please enter '1', '2', or '3'.`);
+                    alert(`Invalid option: "${sanitizedRenameOption}". Please enter '1', '2', or '3'.`);
                 }
             }
         }
@@ -77,12 +95,18 @@
                 if (childItem.isAttachment() && !childItem.isTopLevelItem() && childItem.attachmentLinkMode !== Zotero.Attachments.LINK_MODE_LINKED_URL) {
                     try {
                         const originalPath = await childItem.getFilePathAsync();
-                        if (originalPath) {
+                        if (renameOption !== '2' && originalPath) { // Rename filename if the option is not '2'
                             originalNames.set(childItem.id, originalPath);
                             batchRenamePromises.push(renameAttachment(childItem, originalNames, failedItems, renameOption, stopProcessingCallback));
                         } else {
-                            console.warn(`No file path found for item ${childItem.id}`);
-                            console.log(`Details for item ${childItem.id}: `, JSON.stringify(childItem.toJSON(), null, 2));
+                            // Change title regardless of the file presence
+                            if (renameOption !== '1') {
+                                const parentItem = await Zotero.Items.getAsync(childItem.parentItemID);
+                                const newTitle = Zotero.Attachments.getFileBaseNameFromItem(parentItem);
+                                childItem.setField('title', newTitle);
+                                await childItem.saveTx();
+                                console.log(`Updated title of item ${childItem.id}: "${newTitle}"`);
+                            }
                         }
                     } catch (error) {
                         console.error(`Error retrieving file path for item ${childItem.id}: ${error.message}`);
@@ -172,13 +196,16 @@
 
             const selectedIndexes = prompt(`Item "${item.getField('title')}" has multiple attachments. Enter the numbers of the attachments you wish to rename, separated by commas, or type "all" to rename all attachments:\n${childItemOptions}`);
 
-            if (!selectedIndexes) return [];
+            // Sanitize the user input
+            const sanitizedSelectedIndexes = selectedIndexes ? selectedIndexes.trim().toLowerCase() : null;
 
-            if (selectedIndexes.toLowerCase() === 'all') {
+            if (!sanitizedSelectedIndexes) return [];
+
+            if (sanitizedSelectedIndexes === 'all') {
                 return childItems;
             }
 
-            const indexes = selectedIndexes.split(',').map(Number).filter(index => !isNaN(index) && index > 0 && index <= childItems.length);
+            const indexes = sanitizedSelectedIndexes.split(',').map(Number).filter(index => !isNaN(index) && index > 0 && index <= childItems.length);
             if (indexes.length > 0) {
                 return indexes.map(index => childItems[index - 1]);
             } else {

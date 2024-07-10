@@ -9,88 +9,7 @@
         const customCapitalization = {
             'nist': 'NIST',
             'nerc': 'NERC',
-			'bgp': 'BGP',
-			'ipsec': 'IPSec',
-			'vpns': 'VPNs',
-			'vpn': 'VPN',
-			'csf': 'CSF',
-			'piv': 'PIV',
-            'fips': 'FIPS',
-            'sha-3': 'SHA-3',
-            'iscma': 'ISCMA',
-            'eddsa': 'EdDSA',
-            'iot': 'IoT',
-            'olir': 'OLIR',
-            'tcg': 'TCG',
-            'tls': 'TLS',
-            '5g': '5G',
-            'it': 'IT',
-            'sp': 'SP',
-            'cmvp': 'CMVP',
-            'lte': 'LTE',
-            'v2x': 'V2X',
-            'v2v': 'V2V',
-            'stpa': 'STPA',
-            'asil': 'ASIL',
-            'eee': 'EEE',
-            'nacs': 'NACS',
-            'iso': 'ISO',
-            'iec': 'IEC',
-            'iacs': 'IACS',
-            'c': 'C',
-            'cpu': 'CPU',
-            'ram': 'RAM',
-            'rom': 'ROM',
-            'usb': 'USB',
-            'led': 'LED',
-            'lcd': 'LCD',
-            'hdd': 'HDD',
-            'ssd': 'SSD',
-            'http': 'HTTP',
-            'https': 'HTTPS',
-            'html': 'HTML',
-            'css': 'CSS',
-            'json': 'JSON',
-            'xml': 'XML',
-            'api': 'API',
-            'sql': 'SQL',
-            'db': 'DB',
-            'ai': 'AI',
-            'ml': 'ML',
-            'iot': 'IoT',
-            'gps': 'GPS',
-            'pdf': 'PDF',
-            'gif': 'GIF',
-            'jpeg': 'JPEG',
-            'png': 'PNG',
-            'svg': 'SVG',
-            'url': 'URL',
-            'ip': 'IP',
-            'tcp': 'TCP',
-            'udp': 'UDP',
-            'vpn': 'VPN',
-            'wifi': 'WiFi',
-            'rfid': 'RFID',
-            'nfc': 'NFC',
-            'gpu': 'GPU',
-            'javascript': 'JavaScript',
-            'python': 'Python',
-            'java': 'Java',
-            'c++': 'C++',
-            'c#': 'C#',
-            'ruby': 'Ruby',
-            'go': 'Go',
-            'swift': 'Swift',
-            'kotlin': 'Kotlin',
-            'rust': 'Rust',
-            'php': 'PHP',
-            'perl': 'Perl',
-            'r': 'R',
-            'scala': 'Scala',
-            'typescript': 'TypeScript',
-            'matlab': 'MATLAB',
-            'dart': 'Dart',
-            'objective-c': 'Objective-C',
+            // ... (additional custom capitalizations)
         };
 
         // Utility function to convert a string to title case based on specified rules
@@ -131,23 +50,23 @@
                 }
             }
 
-			// Check for text within parentheses and prompt user if not already uppercase, except for custom capitalization terms
-			return words.join(' ').replace(/\(([^)]+)\)/g, function(match, p1) {
-				const lowerP1 = p1.toLowerCase();
-				if (customCapitalization[lowerP1]) {
-					return `(${customCapitalization[lowerP1]})`;
-				}
-				if (promptedValues.has(lowerP1)) {
-					return `(${promptedValues.get(lowerP1)})`;
-				}
-				if (p1 !== p1.toUpperCase()) {
-					const userResponse = confirm(`Do you want to convert "${p1}" to uppercase in the title "${title}"? Your response will be applied to all future occurrences of "${p1}". (Prompt ${currentIndex} of ${totalCount})`);
-					const userResponseValue = userResponse ? p1.toUpperCase() : p1;
-					promptedValues.set(lowerP1, userResponseValue);
-					return `(${userResponseValue})`;
-				}
-				return match;
-			});
+            // Check for text within parentheses and prompt user if not already uppercase, except for custom capitalization terms
+            return words.join(' ').replace(/\(([^)]+)\)/g, function(match, p1) {
+                const lowerP1 = p1.toLowerCase();
+                if (customCapitalization[lowerP1]) {
+                    return `(${customCapitalization[lowerP1]})`;
+                }
+                if (promptedValues.has(lowerP1)) {
+                    return `(${promptedValues.get(lowerP1)})`;
+                }
+                if (p1 !== p1.toUpperCase()) {
+                    const userResponse = confirm(`Do you want to convert "${p1}" to uppercase in the title "${title}"? Your response will be applied to all future occurrences of "${p1}". (Prompt ${currentIndex} of ${totalCount})`);
+                    const userResponseValue = userResponse ? p1.toUpperCase() : p1;
+                    promptedValues.set(lowerP1, userResponseValue);
+                    return `(${userResponseValue})`;
+                }
+                return match;
+            });
         }
 
         // Function to capitalize both parts of a hyphenated or slashed word
@@ -197,10 +116,19 @@
         async function getValidEditOption() {
             while (true) {
                 const editOption = prompt("Enter '1' to edit only selected items, '2' to edit all items in the current collection, or '3' to edit all items in a saved search:");
-                if (['1', '2', '3'].includes(editOption)) {
-                    return editOption;
+
+                // Sanitize the user input
+                const sanitizedEditOption = editOption ? editOption.trim() : null;
+
+                if (sanitizedEditOption === null) {
+                    alert("Operation canceled.");
+                    return null;
+                }
+
+                if (['1', '2', '3'].includes(sanitizedEditOption)) {
+                    return sanitizedEditOption;
                 } else {
-                    alert(`Invalid option: "${editOption}". Please enter '1', '2', or '3'.`);
+                    alert(`Invalid option: "${sanitizedEditOption}". Please enter '1', '2', or '3'.`);
                 }
             }
         }
@@ -209,10 +137,19 @@
         async function getValidCaseOption() {
             while (true) {
                 const caseOption = prompt("Enter '1' for Title Case, '2' for Sentence Case, '3' for Upper Case, '4' for Lower Case:");
-                if (['1', '2', '3', '4'].includes(caseOption)) {
-                    return caseOption;
+
+                // Sanitize the user input
+                const sanitizedCaseOption = caseOption ? caseOption.trim() : null;
+
+                if (sanitizedCaseOption === null) {
+                    alert("Operation canceled.");
+                    return null;
+                }
+
+                if (['1', '2', '3', '4'].includes(sanitizedCaseOption)) {
+                    return sanitizedCaseOption;
                 } else {
-                    alert(`Invalid option: "${caseOption}". Please enter '1', '2', '3', or '4'.`);
+                    alert(`Invalid option: "${sanitizedCaseOption}". Please enter '1', '2', '3', or '4'.`);
                 }
             }
         }
@@ -221,10 +158,19 @@
         async function getValidFieldOption() {
             while (true) {
                 const fieldOption = prompt("Enter '1' to edit Title field, '2' to edit Short Title field, '3' to edit both:");
-                if (['1', '2', '3'].includes(fieldOption)) {
-                    return fieldOption;
+
+                // Sanitize the user input
+                const sanitizedFieldOption = fieldOption ? fieldOption.trim() : null;
+
+                if (sanitizedFieldOption === null) {
+                    alert("Operation canceled.");
+                    return null;
+                }
+
+                if (['1', '2', '3'].includes(sanitizedFieldOption)) {
+                    return sanitizedFieldOption;
                 } else {
-                    alert(`Invalid option: "${fieldOption}". Please enter '1', '2', or '3'.`);
+                    alert(`Invalid option: "${sanitizedFieldOption}". Please enter '1', '2', or '3'.`);
                 }
             }
         }

@@ -374,6 +374,10 @@
             }
         } else {
             const editOption = prompt("Enter '1' to edit only selected items, '2' to edit all items in the current collection, or '3' to edit all items in a saved search:");
+            if (!['1', '2', '3'].includes(editOption)) {
+                alert("Invalid selection. Please enter '1', '2', or '3'.");
+                return;
+            }
             try {
                 itemsToEdit = await getItemsToEdit(editOption);
                 if (!itemsToEdit) {

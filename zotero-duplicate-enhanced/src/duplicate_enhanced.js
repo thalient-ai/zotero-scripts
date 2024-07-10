@@ -1,6 +1,6 @@
 (async function() {
     const startTime = performance.now();
-    
+
     try {
         const items = await getItemsToEdit();
         if (!items) {
@@ -48,6 +48,7 @@
     }
 })();
 
+// Logs the time taken for a specific operation
 function logTime(label, time) {
     try {
         console.log(`${label}: ${(time / 1000).toFixed(2)} seconds`);
@@ -56,6 +57,7 @@ function logTime(label, time) {
     }
 }
 
+// Normalizes the weights so their sum equals 1
 function normalizeWeights(weights) {
     const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
     for (let key in weights) {
@@ -63,18 +65,25 @@ function normalizeWeights(weights) {
     }
 }
 
+// Prompts the user to enter a similarity threshold, ensuring it is a valid number between 0 and 1
 function getUserInputThreshold(weights) {
     const weightsInfo = `Weights used in the similarity calculation:\nTitle: ${weights.title.toFixed(2)}\nShort Title: ${weights.shortTitle.toFixed(2)}\nCreators: ${weights.creators.toFixed(2)}\nDate: ${weights.date.toFixed(2)}\nPublisher: ${weights.publisher.toFixed(2)}\nPlace: ${weights.place.toFixed(2)}\nJournal: ${weights.journal.toFixed(2)}\nDOI: ${weights.DOI.toFixed(2)}\nISBN: ${weights.ISBN.toFixed(2)}\n\n`;
     const thresholdInput = prompt(weightsInfo + "Enter the similarity threshold for detecting duplicates (a number between 0 and 1, e.g., 0.6 for 60% similarity):", "0.6");
-    const threshold = parseFloat(thresholdInput);
+
+    // Sanitize and validate the threshold input
+    const sanitizedThresholdInput = thresholdInput ? thresholdInput.trim() : null;
+    const threshold = parseFloat(sanitizedThresholdInput);
+
     if (isNaN(threshold) || threshold < 0 || threshold > 1) {
         alert("Invalid threshold value. Please enter a number between 0 and 1.");
         return null;
     }
+
     console.log(`User input similarity threshold: ${threshold}`);
     return threshold;
 }
 
+// Detects potential duplicates based on similarity threshold and weights
 async function detectPotentialDuplicatesOptimized(items, threshold, weights) {
     const potentialDuplicates = [];
     const itemMap = new Map();
@@ -100,6 +109,7 @@ async function detectPotentialDuplicatesOptimized(items, threshold, weights) {
     return potentialDuplicates;
 }
 
+// Normalizes the fields of an item for comparison
 function normalizeItemFields(item, weights) {
     const fields = ['title', 'shortTitle', 'date', 'publisher', 'place', 'journal', 'DOI', 'ISBN'];
     const normalizedItem = {};
@@ -110,14 +120,17 @@ function normalizeItemFields(item, weights) {
     return normalizedItem;
 }
 
+// Normalizes a field by removing special characters and converting to lowercase
 function normalizeField(field) {
     return (field || "").replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "").toLowerCase().trim();
 }
 
+// Normalizes the creators field by combining first and last names
 function normalizeCreators(creators) {
     return creators.map(creator => `${creator.firstName || ""} ${creator.lastName || creator.name || ""}`.toLowerCase().trim()).join(' ');
 }
 
+// Calculates the similarity between two items using the Jaccard similarity index
 function calculateSimilarity(item1, item2, weights) {
     const fields = ['title', 'shortTitle', 'date', 'publisher', 'place', 'journal', 'DOI', 'ISBN'];
 
@@ -137,6 +150,7 @@ function calculateSimilarity(item1, item2, weights) {
     return combinedSimilarity / totalWeight;
 }
 
+// Calculates the Jaccard similarity index between two strings
 function jaccardSimilarity(str1, str2) {
     const set1 = new Set(str1.split(/\s+/));
     const set2 = new Set(str2.split(/\s+/));
@@ -145,6 +159,7 @@ function jaccardSimilarity(str1, str2) {
     return intersection.size / union.size;
 }
 
+// Handles the detected duplicates by prompting the user for an action
 async function handleDetectedDuplicates(duplicates) {
     if (duplicates.length === 0) {
         console.log("No duplicates found.");
@@ -174,11 +189,14 @@ async function handleDetectedDuplicates(duplicates) {
         
         const action = prompt(`Potential duplicate found with similarity ${similarity.toFixed(2)}:\n\nItem 1: ${item1.title}\nItem 2: ${item2.title}\n\nChoose an action:\n1. Add a tag to both Items (e.g., duplicate-pair-${timestamp})\n2. Move Item 2 to Trash\n3. Ignore\n4. Stop Processing\n\n(Press Cancel to skip)`);
 
-        if (action === '1') {
+        // Sanitize the user input
+        const sanitizedAction = action ? action.trim() : null;
+
+        if (sanitizedAction === '1') {
             await actions.tag(item1, item2, `duplicate-pair-${timestamp}`);
-        } else if (action === '2') {
+        } else if (sanitizedAction === '2') {
             await actions.trash(item2);
-        } else if (action === '4') {
+        } else if (sanitizedAction === '4') {
             stopProcessing = true;
         } else {
             console.log(`Ignored potential duplicate:\nItem 1: ${item1.title}\nItem 2: ${item2.title}`);
@@ -186,15 +204,19 @@ async function handleDetectedDuplicates(duplicates) {
     }
 }
 
+// Retrieves items based on user selection
 async function getItemsToEdit() {
     try {
         const zoteroPane = Zotero.getActiveZoteroPane();
         const editOption = prompt("Enter '1' to search selected items, '2' for items in the current collection, or '3' for items in a saved search:");
 
+        // Sanitize the user input
+        const sanitizedEditOption = editOption ? editOption.trim() : null;
+
         let items = [];
         let searchOption = "";
 
-        if (editOption === '2') {
+        if (sanitizedEditOption === '2') {
             const collection = zoteroPane.getSelectedCollection();
             if (!collection) {
                 alert("No collection selected.");
@@ -202,7 +224,7 @@ async function getItemsToEdit() {
             }
             items = await collection.getChildItems();
             searchOption = "Current Collection";
-        } else if (editOption === '3') {
+        } else if (sanitizedEditOption === '3') {
             const savedSearch = zoteroPane.getSelectedSavedSearch();
             if (!savedSearch) {
                 alert("No saved search selected.");

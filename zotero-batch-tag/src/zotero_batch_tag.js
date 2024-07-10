@@ -64,7 +64,7 @@
         if (searchTerm === "*") {
             regex = new RegExp(".*", 'i');  // match all tags
         } else {
-            regex = new RegExp(searchTerm, 'i');  // 'i' for case-insensitive search
+            regex = new RegExp(escapeRegExp(searchTerm), 'i');  // 'i' for case-insensitive search
         }
         return allTags.filter(tag => regex.test(tag));
     }

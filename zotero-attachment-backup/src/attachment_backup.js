@@ -46,6 +46,7 @@
         logTime("Total time", endTime - startTime);
     }
 
+    // Logs the time taken for a specific operation
     function logTime(label, time) {
         try {
             console.log(`${label}: ${(time / 1000).toFixed(2)} seconds`);
@@ -54,17 +55,28 @@
         }
     }
 
+    // Function to get a valid input for the scope of items to edit
     async function getValidEditOption() {
         while (true) {
             const editOption = prompt("Enter '1' to process selected items, '2' for items in the current collection, or '3' for items in a saved search:");
-            if (['1', '2', '3'].includes(editOption)) {
-                return editOption;
+
+            // Sanitize the user input
+            const sanitizedEditOption = editOption ? editOption.trim() : null;
+
+            if (sanitizedEditOption === null) {
+                alert("Operation canceled.");
+                return null;
+            }
+
+            if (['1', '2', '3'].includes(sanitizedEditOption)) {
+                return sanitizedEditOption;
             } else {
-                alert(`Invalid option: "${editOption}". Please enter '1', '2', or '3'.`);
+                alert(`Invalid option: "${sanitizedEditOption}". Please enter '1', '2', or '3'.`);
             }
         }
     }
 
+    // Function to retrieve items based on user selection
     async function getItemsToEdit(editOption, zoteroPane) {
         if (editOption === '2') {
             let collection = zoteroPane.getSelectedCollection();
@@ -98,6 +110,7 @@
         }
     }
 
+    // Function to get the folder path for backup
     async function getFolderPath() {
         return new Promise((resolve, reject) => {
             const nsIFilePicker = Components.interfaces.nsIFilePicker;
@@ -120,6 +133,7 @@
         });
     }
 
+    // Function to count attachments
     async function countAttachments(parentItems, orphanAttachments) {
         let count = orphanAttachments.length;
         for (let item of parentItems) {
@@ -129,6 +143,7 @@
         return count;
     }
 
+    // Function to backup attachments
     async function backupAttachments(parentItems, orphanAttachments, folderPath) {
         for (let item of parentItems) {
             const attachments = await item.getAttachments();
@@ -137,6 +152,7 @@
         await processAttachments(orphanAttachments.map(attachment => attachment.id), folderPath);
     }
 
+    // Function to process attachments and copy files
     async function processAttachments(attachmentIDs, folderPath) {
         for (let attachmentID of attachmentIDs) {
             const attachment = await Zotero.Items.getAsync(attachmentID);
@@ -153,6 +169,7 @@
         }
     }
 
+    // Function to handle file copying
     async function handleFileCopy(source, destination) {
         try {
             const sourceFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsIFile);
@@ -172,6 +189,7 @@
         }
     }
 
+    // Function to handle duplicate files by appending a counter to the filename
     async function handleDuplicateFile(file) {
         let counter = 1;
         let newFileName = file.leafName.replace(/(\.[^\.]+)$/, ` (${counter})$1`);
@@ -187,6 +205,7 @@
         return newFile;
     }
 
+    // Function to normalize the file path by escaping backslashes
     function normalizePath(path) {
         return path.replace(/\\/g, '\\\\'); // Ensure all backslashes are escaped
     }
