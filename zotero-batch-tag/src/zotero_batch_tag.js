@@ -1,6 +1,11 @@
 (async function() {
     const startTime = performance.now();
 
+    // Function to escape special characters for regex
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+    }
+
     // Function to get items to edit based on user selection
     async function getItemsToEdit() {
         const zoteroPane = Zotero.getActiveZoteroPane();
@@ -288,6 +293,79 @@
         alert(`All tags except "${tagsToKeep.join(', ')}" removed from ${contextDescription}.`);
     }
 
+    // Function to split a tag into multiple tags
+    async function splitTagInItems(tag, delimiter, items) {
+        if (!tag || !delimiter) {
+            alert("Invalid tag or delimiter.");
+            return;
+        }
+
+        const itemsToSplitTag = items.filter(item => {
+            const tags = item.getTags().map(t => t.tag);
+            return tags.includes(tag);
+        });
+
+        if (itemsToSplitTag.length === 0) {
+            alert(`No items found with the tag "${tag}".`);
+            return;
+        }
+
+        console.log(`Splitting tag "${tag}" into multiple tags in ${itemsToSplitTag.length} item(s).`);
+
+        const promises = itemsToSplitTag.map(async item => {
+            try {
+                item.removeTag(tag);
+                const newTags = tag.split(delimiter).map(t => t.trim());
+                for (const newTag of newTags) {
+                    item.addTag(newTag);
+                }
+                await item.saveTx();
+                console.log(`Tag "${tag}" split into "${newTags.join(', ')}" in item ${item.id}.`);
+            } catch (error) {
+                console.error(`Error splitting tag in item ${item.id}: ${error.message}`);
+            }
+        });
+
+        await Promise.all(promises);
+        alert(`Tag "${tag}" split into multiple tags in ${itemsToSplitTag.length} item(s).`);
+    }
+
+    // Function to combine multiple tags into one
+    async function combineTagsInItems(tags, newTag, items) {
+        if (!tags || tags.length === 0 || !newTag) {
+            alert("Invalid tags or new tag.");
+            return;
+        }
+
+        const itemsToCombineTags = items.filter(item => {
+            const itemTags = item.getTags().map(t => t.tag);
+            return tags.every(tag => itemTags.includes(tag));
+        });
+
+        if (itemsToCombineTags.length === 0) {
+            alert(`No items found with the tags "${tags.join(', ')}".`);
+            return;
+        }
+
+        console.log(`Combining tags "${tags.join(', ')}" into "${newTag}" in ${itemsToCombineTags.length} item(s).`);
+
+        const promises = itemsToCombineTags.map(async item => {
+            try {
+                for (const tag of tags) {
+                    item.removeTag(tag);
+                }
+                item.addTag(newTag);
+                await item.saveTx();
+                console.log(`Tags "${tags.join(', ')}" combined into "${newTag}" in item ${item.id}.`);
+            } catch (error) {
+                console.error(`Error combining tags in item ${item.id}: ${error.message}`);
+            }
+        });
+
+        await Promise.all(promises);
+        alert(`Tags "${tags.join(', ')}" combined into "${newTag}" in ${itemsToCombineTags.length} item(s).`);
+    }
+
     function logTime(label, time) {
         try {
             console.log(`${label}: ${(time / 1000).toFixed(2)} seconds`);
@@ -304,7 +382,7 @@
 
         console.log(`Total items to edit: ${items.length}`);
 
-        const action = prompt("Enter '1' to add a tag, '2' to remove a tag, '3' to replace a tag, '4' to remove all tags, '5' to remove multiple tags by search, or '6' to remove all tags except specified ones:");
+        const action = prompt("Enter '1' to add a tag, '2' to remove tags (multiple options), '3' to replace a tag, '4' to split a tag, or '5' to combine tags:");
         if (action === '1') {
             const tag = prompt("Enter the tag to add:");
             if (tag) {
@@ -313,12 +391,35 @@
                 alert("No tag entered.");
             }
         } else if (action === '2') {
-            const allTags = getAllTags(items);
-            const searchTerm = prompt("Enter the tag to search for:");
-            const matchingTags = searchTags(allTags, searchTerm);
-            const tag = selectTagsFromSearchResults(matchingTags);
-            if (tag) {
-                await removeTagFromItems(tag[0], items);
+            const removeAction = prompt("Enter '1' to remove a single tag, '2' to remove multiple tags by search, '3' to remove all tags, or '4' to remove all tags except specified ones:");
+            if (removeAction === '1') {
+                const allTags = getAllTags(items);
+                const searchTerm = prompt("Enter the tag to search for:");
+                const matchingTags = searchTags(allTags, searchTerm);
+                const tag = selectTagsFromSearchResults(matchingTags);
+                if (tag) {
+                    await removeTagFromItems(tag[0], items);
+                }
+            } else if (removeAction === '2') {
+                const allTags = getAllTags(items);
+                const searchTerm = prompt("Enter the tag search term (e.g., 'temp*' to match 'temp', 'temporary', etc.):");
+                const matchingTags = searchTags(allTags, searchTerm);
+                const selectedTags = selectTagsFromSearchResults(matchingTags);
+                if (selectedTags) {
+                    await removeSelectedTagsFromItems(selectedTags, items, contextDescription);
+                }
+            } else if (removeAction === '3') {
+                await removeAllTagsFromItems(items);
+            } else if (removeAction === '4') {
+                const allTags = getAllTags(items);
+                const searchTerm = prompt("Enter the tag search term to keep (e.g., 'temp*' to match 'temp', 'temporary', etc.):");
+                const matchingTags = searchTags(allTags, searchTerm);
+                const tagsToKeep = selectTagsFromSearchResults(matchingTags);
+                if (tagsToKeep) {
+                    await removeAllExceptTagsFromItems(tagsToKeep, items, contextDescription);
+                }
+            } else {
+                alert("Invalid remove action.");
             }
         } else if (action === '3') {
             const allTags = getAllTags(items);
@@ -334,22 +435,31 @@
                 }
             }
         } else if (action === '4') {
-            await removeAllTagsFromItems(items);
+            const allTags = getAllTags(items);
+            const searchTerm = prompt("Enter the tag to search for:");
+            const matchingTags = searchTags(allTags, searchTerm);
+            const tag = selectTagsFromSearchResults(matchingTags);
+            if (tag) {
+                const delimiter = prompt("Enter the delimiter to split the tag:");
+                if (delimiter) {
+                    await splitTagInItems(tag[0], delimiter, items);
+                } else {
+                    alert("No delimiter entered.");
+                }
+            }
         } else if (action === '5') {
             const allTags = getAllTags(items);
-            const searchTerm = prompt("Enter the tag search term (e.g., 'temp*' to match 'temp', 'temporary', etc.):");
-            const matchingTags = searchTags(allTags, searchTerm);
-            const selectedTags = selectTagsFromSearchResults(matchingTags);
-            if (selectedTags) {
-                await removeSelectedTagsFromItems(selectedTags, items, contextDescription);
-            }
-        } else if (action === '6') {
-            const allTags = getAllTags(items);
-            const searchTerm = prompt("Enter the tag search term to keep (e.g., 'temp*' to match 'temp', 'temporary', etc.):");
-            const matchingTags = searchTags(allTags, searchTerm);
-            const tagsToKeep = selectTagsFromSearchResults(matchingTags);
-            if (tagsToKeep) {
-                await removeAllExceptTagsFromItems(tagsToKeep, items, contextDescription);
+            const searchTerm = prompt("Enter the tags to search for (separated by commas):");
+            const tagSearchTerms = searchTerm.split(',').map(t => t.trim());
+            const matchingTags = tagSearchTerms.map(term => searchTags(allTags, term)).flat();
+            const tags = selectTagsFromSearchResults(matchingTags);
+            if (tags) {
+                const newTag = prompt("Enter the new combined tag:");
+                if (newTag) {
+                    await combineTagsInItems(tags, newTag, items);
+                } else {
+                    alert("No new tag entered.");
+                }
             }
         } else {
             alert("Invalid action.");
