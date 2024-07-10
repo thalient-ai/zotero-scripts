@@ -9,7 +9,7 @@
         }
 
         const weights = {
-            title: 0.45,
+            title: 0.4,
             shortTitle: 0.05,
             creators: 0.2,
             date: 0.05,
@@ -17,7 +17,8 @@
             place: 0.05,
             journal: 0.05,
             DOI: 0.05,
-            ISBN: 0.05
+            ISBN: 0.05,
+            itemType: 0.05 // Added weight for item type
         };
 
         normalizeWeights(weights);
@@ -67,7 +68,7 @@ function normalizeWeights(weights) {
 
 // Prompts the user to enter a similarity threshold, ensuring it is a valid number between 0 and 1
 function getUserInputThreshold(weights) {
-    const weightsInfo = `Weights used in the similarity calculation:\nTitle: ${weights.title.toFixed(2)}\nShort Title: ${weights.shortTitle.toFixed(2)}\nCreators: ${weights.creators.toFixed(2)}\nDate: ${weights.date.toFixed(2)}\nPublisher: ${weights.publisher.toFixed(2)}\nPlace: ${weights.place.toFixed(2)}\nJournal: ${weights.journal.toFixed(2)}\nDOI: ${weights.DOI.toFixed(2)}\nISBN: ${weights.ISBN.toFixed(2)}\n\n`;
+    const weightsInfo = `Weights used in the similarity calculation:\nTitle: ${weights.title.toFixed(2)}\nShort Title: ${weights.shortTitle.toFixed(2)}\nCreators: ${weights.creators.toFixed(2)}\nDate: ${weights.date.toFixed(2)}\nPublisher: ${weights.publisher.toFixed(2)}\nPlace: ${weights.place.toFixed(2)}\nJournal: ${weights.journal.toFixed(2)}\nDOI: ${weights.DOI.toFixed(2)}\nISBN: ${weights.ISBN.toFixed(2)}\nItem Type: ${weights.itemType.toFixed(2)}\n\n`; // Added item type to weights info
     const thresholdInput = prompt(weightsInfo + "Enter the similarity threshold for detecting duplicates (a number between 0 and 1, e.g., 0.6 for 60% similarity):", "0.6");
 
     // Sanitize and validate the threshold input
@@ -111,12 +112,13 @@ async function detectPotentialDuplicatesOptimized(items, threshold, weights) {
 
 // Normalizes the fields of an item for comparison
 function normalizeItemFields(item, weights) {
-    const fields = ['title', 'shortTitle', 'date', 'publisher', 'place', 'journal', 'DOI', 'ISBN'];
+    const fields = ['title', 'shortTitle', 'date', 'publisher', 'place', 'journal', 'DOI', 'ISBN', 'itemType']; // Added item type to fields
     const normalizedItem = {};
     fields.forEach(field => {
         normalizedItem[field] = normalizeField(item.getField(field));
     });
     normalizedItem.creators = normalizeCreators(item.getCreators());
+    normalizedItem.itemType = item.itemType.toLowerCase().trim(); // Normalize item type
     return normalizedItem;
 }
 
@@ -132,7 +134,7 @@ function normalizeCreators(creators) {
 
 // Calculates the similarity between two items using the Jaccard similarity index
 function calculateSimilarity(item1, item2, weights) {
-    const fields = ['title', 'shortTitle', 'date', 'publisher', 'place', 'journal', 'DOI', 'ISBN'];
+    const fields = ['title', 'shortTitle', 'date', 'publisher', 'place', 'journal', 'DOI', 'ISBN', 'itemType']; // Added item type to fields
 
     let totalWeight = 0;
     let combinedSimilarity = 0;
