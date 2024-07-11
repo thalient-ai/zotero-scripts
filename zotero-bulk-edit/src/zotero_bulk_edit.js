@@ -172,7 +172,7 @@
     function autocompletePrompt(promptText, suggestions) {
         let input = "";
         while (true) {
-            input = prompt(promptText + "\n\nCurrent input: " + input + "\n\nStart typing the name of the field or item type you want to edit (e.g., 'title', 'publisher', 'book', 'journalArticle', etc.).");
+            input = prompt(promptText + "\n\nCurrent input: " + input + "\n\nStart typing the name of the field or item type you want to edit (e.g., 'title', 'publisher', 'book', 'journal article', etc.). The script will search and options in the next prompt.");
             if (input === null) return null;
 
             let matches = suggestions.filter(suggestion => suggestion.localized.toLowerCase().includes(input.toLowerCase()));
@@ -240,10 +240,21 @@
 
     // Function to update item type
     async function updateItemType(itemsToEdit, newType) {
+        const typeID = Zotero.ItemTypes.getID(newType);
+        if (!typeID) {
+            alert(`Invalid item type: ${newType}`);
+            return;
+        }
         await Zotero.DB.executeTransaction(async function() {
             for (let item of itemsToEdit) {
-                item.setType(Zotero.ItemTypes.getID(newType));
-                await item.save();
+                // Ensure only parent items are updated
+                if (!item.isAttachment() || item.getField('parentItemID')) {
+                    console.log(`Updating item ${item.id} to type ${newType} (ID: ${typeID})`);
+                    item.setType(typeID);
+                    await item.save();
+                } else {
+                    console.log(`Skipping attachment with no parent: Item ID ${item.id}`);
+                }
             }
         });
         alert(`Item types updated to "${newType}" for selected items.`);
@@ -398,7 +409,7 @@
         }
 
         // Prompt the user to choose between modifying fields or item types
-        const editOption = prompt("Do you want to modify fields or item types?\n\nEnter '1' to modify fields or '2' to modify item types:");
+        const editOption = prompt("Do you want to modify fields or item type?\n\nEnter '1' to modify fields or '2' to modify item type:");
         if (editOption !== '1' && editOption !== '2') {
             alert("Invalid selection. Please enter '1' or '2'.");
             return;
