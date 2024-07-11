@@ -12,8 +12,8 @@
             }
 
             const weights = {
-                lastName: 0.4,
-                firstName: 0.4,
+                lastName: 0.5,
+                firstName: 0.3,
                 fullName: 0.2
             };
 
