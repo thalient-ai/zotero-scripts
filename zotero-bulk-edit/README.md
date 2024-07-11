@@ -26,12 +26,13 @@ This project builds on [Schoeneh's](https://github.com/Schoeneh) Zotero Search a
 ## Getting Started
 
 0. Download the script file: [zotero-bulk-edit](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-bulk-edit/src/zotero_bulk_edit.js)
-1. **Select Items in Zotero**: Begin by selecting the items you want to edit in Zotero.
+1. **Select Items in Zotero**: Begin by selecting the items you want to edit in Zotero. You can select multiple items individually, all items in the active collection, or all items in a saved search.
 2. **Run the Script**: Execute the script to start the bulk editing process.
-3. **Field Selection**: When prompted, start typing the field name you want to edit. The script will show matching options for you to confirm. If multiple matches are found, you will be prompted to select the correct field. For example, if you type "date," you might see options like "Date," "Date Decided," and "Date Enacted." Simply enter the number corresponding to your choice.
-4. **Search and Replace**: Enter the search term using regular expressions for advanced search patterns, and specify the replacement value. Special characters can be escaped using `\`.
-5. **Confirm Changes**: Review the preview of the changes for the first matching record and confirm to apply the edits.
-6. **Editing many items will take time, a confirmation window will be presented at the completion**
+3. **Field or Item Type**: Choose whether to edit Metadata Fields (e.g., Title, Publisher, etc.) or Item Types (Document, Book, etc.)
+4. **Field Selection**: When prompted, start typing the field name you want to edit. The script will show matching options for you to confirm. If multiple matches are found, you will be prompted to select the correct field. For example, if you type "date," you might see options like "Date," "Date Decided," and "Date Enacted." Simply enter the number corresponding to your choice.
+5. **Search and Replace**: Enter the search term using regular expressions for advanced search patterns, and specify the replacement value. Special characters can be escaped using `\`.
+6. **Confirm Changes**: Review the preview of the changes for the first matching record and confirm to apply the edits.
+7. **Editing many items will take time, a confirmation window will be presented at the completion**
 
 ## Example
 
