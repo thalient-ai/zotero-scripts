@@ -27,6 +27,7 @@ All scripts were written for Zotero 7
 | **Batch Tagging (`zotero_batch_tag.js`)** | Add, remove, replace, split, and combine tags for multiple Zotero items. | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-batch-tag) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-batch-tag/src/zotero_batch_tag.js) |
 | **Bulk Edit (`zotero_bulk_edit.js`)** | Edit the metadata (fields, notes, and authors) for multiple Zotero items. | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-bulk-edit) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-bulk-edit/src/zotero_bulk_edit.js) |
 | **Duplicate Enhanced (`duplicate_enhanced.js`)** | Detection of duplicate items in your Zotero library based on customizable similarity thresholds and weights. | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-duplicate-enhanced) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-duplicate-enhanced/src/duplicate_enhanced.js) |
+| **Similar Name Detection (`similar_name_detection.js`)** | Detection of duplicate author names based on customizable similarity | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-similar-name-detection) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-similar-name-detection/src/similar_name_detection.js) |
 | **Text Case Conversion (`zotero-text-case.js`)** | Converts the case of titles for selected Zotero items. | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-text-case) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-text-case/src/zotero-text-case.js) |
 
 
@@ -69,6 +70,10 @@ If you clone or fork the repository, you can add the scripts (.js) to your Zoter
 #### [Duplicate Enhanced (`duplicate_enhanced.js`)](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-duplicate-enhanced/src/duplicate_enhanced.js)
 - The [built-in duplicate detection](https://www.zotero.org/support/duplicate_detection) in Zotero is very rudimentary and rigid. Items that are duplicates but have slight differences in their metadata are not detected using the built-in method.
 - This script detects duplicates using a similarity calculation of key metadata fields. The user can modify the script to set weights as well as set the similarity threshold through prompts. When a duplicate is detected, the script presents the items and their metadata to the user along with the calculated similarity. The user can then add a unique tag to both, move a duplicate to the trash, or ignore the duplicates.
+
+#### [Similar Name Detection (`similar_name_detection.js`)](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-similar-name-detection/src/similar_name_detection.js)
+- You may run into an issue where the name of an author is different across multiple items. For example, "John Doe", "John J. Doe", "J. J. Doe". 
+- This script compares author names across multiple items and detects similar names like the example above. The script then provides the option to rename those author names into a user-defined consistent format.
 
 #### [Text Case Conversion (`zotero-text-case.js`)](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-text-case/src/zotero-text-case.js)
 - Zotero has a built-in feature to change an item's title to `Title Case` or `Sentence Case`. However, these options do not handle edge cases well, such as abbreviations and acronyms. Additionally, there is no option for `Upper Case` or `Lower Case`.
