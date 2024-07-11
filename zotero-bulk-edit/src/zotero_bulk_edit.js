@@ -118,19 +118,61 @@
         { "field": "websiteType", "localized": "Website Type" }
     ];
 
-    // Sort fields alphabetically by localized name
+    // Item type definitions
+    const itemTypes = [
+        { "type": "artwork", "localized": "Artwork" },
+        { "type": "audioRecording", "localized": "Audio Recording" },
+        { "type": "bill", "localized": "Bill" },
+        { "type": "blogPost", "localized": "Blog Post" },
+        { "type": "book", "localized": "Book" },
+        { "type": "bookSection", "localized": "Book Section" },
+        { "type": "case", "localized": "Case" },
+        { "type": "computerProgram", "localized": "Software" },
+        { "type": "conferencePaper", "localized": "Conference Paper" },
+        { "type": "dataset", "localized": "Dataset" },
+        { "type": "dictionaryEntry", "localized": "Dictionary Entry" },
+        { "type": "document", "localized": "Document" },
+        { "type": "email", "localized": "Email" },
+        { "type": "encyclopediaArticle", "localized": "Encyclopedia Article" },
+        { "type": "film", "localized": "Film" },
+        { "type": "forumPost", "localized": "Forum Post" },
+        { "type": "hearing", "localized": "Hearing" },
+        { "type": "instantMessage", "localized": "Instant Message" },
+        { "type": "interview", "localized": "Interview" },
+        { "type": "journalArticle", "localized": "Journal Article" },
+        { "type": "letter", "localized": "Letter" },
+        { "type": "magazineArticle", "localized": "Magazine Article" },
+        { "type": "manuscript", "localized": "Manuscript" },
+        { "type": "map", "localized": "Map" },
+        { "type": "newspaperArticle", "localized": "Newspaper Article" },
+        { "type": "patent", "localized": "Patent" },
+        { "type": "podcast", "localized": "Podcast" },
+        { "type": "preprint", "localized": "Preprint" },
+        { "type": "presentation", "localized": "Presentation" },
+        { "type": "radioBroadcast", "localized": "Radio Broadcast" },
+        { "type": "report", "localized": "Report" },
+        { "type": "standard", "localized": "Standard" },
+        { "type": "statute", "localized": "Statute" },
+        { "type": "thesis", "localized": "Thesis" },
+        { "type": "tvBroadcast", "localized": "TV Broadcast" },
+        { "type": "videoRecording", "localized": "Video Recording" },
+        { "type": "webpage", "localized": "Web Page" }
+    ];
+
+    // Sort fields and item types alphabetically by localized name
     fields.sort((a, b) => a.localized.localeCompare(b.localized));
+    itemTypes.sort((a, b) => a.localized.localeCompare(b.localized));
 
     // Function to escape special characters for regular expressions
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
-    // Function to prompt user to select a field with autocomplete suggestions
+    // Function to prompt user to select a field or item type with autocomplete suggestions
     function autocompletePrompt(promptText, suggestions) {
         let input = "";
         while (true) {
-            input = prompt(promptText + "\n\nCurrent input: " + input + "\n\nStart typing the name of the field you want to edit (e.g., 'title', 'publisher', 'type', 'name', etc.).");
+            input = prompt(promptText + "\n\nCurrent input: " + input + "\n\nStart typing the name of the field or item type you want to edit (e.g., 'title', 'publisher', 'book', 'journalArticle', etc.).");
             if (input === null) return null;
 
             let matches = suggestions.filter(suggestion => suggestion.localized.toLowerCase().includes(input.toLowerCase()));
@@ -139,7 +181,7 @@
                 continue;
             } else {
                 let suggestionText = matches.map((match, index) => `${index + 1}. ${match.localized}`).join("\n");
-                let choice = prompt(`Multiple matches found:\n\n${suggestionText}\n\nType the number to select the field:`);
+                let choice = prompt(`Multiple matches found:\n\n${suggestionText}\n\nType the number to select the field or item type:`);
                 if (choice === null || choice === "") {
                     alert("Input canceled. Please start over.");
                     return null;
@@ -155,17 +197,17 @@
     }
 
     // Function to get items to edit based on user selection
-    async function getItemsToEdit(editOption) {
+    async function getItemsToEdit(editScope) {
         const zoteroPane = Zotero.getActiveZoteroPane();
 
-        if (editOption === '2') {
+        if (editScope === '2') {
             let collection = zoteroPane.getSelectedCollection();
             if (!collection) {
                 alert("No collection selected.");
                 return null;
             }
             return await collection.getChildItems();
-        } else if (editOption === '3') {
+        } else if (editScope === '3') {
             let savedSearch = zoteroPane.getSelectedSavedSearch();
             if (!savedSearch) {
                 alert("No saved search selected.");
@@ -196,7 +238,18 @@
         }
     }
 
-    // Function to update creator names
+    // Function to update item type
+    async function updateItemType(itemsToEdit, newType) {
+        await Zotero.DB.executeTransaction(async function() {
+            for (let item of itemsToEdit) {
+                item.setType(Zotero.ItemTypes.getID(newType));
+                await item.save();
+            }
+        });
+        alert(`Item types updated to "${newType}" for selected items.`);
+    }
+
+    // Function to update creators
     async function updateCreators(fieldName, itemsToEdit, searchRegex, replace) {
         let deletionConfirmed = false;
         let toBeDeletedItems = [];
@@ -332,82 +385,99 @@
     }
 
     try {
-        // Start the field selection process
-        const selectedField = autocompletePrompt("Start typing the field name:", fields);
-        if (!selectedField) {
-            alert("Field selection canceled or invalid.");
-            return;
-        }
-        const fieldName = selectedField.field;
-        alert(`Field "${selectedField.localized}" selected.`);
-
-        if (fieldName === "note") {
-            alert("Warning: Only selected Notes can be edited. Ensure you have selected the notes you wish to edit.");
-        }
-
-        const search = prompt("Enter the characters or words to search for. Use * as a wildcard. Leave empty to search for blank fields. Use \\ to escape special characters (e.g., C++ becomes C\\+\\+).", "");
-        if (search === null) {
-            alert("Search operation canceled.");
+        // Prompt the user to choose the scope of items to edit
+        const editScope = prompt("Enter '1' to edit only selected items, '2' to edit all items in the current collection, or '3' to edit all items in a saved search:");
+        if (!['1', '2', '3'].includes(editScope)) {
+            alert("Invalid selection. Please enter '1', '2', or '3'.");
             return;
         }
 
-        const replace = prompt("Enter the replacement term:", "");
-        if (replace === null) {
-            alert("Replace operation canceled.");
+        let itemsToEdit = await getItemsToEdit(editScope);
+        if (!itemsToEdit) {
             return;
         }
 
-        let searchRegex;
-        if (search === "") {
-            searchRegex = /^$/;
-        } else {
-            const regexPattern = search.split("*").map(escapeRegExp).join(".*");
-            searchRegex = new RegExp(regexPattern, "i");
+        // Prompt the user to choose between modifying fields or item types
+        const editOption = prompt("Do you want to modify fields or item types?\n\nEnter '1' to modify fields or '2' to modify item types:");
+        if (editOption !== '1' && editOption !== '2') {
+            alert("Invalid selection. Please enter '1' or '2'.");
+            return;
         }
 
-        let itemsToEdit;
-        if (fieldName === "note") {
-            itemsToEdit = Zotero.getActiveZoteroPane().getSelectedItems().filter(item => item.isNote());
-            if (!itemsToEdit.length) {
-                alert("No Notes selected.");
+        let selectedField;
+        if (editOption === '1') {
+            // Field selection process
+            selectedField = autocompletePrompt("Start typing the field name:", fields);
+            if (!selectedField) {
+                alert("Field selection canceled or invalid.");
                 return;
             }
-        } else {
-            const editOption = prompt("Enter '1' to edit only selected items, '2' to edit all items in the current collection, or '3' to edit all items in a saved search:");
-            if (!['1', '2', '3'].includes(editOption)) {
-                alert("Invalid selection. Please enter '1', '2', or '3'.");
+            const fieldName = selectedField.field;
+            alert(`Field "${selectedField.localized}" selected.`);
+
+            const search = prompt("Enter the characters or words to search for. Use * as a wildcard. Leave empty to search for blank fields. Use \\ to escape special characters (e.g., C++ becomes C\\+\\+).", "");
+            if (search === null) {
+                alert("Search operation canceled.");
                 return;
             }
+
+            const replace = prompt("Enter the replacement term:", "");
+            if (replace === null) {
+                alert("Replace operation canceled.");
+                return;
+            }
+
+            let searchRegex;
+            if (search === "") {
+                searchRegex = /^$/;
+            } else {
+                const regexPattern = search.split("*").map(escapeRegExp).join(".*");
+                searchRegex = new RegExp(regexPattern, "i");
+            }
+
+            const confirmationMessage = `You have chosen to edit ${itemsToEdit.length} records.\n\nField: ${selectedField.localized}\nSearch term: ${search}\nReplace term: ${replace}\n\nDo you want to proceed?`;
+            const confirmation = confirm(confirmationMessage);
+            if (!confirmation) {
+                console.log("User cancelled the editing process.");
+                return;
+            }
+            console.log(confirmationMessage);
+
             try {
-                itemsToEdit = await getItemsToEdit(editOption);
-                if (!itemsToEdit) {
-                    return;
+                if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
+                    await updateCreators(fieldName, itemsToEdit, searchRegex, replace);
+                } else if (fieldName === "note") {
+                    await updateNotes(itemsToEdit, searchRegex, replace);
+                } else {
+                    await updateFieldValues(fieldName, selectedField, itemsToEdit, searchRegex, replace);
                 }
             } catch (error) {
-                alert(`An error occurred while retrieving items: ${error.message}`);
+                alert(`An error occurred during the update process: ${error.message}`);
+                console.error(`Error in bulk edit script: ${error.message}`);
+            }
+        } else if (editOption === '2') {
+            // Item type selection process
+            const selectedType = autocompletePrompt("Start typing the item type:", itemTypes);
+            if (!selectedType) {
+                alert("Item type selection canceled or invalid.");
                 return;
             }
-        }
+            alert(`Item type "${selectedType.localized}" selected.`);
 
-        const confirmationMessage = `You have chosen to edit ${itemsToEdit.length} records.\n\nField: ${selectedField.localized}\nSearch term: ${search}\nReplace term: ${replace}\n\nDo you want to proceed?`;
-        const confirmation = confirm(confirmationMessage);
-        if (!confirmation) {
-            console.log("User cancelled the editing process.");
-            return;
-        }
-        console.log(confirmationMessage);
-
-        try {
-            if (fieldName === "creatorFirstName" || fieldName === "creatorLastName") {
-                await updateCreators(fieldName, itemsToEdit, searchRegex, replace);
-            } else if (fieldName === "note") {
-                await updateNotes(itemsToEdit, searchRegex, replace);
-            } else {
-                await updateFieldValues(fieldName, selectedField, itemsToEdit, searchRegex, replace);
+            const confirmationMessage = `You have chosen to edit ${itemsToEdit.length} records.\n\nNew Item Type: ${selectedType.localized}\n\nDo you want to proceed?`;
+            const confirmation = confirm(confirmationMessage);
+            if (!confirmation) {
+                console.log("User cancelled the editing process.");
+                return;
             }
-        } catch (error) {
-            alert(`An error occurred during the update process: ${error.message}`);
-            console.error(`Error in bulk edit script: ${error.message}`);
+            console.log(confirmationMessage);
+
+            try {
+                await updateItemType(itemsToEdit, selectedType.type);
+            } catch (error) {
+                alert(`An error occurred while updating item types: ${error.message}`);
+                console.error(`Error in bulk edit script: ${error.message}`);
+            }
         }
     } catch (error) {
         console.error(`Error in bulk edit script: ${error.message}`);
