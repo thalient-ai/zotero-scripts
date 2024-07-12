@@ -72,12 +72,12 @@ If you clone or fork the repository, you can add the scripts (.js) to your Zoter
 - This script detects duplicates using a similarity calculation of key metadata fields. The user can modify the script to set weights as well as set the similarity threshold through prompts. When a duplicate is detected, the script presents the items and their metadata to the user along with the calculated similarity. The user can then add a unique tag to both, move a duplicate to the trash, or ignore the duplicates.
 
 #### [Similar Name Detection (`similar_name_detection.js`)](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-similar-name-detection/src/similar_name_detection.js)
-- You may run into an issue where the name of an author is different across multiple items. For example, "John Doe", "John J. Doe", "J. J. Doe". 
-- This script compares author names across multiple items and detects similar names like the example above. The script then provides the option to rename those author names into a user-defined consistent format.
+- An author's name may appear differently across multiple items. For example, "John Doe", "John J. Doe", "J. J. Doe". 
+- This script compares author names across multiple items and detects similar names like the example above. The script then provides the option to rename those author names using a user-defined consistent format.
 
 #### [Text Case Conversion (`zotero-text-case.js`)](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-text-case/src/zotero-text-case.js)
 - Zotero has a built-in feature to change an item's title to `Title Case` or `Sentence Case`. However, these options do not handle edge cases well, such as abbreviations and acronyms. Additionally, there is no option for `Upper Case` or `Lower Case`.
-- This script converts the titles of multiple items to `Title Case`, `Sentence Case`, `Upper Case`, or `Lower Case`, using a custom capitalization dictionary for specific terms and acronyms. The user can add and remove terms from the custom dictionary in the script. The script conforms to the APA rules for `Title Case`.
+- This script converts the titles of multiple items to `Title Case`, `Sentence Case`, `Upper Case`, or `Lower Case`. The script also includes a custom capitalization dictionary to specially handle user-defined terms and acronyms. The user can add and remove terms from the custom dictionary in the script. The script conforms to the APA rules for `Title Case`.
 
 ## Contributing
 
