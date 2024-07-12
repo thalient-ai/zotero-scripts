@@ -350,47 +350,56 @@
         alert("Notes updated.");
     }
 
-    // Function to update field values
-    async function updateFieldValues(fieldName, selectedField, itemsToEdit, searchRegex, replace) {
-        let idsCorrect = [];
-        for (let item of itemsToEdit) {
+// Function to update field values
+async function updateFieldValues(fieldName, selectedField, itemsToEdit, searchRegex, replace) {
+    let idsCorrect = [];
+    let invalidFieldCount = 0;
+
+    for (let item of itemsToEdit) {
+        try {
             let fieldValue = item.getField(fieldName) || "";
             if (searchRegex.test(fieldValue)) {
                 idsCorrect.push(item.id);
             }
+        } catch (error) {
+            console.error(`Error in bulk edit script: '${fieldName}' is not a valid field for type '${item.itemType}'. Skipping this item.`);
+            invalidFieldCount++;
         }
+    }
 
-        if (!idsCorrect.length) {
-            alert("No items found with the specified search term.");
+    if (!idsCorrect.length && invalidFieldCount === 0) {
+        alert("No items found with the specified search term.");
+        return;
+    }
+
+    // Preview of Edit
+    if (idsCorrect.length > 0) {
+        let previewItem = await Zotero.Items.getAsync(idsCorrect[0]);
+        let previewOldValue = previewItem.getField(fieldName) || "";
+        let previewNewValue = previewOldValue.replace(searchRegex, replace);
+        let confirmed = confirm(`${idsCorrect.length} item(s) found with the specified search term in the field "${selectedField.localized}".\n\nExample of change:\nOld: ${previewOldValue}\nNew: ${previewNewValue}\n\nDo you want to apply these changes to all items?`);
+
+        if (!confirmed) {
+            alert("Update operation canceled.");
             return;
         }
-
-        // Preview of Edit
-        if (idsCorrect.length > 0) {
-            let previewItem = await Zotero.Items.getAsync(idsCorrect[0]);
-            let previewOldValue = previewItem.getField(fieldName) || "";
-            let previewNewValue = previewOldValue.replace(searchRegex, replace);
-            let confirmed = confirm(`${idsCorrect.length} item(s) found with the specified search term in the field "${selectedField.localized}".\n\nExample of change:\nOld: ${previewOldValue}\nNew: ${previewNewValue}\n\nDo you want to apply these changes to all items?`);
-
-            if (!confirmed) {
-                alert("Update operation canceled.");
-                return;
-            }
-        }
-
-        // Replace values in selected items
-        await Zotero.DB.executeTransaction(async function() {
-            for (let id of idsCorrect) {
-                let item = await Zotero.Items.getAsync(id);
-                let oldValue = item.getField(fieldName) || "";
-                let newValue = oldValue.replace(searchRegex, replace);
-                console.log(`Updating item ${item.id} field "${fieldName}" from "${oldValue}" to "${newValue}"`);
-                item.setField(fieldName, newValue);
-                await item.save();
-            }
-        });
-        alert(`${idsCorrect.length} item(s) updated successfully.\n\nThe specified search term was replaced in the "${selectedField.localized}" field.`);
     }
+
+    // Replace values in selected items
+    await Zotero.DB.executeTransaction(async function() {
+        for (let id of idsCorrect) {
+            let item = await Zotero.Items.getAsync(id);
+            let oldValue = item.getField(fieldName) || "";
+            let newValue = oldValue.replace(searchRegex, replace);
+            console.log(`Updating item ${item.id} field "${fieldName}" from "${oldValue}" to "${newValue}"`);
+            item.setField(fieldName, newValue);
+            await item.save();
+        }
+    });
+
+    alert(`${idsCorrect.length} item(s) updated successfully.\n\nThe specified search term was replaced in the "${selectedField.localized}" field.\n\n${invalidFieldCount} item(s) were not updated due to invalid fields.`);
+}
+
 
     function logTime(label, time) {
         try {
@@ -467,7 +476,6 @@
                     await updateFieldValues(fieldName, selectedField, itemsToEdit, searchRegex, replace);
                 }
             } catch (error) {
-                alert(`An error occurred during the update process: ${error.message}`);
                 console.error(`Error in bulk edit script: ${error.message}`);
             }
         } else if (editOption === '2') {
@@ -489,13 +497,11 @@
             try {
                 await updateItemType(itemsToEdit, selectedType.localized);
             } catch (error) {
-                alert(`An error occurred while updating item types: ${error.message}`);
                 console.error(`Error in bulk edit script: ${error.message}`);
             }
         }
     } catch (error) {
         console.error(`Error in bulk edit script: ${error.message}`);
-        alert(`An error occurred: ${error.message}`);
     } finally {
         const endTime = performance.now();
         logTime("Total time", endTime - startTime);
