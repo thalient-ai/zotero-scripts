@@ -172,7 +172,7 @@
     function autocompletePrompt(promptText, suggestions) {
         let input = "";
         while (true) {
-            input = prompt(promptText + "\n\nCurrent input: " + input + "\n\nStart typing the name of the field or item type you want to edit (e.g., 'title', 'publisher', 'book', 'journal article', etc.). The script will search and options in the next prompt.");
+            input = prompt(promptText + "\n\nCurrent input: " + input + "\n\nStart typing the name of the itme field (e.g., 'Title', 'Publisher', 'Date') or item type (e.g., 'Document', 'Journal Article', 'Book') you want to edit.");
             if (input === null) return null;
 
             let matches = suggestions.filter(suggestion => suggestion.localized.toLowerCase().includes(input.toLowerCase()));
@@ -239,25 +239,30 @@
     }
 
     // Function to update item type
-    async function updateItemType(itemsToEdit, newType) {
+    async function updateItemType(itemsToEdit, newTypeLocalized) {
+        const newType = itemTypes.find(type => type.localized === newTypeLocalized).type;
         const typeID = Zotero.ItemTypes.getID(newType);
         if (!typeID) {
-            alert(`Invalid item type: ${newType}`);
+            alert(`Invalid item type: ${newTypeLocalized}`);
             return;
         }
+        let processedCount = 0;
+        let skippedCount = 0;
         await Zotero.DB.executeTransaction(async function() {
             for (let item of itemsToEdit) {
                 // Ensure only parent items are updated
                 if (!item.isAttachment() || item.getField('parentItemID')) {
-                    console.log(`Updating item ${item.id} to type ${newType} (ID: ${typeID})`);
+                    console.log(`Updating item ${item.id} to type ${newTypeLocalized} (ID: ${typeID})`);
                     item.setType(typeID);
                     await item.save();
+                    processedCount++;
                 } else {
                     console.log(`Skipping attachment with no parent: Item ID ${item.id}`);
+                    skippedCount++;
                 }
             }
         });
-        alert(`Item types updated to "${newType}" for selected items.`);
+        alert(`Item types updated to "${newTypeLocalized}" for selected items.\n\n ${processedCount} item(s) processed,\n\n ${skippedCount} item(s) skipped.`);
     }
 
     // Function to update creators
@@ -409,7 +414,7 @@
         }
 
         // Prompt the user to choose between modifying fields or item types
-        const editOption = prompt("Do you want to modify fields or item type?\n\nEnter '1' to modify fields or '2' to modify item type:");
+        const editOption = prompt("Do you want to modify fields or item types?\n\nEnter '1' to modify fields or '2' to modify item types:");
         if (editOption !== '1' && editOption !== '2') {
             alert("Invalid selection. Please enter '1' or '2'.");
             return;
@@ -424,15 +429,14 @@
                 return;
             }
             const fieldName = selectedField.field;
-            alert(`Field "${selectedField.localized}" selected.`);
 
-            const search = prompt("Enter the characters or words to search for. Use * as a wildcard. Leave empty to search for blank fields. Use \\ to escape special characters (e.g., C++ becomes C\\+\\+).", "");
+            const search = prompt(`Enter the characters or words to search for in the "${selectedField.localized}" field. Use * as a wildcard. Leave empty to search for blank fields. Use \\ to escape special characters (e.g., C++ becomes C\\+\\+).`, "");
             if (search === null) {
                 alert("Search operation canceled.");
                 return;
             }
 
-            const replace = prompt("Enter the replacement term:", "");
+            const replace = prompt(`Enter the replacement term for the "${selectedField.localized}" field:`, "");
             if (replace === null) {
                 alert("Replace operation canceled.");
                 return;
@@ -473,7 +477,6 @@
                 alert("Item type selection canceled or invalid.");
                 return;
             }
-            alert(`Item type "${selectedType.localized}" selected.`);
 
             const confirmationMessage = `You have chosen to edit ${itemsToEdit.length} records.\n\nNew Item Type: ${selectedType.localized}\n\nDo you want to proceed?`;
             const confirmation = confirm(confirmationMessage);
@@ -484,7 +487,7 @@
             console.log(confirmationMessage);
 
             try {
-                await updateItemType(itemsToEdit, selectedType.type);
+                await updateItemType(itemsToEdit, selectedType.localized);
             } catch (error) {
                 alert(`An error occurred while updating item types: ${error.message}`);
                 console.error(`Error in bulk edit script: ${error.message}`);
