@@ -1,30 +1,50 @@
 const Zotero = require("Zotero");
 
-// Function to process renaming of each attachment
+/**
+ * Process the renaming of an individual attachment.
+ * @param {Object} attachment - The attachment to process.
+ * @returns {Object} An object indicating the number of successful renames and errors.
+ */
 async function processRenaming(attachment) {
-    // Check if the attachment is a linked URL, which cannot be renamed
+    // Ensure the attachment is defined before processing.
+    if (!attachment) {
+        Zotero.logError("Attempted to process an undefined attachment.");
+        return { renamed: 0, errors: 1 };
+    }
+
+    // Do not process attachments that are linked URLs because they cannot be renamed.
     if (attachment.attachmentLinkMode === Zotero.Attachments.LINK_MODE_LINKED_URL) {
         Zotero.logError(`Cannot rename linked URL attachment ${attachment.id}.`);
         return { renamed: 0, errors: 1 };
     }
 
-    // Retrieve the current path of the attachment
+    // Check for a valid parent ID, essential for renaming based on parent item metadata.
+    if (!attachment.parentItemID) {
+        Zotero.logError(`Attachment ${attachment.id} does not have a parent item.`);
+        return { renamed: 0, errors: 1 };
+    }
+
+    // Attempt to retrieve the parent item to use its metadata for renaming.
+    const parentItem = await Zotero.Items.getAsync(attachment.parentItemID);
+    if (!parentItem) {
+        Zotero.logError(`No parent item found for attachment ${attachment.id}.`);
+        return { renamed: 0, errors: 1 };
+    }
+
+    // Retrieve and validate the file path of the attachment.
     const currentPath = await attachment.getFilePathAsync();
-    // Check if the current path exists (i.e., the attachment is locally stored)
     if (!currentPath) {
         Zotero.logError(`No local file path available for attachment ${attachment.id}.`);
         return { renamed: 0, errors: 1 };
     }
 
-    // Retrieve the parent item to get its metadata for the renaming process
-    const parentItem = await Zotero.Items.getAsync(attachment.parentItemID);
-    // Construct the new name using the parent item's title
+    // Construct the new file name using the parent item's title and existing extension.
     const newName = Zotero.Attachments.getFileBaseNameFromItem(parentItem);
     const currentName = currentPath.split(/(\\|\/)/g).pop();
     const extension = currentName.includes('.') ? currentName.split('.').pop() : '';
     const finalName = extension ? `${newName}.${extension}` : newName;
 
-    // Rename the file if the new name is different from the current name
+    // Rename the attachment file if the new name differs from the current name.
     if (newName !== currentName) {
         try {
             await attachment.renameAttachmentFile(finalName);
@@ -40,26 +60,33 @@ async function processRenaming(attachment) {
     return { renamed: 0, errors: 0 };
 }
 
-if (items && items.length > 0) {
-    // Using a Set to track processed attachment IDs to prevent processing the same attachment multiple times
-    let processedAttachmentIds = new Set();
+/**
+ * Main execution function that processes either single or multiple items.
+ */
+(async () => {
+    // Guard against missing input.
+    if (!items && !item) {
+        Zotero.alert(null, "Rename Attachments", "[Rename Attachments] No item or items array provided.");
+        return;
+    }
+
+    // Determine the target items based on whether a single item or multiple items are selected.
+    let targetItems = items ? items : (item ? [item] : []);
     let totalRenamed = 0;
     let totalErrors = 0;
 
-    (async () => {
-        for (const currentItem of items) {
-            // Handle both attachments directly and attachments of parent items
-            let attachments = currentItem.itemType === 'attachment' ? [currentItem] : await Zotero.Items.getAsync(currentItem.getAttachments());
-            for (const attachment of attachments) {
-                if (!processedAttachmentIds.has(attachment.id)) {
-                    const result = await processRenaming(attachment);
-                    totalRenamed += result.renamed;
-                    totalErrors += result.errors;
-                    processedAttachmentIds.add(attachment.id);
-                }
-            }
+    // Process each item, handling attachments directly or fetching attachments from items.
+    for (const currentItem of targetItems) {
+        let attachments = currentItem.itemType === 'attachment' ? [currentItem] : await Zotero.Items.getAsync(currentItem.getAttachments());
+        for (const attachment of attachments) {
+            const result = await processRenaming(attachment);
+            totalRenamed += result.renamed;
+            totalErrors += result.errors;
         }
+    }
 
+    // Display a summary alert only if there are changes or errors to report.
+    if (totalRenamed > 0 || totalErrors > 0) {
         Zotero.alert(null, "Rename Attachments", `[Rename Attachments] Successfully renamed ${totalRenamed} attachments. Errors: ${totalErrors}`);
-    })();
-}
+    }
+})();
