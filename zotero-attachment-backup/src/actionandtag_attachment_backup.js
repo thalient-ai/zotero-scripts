@@ -1,16 +1,32 @@
 const Zotero = require("Zotero");
+const window = require("window");
 
 (async function () {
+    if (window.backupAttachmentsRunning) return;
+    window.backupAttachmentsRunning = true;
+
     try {
-        // Check if the action was triggered for a single item to avoid duplicate operations
-        if (item) {
-            return;
+        const zoteroPane = Zotero.getActiveZoteroPane();
+
+        // Get selected items or items from the selected collection
+        let selectedItems = zoteroPane.getSelectedItems();
+        if (!selectedItems.length) {
+            let selectedCollection = zoteroPane.getSelectedCollection();
+            if (selectedCollection) {
+                logMessage(`Items from collection: ${selectedCollection.name}`);
+                selectedItems = await selectedCollection.getChildItems();
+            } else {
+                window.alert("No items or collection selected.");
+                logMessage("No items or collection selected.");
+                window.backupAttachmentsRunning = false;
+                return;
+            }
         }
 
-        // Get the selected items
-        const selectedItems = items || require('ZoteroPane').getSelectedItems();
-        if (!selectedItems || !selectedItems.length) {
-            Zotero.alert(null, "Backup Attachments", "No items selected.");
+        if (!selectedItems.length) {
+            window.alert("No items found to backup.");
+            logMessage("No items found to backup.");
+            window.backupAttachmentsRunning = false;
             return;
         }
 
@@ -22,14 +38,16 @@ const Zotero = require("Zotero");
         const folderPath = await getFolderPath();
         if (!folderPath) {
             Zotero.alert(null, "Backup Attachments", "No folder selected.");
+            window.backupAttachmentsRunning = false;
             return;
         }
 
         // Confirm the backup operation
         const totalAttachments = await countAttachments(parentItems, orphanAttachments);
-        const confirmation = Services.prompt.confirm(null, "Backup Attachments", `You are about to backup ${totalAttachments} attachments to the following directory:\n\n${folderPath}\n\nDo you want to proceed?`);
+        const confirmation = window.confirm(`You are about to backup ${totalAttachments} attachments to the following directory:\n\n${folderPath}\n\nDo you want to proceed?`);
         if (!confirmation) {
             Zotero.alert(null, "Backup Attachments", "Backup process cancelled.");
+            window.backupAttachmentsRunning = false;
             return;
         }
 
@@ -40,6 +58,8 @@ const Zotero = require("Zotero");
     } catch (error) {
         Zotero.logError(`Error: ${error.message}`);
         Zotero.alert(null, "Backup Attachments", `An error occurred: ${error.message}`);
+    } finally {
+        window.backupAttachmentsRunning = false;
     }
 
     // Function to get the folder path for backup
@@ -145,5 +165,14 @@ const Zotero = require("Zotero");
     // Function to normalize the file path by escaping backslashes
     function normalizePath(path) {
         return path.replace(/\\/g, '\\\\'); // Ensure all backslashes are escaped
+    }
+
+    // Utility function to log messages
+    function logMessage(message, type = "info") {
+        if (type === "error") {
+            Zotero.logError(message);
+        } else {
+            Zotero.debug(message);
+        }
     }
 })();
