@@ -12,7 +12,7 @@ const window = require("window");
     Zotero.logError("Starting duplicate detection process.");
 
     try {
-        // Obtain items to edit based on user selection
+        // Obtain items to edit based on user selection or collection
         const items = await getItemsToEdit();
         if (!items || items.length === 0) {
             Zotero.logError("No items to process.");
@@ -89,18 +89,32 @@ async function detectPotentialDuplicates(items, threshold, weights) {
     const potentialDuplicates = [];
     const itemMap = new Map(items.map(item => [item.id, normalizeItemFields(item)]));
 
+    const compareItems = async ([id1, item1], [id2, item2]) => {
+        const similarity = calculateSimilarity(item1, item2, weights);
+        Zotero.logError(`Comparing items ${id1} and ${id2} with similarity: ${similarity}`);
+        if (similarity > threshold) {
+            return { item1: items.find(i => i.id === id1), item2: items.find(i => i.id === id2), similarity };
+        }
+        return null;
+    };
+
+    const comparisons = [];
     for (let [id1, item1] of itemMap) {
         for (let [id2, item2] of itemMap) {
             if (id1 !== id2 && !pairAlreadyProcessed(id1, id2)) {
-                const similarity = calculateSimilarity(item1, item2, weights);
-                Zotero.logError(`Comparing items ${id1} and ${id2} with similarity: ${similarity}`);
-                if (similarity > threshold) {
-                    potentialDuplicates.push({ item1: items.find(i => i.id === id1), item2: items.find(i => i.id === id2), similarity });
-                    markPairAsProcessed(id1, id2);
-                }
+                comparisons.push(compareItems([id1, item1], [id2, item2]));
+                markPairAsProcessed(id1, id2);
             }
         }
     }
+
+    const results = await Promise.all(comparisons);
+    for (const result of results) {
+        if (result !== null) {
+            potentialDuplicates.push(result);
+        }
+    }
+
     return potentialDuplicates;
 }
 
@@ -222,10 +236,16 @@ function logTime(label, milliseconds) {
 
 async function getItemsToEdit() {
     const zoteroPane = Zotero.getActiveZoteroPane();
-    const selectedItems = zoteroPane.getSelectedItems();
-    if (!selectedItems || selectedItems.length === 0) {
-        return null;
+    let selectedItems = zoteroPane.getSelectedItems();
+    if (!selectedItems.length) {
+        let selectedCollection = zoteroPane.getSelectedCollection();
+        if (selectedCollection) {
+            Zotero.logError(`Items from collection: ${selectedCollection.name}`);
+            selectedItems = await selectedCollection.getChildItems();
+        } else {
+            window.alert("No items or collection selected.");
+            return null;
+        }
     }
-
     return selectedItems;
 }
