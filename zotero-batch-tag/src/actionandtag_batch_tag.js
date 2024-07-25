@@ -4,14 +4,12 @@ const window = require("window");
 (async function () {
     const startTime = new Date();
 
-    // Prevent duplicate execution
     if (window.batchTagRunning) return;
     window.batchTagRunning = true;
 
     const customCapitalization = {
         'nist': 'NIST',
         'nerc': 'NERC',
-        // ... (additional custom capitalizations)
     };
 
     function toTitleCase(str, title, currentIndex, totalCount) {
@@ -127,10 +125,14 @@ const window = require("window");
         return Array.from(tagSet);
     }
 
-    function searchTags(allTags, searchTerms) {
-        const terms = searchTerms.split(',').map(term => term.trim());
-        const regexes = terms.map(term => new RegExp(escapeRegExp(term), 'i'));
-        return allTags.filter(tag => regexes.some(regex => regex.test(tag)));
+    function searchTags(allTags, searchTerm) {
+        let regex;
+        if (searchTerm.includes('*')) {
+            regex = new RegExp(searchTerm.replace('*', '.*'), 'i');
+        } else {
+            regex = new RegExp(escapeRegExp(searchTerm), 'i');
+        }
+        return allTags.filter(tag => regex.test(tag));
     }
 
     function selectTagsFromSearchResults(tags) {
@@ -160,29 +162,42 @@ const window = require("window");
         return selectedTags;
     }
 
-    async function performTagOperation(operation, tags, items, newTag = null, delimiter = null) {
+    async function performTagOperation(operation, tags, items, newTags = [], delimiter = null) {
         const promises = items.map(async item => {
             try {
                 if (operation === 'add') {
                     item.addTag(tags[0]);
                 } else if (operation === 'remove') {
-                    item.removeTag(tags[0]);
+                    for (const tag of tags) {
+                        item.removeTag(tag);
+                    }
                 } else if (operation === 'removeAll') {
                     item.setTags([]);
                 } else if (operation === 'replace') {
-                    item.removeTag(tags[0]);
-                    item.addTag(newTag);
+                    for (const tag of tags) {
+                        item.removeTag(tag);
+                    }
+                    item.addTag(newTags[0]);
                 } else if (operation === 'split') {
                     item.removeTag(tags[0]);
-                    const newTags = tags[0].split(delimiter).map(t => t.trim());
-                    for (const newTag of newTags) {
+                    const splitTags = tags[0].split(delimiter).map(t => t.trim());
+                    for (const newTag of splitTags) {
                         item.addTag(newTag);
                     }
                 } else if (operation === 'combine') {
                     for (const tag of tags) {
                         item.removeTag(tag);
                     }
-                    item.addTag(newTag);
+                    for (const newTag of newTags) {
+                        item.addTag(newTag);
+                    }
+                } else if (operation === 'prefix' || operation === 'suffix') {
+                    for (const tag of tags) {
+                        item.removeTag(tag);
+                    }
+                    for (const newTag of newTags) {
+                        item.addTag(newTag);
+                    }
                 }
                 await item.saveTx();
             } catch (error) {
@@ -240,6 +255,36 @@ const window = require("window");
         }
     }
 
+    async function selectBaseTag(allTags) {
+        let baseTagChoices = searchTags(allTags, window.prompt("Enter a search term for the base tag:"));
+        baseTagChoices = baseTagChoices.map((tag, index) => `${index + 1}. ${tag}`).join("\n");
+        const baseTagChoice = window.prompt(`Select a base tag by number or enter a new search term:\n\n${baseTagChoices}`);
+
+        if (baseTagChoice === null) {
+            window.alert("Operation canceled.");
+            return null;
+        }
+
+        const baseTagIndex = parseInt(baseTagChoice.trim(), 10) - 1;
+        if (isNaN(baseTagIndex) || baseTagIndex < 0 || baseTagIndex >= baseTagChoices.length) {
+            window.alert("Invalid choice.");
+            return null;
+        }
+
+        return baseTagChoices.split("\n")[baseTagIndex].split(". ")[1];
+    }
+
+    async function searchAndSelectTags(allTags) {
+        const searchTerm = window.prompt("Enter the regex or tag to search for:");
+        const matchingTags = searchTags(allTags, searchTerm);
+        if (matchingTags.length === 0) {
+            window.alert("No matching tags found.");
+            return null;
+        }
+
+        return matchingTags;
+    }
+
     try {
         if (!items && !item) {
             window.alert("Bulk Edit", "No item or items array provided.");
@@ -262,8 +307,9 @@ const window = require("window");
             3. Replace tags
             4. Split a tag
             5. Combine tags
-            6. Apply case conversion to tags`,
-            ['1', '2', '3', '4', '5', '6']
+            6. Apply case conversion to tags
+            7. Add prefix or suffix to tags`,
+            ['1', '2', '3', '4', '5', '6', '7']
         );
 
         let searchTerm, matchingTags, selectedTags, newTag, delimiter;
@@ -316,7 +362,7 @@ const window = require("window");
                 selectedTags = selectTagsFromSearchResults(matchingTags);
                 if (selectedTags) {
                     newTag = window.prompt("Enter the new tag:");
-                    if (newTag) await performTagOperation('replace', selectedTags, itemsToEdit, newTag);
+                    if (newTag) await performTagOperation('replace', selectedTags, itemsToEdit, [newTag]);
                     else window.alert("No new tag entered.");
                 }
                 break;
@@ -331,14 +377,22 @@ const window = require("window");
                 }
                 break;
             case '5':
-                const baseTag = window.prompt("Enter the base tag to combine:");
-                const tagToCombineRegex = window.prompt("Enter the regex for the tags to combine:");
-                const separator = window.prompt("Enter the separator to join the tags (e.g., '-'):");
-                if (baseTag && tagToCombineRegex && separator) {
-                    const tagsToCombine = searchTags(getAllTags(itemsToEdit), tagToCombineRegex);
-                    await performTagOperation('combine', tagsToCombine, itemsToEdit, `${baseTag}${separator}${tagsToCombine.join(separator)}`);
-                } else {
-                    window.alert("Invalid input for base tag, regex, or separator.");
+                const allTags = getAllTags(itemsToEdit);
+                const baseTag = await selectBaseTag(allTags);
+                if (baseTag) {
+                    delimiter = window.prompt("Enter the separator to join the tags (optional):");
+                    const tagToCombineRegex = window.prompt("Enter the regex or tag to combine with:");
+                    if (tagToCombineRegex !== null) {
+                        const tagsToCombine = searchTags(allTags, tagToCombineRegex);
+                        if (tagsToCombine.length > 0) {
+                            const newTags = tagsToCombine.map(tag => `${baseTag}${delimiter || ''}${tag}`);
+                            await performTagOperation('combine', tagsToCombine.concat(baseTag), itemsToEdit, newTags);
+                        } else {
+                            window.alert(`No tags matching the pattern "${tagToCombineRegex}" found.`);
+                        }
+                    } else {
+                        window.alert("Invalid input for regex.");
+                    }
                 }
                 break;
             case '6':
@@ -364,6 +418,29 @@ const window = require("window");
                 }
 
                 await performTagCaseOperation(caseFunction, itemsToEdit);
+                break;
+            case '7':
+                const prefixOrSuffix = await getValidInput(
+                    "Enter '1' to add a prefix or '2' to add a suffix:",
+                    ['1', '2']
+                );
+
+                newTag = window.prompt(`Enter the ${prefixOrSuffix === '1' ? 'prefix' : 'suffix'} to add:`);
+                if (!newTag) {
+                    window.alert("No prefix or suffix entered.");
+                    break;
+                }
+
+                matchingTags = await searchAndSelectTags(getAllTags(itemsToEdit));
+
+                if (matchingTags) {
+                    const newTags = matchingTags.map(tag =>
+                        prefixOrSuffix === '1' ? `${newTag}${tag}` : `${tag}${newTag}`
+                    );
+                    await performTagOperation(prefixOrSuffix === '1' ? 'prefix' : 'suffix', matchingTags, itemsToEdit, newTags);
+                } else {
+                    window.alert("No tags matching the pattern found.");
+                }
                 break;
             default:
                 window.alert("Invalid action.");
