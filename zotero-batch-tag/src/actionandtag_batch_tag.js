@@ -179,10 +179,15 @@ const window = require("window");
                     }
                     item.addTag(newTags[0]);
                 } else if (operation === 'split') {
-                    item.removeTag(tags[0]);
-                    const splitTags = tags[0].split(delimiter).map(t => t.trim());
-                    for (const newTag of splitTags) {
-                        item.addTag(newTag);
+                    for (const tag of tags) {
+                        const itemTags = item.getTags().map(t => t.tag);
+                        if (itemTags.includes(tag)) {
+                            item.removeTag(tag);
+                            const splitTags = tag.split(delimiter).map(t => t.trim());
+                            for (const newTag of splitTags) {
+                                item.addTag(newTag);
+                            }
+                        }
                     }
                 } else if (operation === 'combine') {
                     for (const tag of tags) {
@@ -367,12 +372,24 @@ const window = require("window");
                 }
                 break;
             case '4':
-                searchTerm = window.prompt("Enter the tag to search for:");
-                matchingTags = searchTags(getAllTags(itemsToEdit), searchTerm);
-                selectedTags = selectTagsFromSearchResults(matchingTags);
-                if (selectedTags) {
-                    delimiter = window.prompt("Enter the delimiter to split the tag:");
-                    if (delimiter) await performTagOperation('split', selectedTags, itemsToEdit, null, delimiter);
+                const splitAction = await getValidInput(
+                    `Choose a split option:
+                    1. Split a single tag
+                    2. Split all tags by a specified delimiter`,
+                    ['1', '2']
+                );
+                if (splitAction === '1') {
+                    searchTerm = window.prompt("Enter the tag to search for:");
+                    matchingTags = searchTags(getAllTags(itemsToEdit), searchTerm);
+                    selectedTags = selectTagsFromSearchResults(matchingTags);
+                    if (selectedTags) {
+                        delimiter = window.prompt("Enter the delimiter to split the tag:");
+                        if (delimiter) await performTagOperation('split', selectedTags, itemsToEdit, null, delimiter);
+                        else window.alert("No delimiter entered.");
+                    }
+                } else if (splitAction === '2') {
+                    delimiter = window.prompt("Enter the delimiter to split all tags:");
+                    if (delimiter) await performTagOperation('split', getAllTags(itemsToEdit), itemsToEdit, null, delimiter);
                     else window.alert("No delimiter entered.");
                 }
                 break;
