@@ -16,13 +16,17 @@ All scripts were written for Zotero 7
 
 ![Screenshot](doc/zotero_version.png)
 
-## Scripts Included
+## Scripts
 
+I am providing two sets of scripts. The first set of scripts are run in Zotero's `Run Javascript` Developer Tool. The second set of scripts are compatible with WindingWind's [Actions and Tags](https://github.com/windingwind/zotero-actions-tags) plugin.
+ 
+### `Run Javascript` Scripts
 | Script | Description | Script README | Script Link |
 | --- | --- | --- | --- |
 | **Attachment Backup (`attachment_backup.js`)** | Copy attachment files for selected items to a user-specified folder. | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-attachment-backup) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-backup/src/attachment_backup.js) |
 | **Attachment Date Added (`attachment_dateAdded.js`)** | Update the "Date Added" field of parent items to match the "Date Added" of their attachment(s). | [README](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-dateAdded/README.md) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-dateAdded/src/attachment_dateAdded.js) |
 | **Attachment Delete (`attachment_delete.js`)** | Delete the local attachment files for selected items. This script is intended for Zotero Sync users. | [README](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-delete/README.md) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-delete/src/attachment_delete.js) |
+| **Attachment Download (`attachment_download.js`)** | When using Zotero Sync, this script allows you to selectively download attachments in bulk. | Placeholder | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-download/src/attachment_download.js) |
 | **Attachment Rename (`zotero_attachment_rename.js`)** | Rename attachment filenames and/or titles based on the parent item metadata. | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-attachment-rename) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-rename/src/zotero_attachment_rename.js) |
 | **Batch Tagging (`zotero_batch_tag.js`)** | Add, remove, replace, split, and combine tags for multiple items. | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-batch-tag) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-batch-tag/src/zotero_batch_tag.js) |
 | **Bulk Edit (`zotero_bulk_edit.js`)** | Edit the metadata (fields, notes, and authors) or item type (document, book, journal article...)  for multiple items. | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-bulk-edit) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-bulk-edit/src/zotero_bulk_edit.js) |
@@ -30,6 +34,19 @@ All scripts were written for Zotero 7
 | **Similar Name Detection (`similar_name_detection.js`)** | Detect and rename similar author names | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-similar-name-detection) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-similar-name-detection/src/similar_name_detection.js) |
 | **Text Case Conversion (`zotero-text-case.js`)** | Convert the text case of titles for selected Zotero items. | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-text-case) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-text-case/src/zotero-text-case.js) |
 
+### [Actions and Tags](https://github.com/windingwind/zotero-actions-tags) Plugin Scripts
+The Actions and Tags plugin enables you to add these scripts below to the plugin and either add them to a context menu (i.e., right click menu), map them to a keyboard shortcut, or have them execute automatically via a workflow. It is a huge quality of life improvement.
+
+| Script | Description | Script Link |
+| --- | --- | --- |
+| **Attachment Backup** | Copy attachment files for selected items to a user-specified folder. | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-backup/src/actionandtag_attachment_backup.js) |
+| **Attachment Date Added** | Update the "Date Added" field of parent items to match the "Date Added" of their attachment(s). | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-dateAdded/src/actionandtag_dateAdded.js) |
+| **Attachment Delete** | Delete the local attachment files for selected items. This script is intended for Zotero Sync users. | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-delete/src/actionandtag_attachment_delete.js) |
+| **Attachment Rename** | Rename attachment filenames and/or titles based on the parent item metadata. | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-rename/src/actionandtag_attachment_rename.js) |
+| **Attachment Title Sync** | Rename attachment titles to match attachment filenames. | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-attachment-rename/src/actionandtag_attachment_title_sync.js) |
+| **Batch Tagging** | Add, remove, replace, split, and combine tags for multiple items. | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-batch-tag/src/actionandtag_batch_tag.js) |
+| **Bulk Edit** | Edit the metadata (fields, notes, and authors) or item type (document, book, journal article...)  for multiple items. | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-bulk-edit/src/actionandtag_bulk_edit.js) |
+| **Duplicate Enhanced** | Detect, merge, or tag duplicate items in your Zotero library based on similar metadata. | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-duplicate-enhanced/src/actionandtag_duplicate.js) |
 
 ## Usage
 
