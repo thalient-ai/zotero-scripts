@@ -35,7 +35,7 @@ I am providing two sets of scripts. The first set of scripts are run in Zotero's
 | **Text Case Conversion (`zotero-text-case.js`)** | Convert the text case of titles for selected Zotero items. | [README](https://github.com/thalient-ai/zotero-scripts/tree/main/zotero-text-case) | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-text-case/src/zotero-text-case.js) |
 
 ### [Actions and Tags](https://github.com/windingwind/zotero-actions-tags) Plugin Scripts
-The Actions and Tags plugin enables you to add these scripts below to the plugin and either add them to a context menu (i.e., right click menu), map them to a keyboard shortcut, or have them execute automatically via a workflow. It is a huge quality of life improvement.
+The Actions and Tags plugin enables you to add these scripts to the plugin and either execute them via the context menu (i.e., right click menu), map them to a keyboard shortcut, or have them execute automatically via a workflow. It is a huge quality of life improvement. Review the plugin's homepage for usage instructions.
 
 | Script | Description | Script Link |
 | --- | --- | --- |
