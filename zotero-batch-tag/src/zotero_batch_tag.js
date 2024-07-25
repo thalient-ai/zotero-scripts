@@ -101,19 +101,44 @@
     }
 
     // Function to perform tag operations
-    async function performTagOperation(operation, tag, items, newTag = null, delimiter = null) {
+    async function performTagOperation(operation, tags, items, newTags = [], delimiter = null) {
         const promises = items.map(async item => {
             try {
                 if (operation === 'add') {
-                    item.addTag(tag);
+                    item.addTag(tags[0]);
                 } else if (operation === 'remove') {
-                    item.removeTag(tag);
+                    for (const tag of tags) {
+                        item.removeTag(tag);
+                    }
+                } else if (operation === 'removeAll') {
+                    item.setTags([]);
                 } else if (operation === 'replace') {
-                    item.removeTag(tag);
-                    item.addTag(newTag);
+                    for (const tag of tags) {
+                        item.removeTag(tag);
+                    }
+                    item.addTag(newTags[0]);
                 } else if (operation === 'split') {
-                    item.removeTag(tag);
-                    const newTags = tag.split(delimiter).map(t => t.trim());
+                    for (const tag of tags) {
+                        const itemTags = item.getTags().map(t => t.tag);
+                        if (itemTags.includes(tag)) {
+                            item.removeTag(tag);
+                            const splitTags = tag.split(delimiter).map(t => t.trim());
+                            for (const newTag of splitTags) {
+                                item.addTag(newTag);
+                            }
+                        }
+                    }
+                } else if (operation === 'combine') {
+                    for (const tag of tags) {
+                        item.removeTag(tag);
+                    }
+                    for (const newTag of newTags) {
+                        item.addTag(newTag);
+                    }
+                } else if (operation === 'prefix' || operation === 'suffix') {
+                    for (const tag of tags) {
+                        item.removeTag(tag);
+                    }
                     for (const newTag of newTags) {
                         item.addTag(newTag);
                     }
@@ -242,14 +267,14 @@
 
         console.log(`Total items to edit: ${items.length}`);
 
-        const action = prompt("Enter '1' to add a tag, '2' to remove tags (multiple options), '3' to replace a tag, '4' to split a tag, '5' to combine tags, or '6' to apply case conversion to tags:");
+        const action = prompt("Enter '1' to add a tag, '2' to remove tags (multiple options), '3' to replace a tag, '4' to split a tag, '5' to combine tags, '6' to apply case conversion to tags, or '7' to add a prefix or suffix to tags:");
         const allTags = getAllTags(items);
-        let searchTerm, matchingTags, selectedTags, tag, newTag, delimiter;
+        let searchTerm, matchingTags, selectedTags, newTag, delimiter;
 
         switch (action) {
             case '1':
                 tag = prompt("Enter the tag to add:");
-                if (tag) await performTagOperation('add', tag, items);
+                if (tag) await performTagOperation('add', [tag], items);
                 else alert("No tag entered.");
                 break;
             case '2':
@@ -259,7 +284,7 @@
                         searchTerm = prompt("Enter the tag to search for:");
                         matchingTags = searchTags(allTags, searchTerm);
                         selectedTags = selectTagsFromSearchResults(matchingTags);
-                        if (selectedTags) await performTagOperation('remove', selectedTags[0], items);
+                        if (selectedTags) await performTagOperation('remove', selectedTags, items);
                         break;
                     case '2':
                         searchTerm = prompt("Enter the tag search term (e.g., 'temp*' to match 'temp', 'temporary', etc.):");
@@ -268,13 +293,16 @@
                         if (selectedTags) await performTagOperation('remove', selectedTags, items);
                         break;
                     case '3':
-                        await performTagOperation('remove', allTags, items);
+                        await performTagOperation('removeAll', [], items);
                         break;
                     case '4':
                         searchTerm = prompt("Enter the tag search term to keep (e.g., 'temp*' to match 'temp', 'temporary', etc.):");
                         matchingTags = searchTags(allTags, searchTerm);
                         selectedTags = selectTagsFromSearchResults(matchingTags);
-                        if (selectedTags) await performTagOperation('removeExcept', selectedTags, items);
+                        if (selectedTags) {
+                            const tagsToKeep = new Set(selectedTags);
+                            await performTagOperation('remove', allTags.filter(tag => !tagsToKeep.has(tag)), items);
+                        }
                         break;
                     default:
                         alert("Invalid remove action.");
@@ -287,29 +315,48 @@
                 selectedTags = selectTagsFromSearchResults(matchingTags);
                 if (selectedTags) {
                     newTag = prompt("Enter the new tag:");
-                    if (newTag) await performTagOperation('replace', selectedTags[0], items, newTag);
+                    if (newTag) await performTagOperation('replace', selectedTags, items, [newTag]);
                     else alert("No new tag entered.");
                 }
                 break;
             case '4':
-                searchTerm = prompt("Enter the tag to search for:");
-                matchingTags = searchTags(allTags, searchTerm);
-                selectedTags = selectTagsFromSearchResults(matchingTags);
-                if (selectedTags) {
-                    delimiter = prompt("Enter the delimiter to split the tag:");
-                    if (delimiter) await performTagOperation('split', selectedTags[0], items, null, delimiter);
+                const splitAction = await getValidInput(
+                    `Choose a split option:
+                    1. Split a single tag
+                    2. Split all tags by a specified delimiter`,
+                    ['1', '2']
+                );
+                if (splitAction === '1') {
+                    searchTerm = prompt("Enter the tag to search for:");
+                    matchingTags = searchTags(allTags, searchTerm);
+                    selectedTags = selectTagsFromSearchResults(matchingTags);
+                    if (selectedTags) {
+                        delimiter = prompt("Enter the delimiter to split the tag:");
+                        if (delimiter) await performTagOperation('split', selectedTags, items, null, delimiter);
+                        else alert("No delimiter entered.");
+                    }
+                } else if (splitAction === '2') {
+                    delimiter = prompt("Enter the delimiter to split all tags:");
+                    if (delimiter) await performTagOperation('split', allTags, items, null, delimiter);
                     else alert("No delimiter entered.");
                 }
                 break;
             case '5':
-                searchTerm = prompt("Enter the tags to search for (separated by commas):");
-                const tagSearchTerms = searchTerm.split(',').map(t => t.trim());
-                matchingTags = tagSearchTerms.map(term => searchTags(allTags, term)).flat();
-                selectedTags = selectTagsFromSearchResults(matchingTags);
-                if (selectedTags) {
-                    newTag = prompt("Enter the new combined tag:");
-                    if (newTag) await performTagOperation('combine', selectedTags, items, newTag);
-                    else alert("No new tag entered.");
+                const baseTag = await selectBaseTag(allTags);
+                if (baseTag) {
+                    delimiter = prompt("Enter the separator to join the tags (optional):");
+                    const tagToCombineRegex = prompt("Enter the regex or tag to combine with:");
+                    if (tagToCombineRegex !== null) {
+                        const tagsToCombine = searchTags(allTags, tagToCombineRegex);
+                        if (tagsToCombine.length > 0) {
+                            const newTags = tagsToCombine.map(tag => `${baseTag}${delimiter || ''}${tag}`);
+                            await performTagOperation('combine', tagsToCombine.concat(baseTag), items, newTags);
+                        } else {
+                            alert(`No tags matching the pattern "${tagToCombineRegex}" found.`);
+                        }
+                    } else {
+                        alert("Invalid input for regex.");
+                    }
                 }
                 break;
             case '6':
@@ -317,7 +364,6 @@
                     "Enter '1' for Title Case, '2' for Sentence Case, '3' for Upper Case, '4' for Lower Case:",
                     ['1', '2', '3', '4']
                 );
-                if (!caseOption) return;
 
                 let caseFunction;
                 switch (caseOption) {
@@ -337,6 +383,29 @@
 
                 await performTagCaseOperation(caseFunction, items);
                 break;
+            case '7':
+                const prefixOrSuffix = await getValidInput(
+                    "Enter '1' to add a prefix or '2' to add a suffix:",
+                    ['1', '2']
+                );
+
+                newTag = prompt(`Enter the ${prefixOrSuffix === '1' ? 'prefix' : 'suffix'} to add:`);
+                if (!newTag) {
+                    alert("No prefix or suffix entered.");
+                    break;
+                }
+
+                matchingTags = await searchAndSelectTags(allTags);
+
+                if (matchingTags) {
+                    const newTags = matchingTags.map(tag =>
+                        prefixOrSuffix === '1' ? `${newTag}${tag}` : `${tag}${newTag}`
+                    );
+                    await performTagOperation(prefixOrSuffix === '1' ? 'prefix' : 'suffix', matchingTags, items, newTags);
+                } else {
+                    alert("No tags matching the pattern found.");
+                }
+                break;
             default:
                 alert("Invalid action.");
                 break;
@@ -347,14 +416,6 @@
     } finally {
         const endTime = performance.now();
         console.log(`Total time: ${(endTime - startTime) / 1000} seconds`);
-    }
-
-    function logTime(label, time) {
-        try {
-            console.log(`${label}: ${(time / 1000).toFixed(2)} seconds`);
-        } catch (error) {
-            console.error(`Failed to log time for ${label}: ${error.message}`);
-        }
     }
 
     async function getValidInput(promptMessage, validOptions) {
@@ -371,5 +432,35 @@
                 alert(`Invalid option: "${sanitizedInput}". Please enter one of the following: ${validOptions.join(', ')}.`);
             }
         }
+    }
+
+    async function selectBaseTag(allTags) {
+        let baseTagChoices = searchTags(allTags, prompt("Enter a search term for the base tag:"));
+        baseTagChoices = baseTagChoices.map((tag, index) => `${index + 1}. ${tag}`).join("\n");
+        const baseTagChoice = prompt(`Select a base tag by number or enter a new search term:\n\n${baseTagChoices}`);
+
+        if (baseTagChoice === null) {
+            alert("Operation canceled.");
+            return null;
+        }
+
+        const baseTagIndex = parseInt(baseTagChoice.trim(), 10) - 1;
+        if (isNaN(baseTagIndex) || baseTagIndex < 0 || baseTagIndex >= baseTagChoices.length) {
+            alert("Invalid choice.");
+            return null;
+        }
+
+        return baseTagChoices.split("\n")[baseTagIndex].split(". ")[1];
+    }
+
+    async function searchAndSelectTags(allTags) {
+        const searchTerm = prompt("Enter the regex or tag to search for:");
+        const matchingTags = searchTags(allTags, searchTerm);
+        if (matchingTags.length === 0) {
+            alert("No matching tags found.");
+            return null;
+        }
+
+        return matchingTags;
     }
 })();
