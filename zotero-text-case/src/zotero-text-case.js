@@ -1,18 +1,16 @@
-(async function() {
+(async function () {
     const startTime = performance.now();
     const promptedValues = new Map(); // Map to keep track of prompted values and user responses
 
     try {
         const zoteroPane = Zotero.getActiveZoteroPane();
 
-        // Dictionary of specific words or terms that should be capitalized
         const customCapitalization = {
             'nist': 'NIST',
             'nerc': 'NERC',
             // ... (additional custom capitalizations)
         };
 
-        // Utility function to convert a string to title case based on specified rules
         function toTitleCase(str, title, currentIndex, totalCount) {
             const lowerCaseWords = ["a", "an", "and", "as", "at", "but", "by", "for", "if", "nor", "of", "on", "or", "so", "the", "to", "up", "yet"];
             const separators = ['-', ':', '–', '/', '"', '“', '”'];
@@ -23,35 +21,25 @@
                 let word = words[i];
                 const lowerWord = word.toLowerCase();
 
-                console.log(`Processing word: "${word}"`);
-
-                // Handle custom capitalization
                 if (customCapitalization[lowerWord]) {
                     words[i] = customCapitalization[lowerWord];
-                    console.log(`Custom capitalization applied: "${words[i]}"`);
                     continue;
                 }
 
-                // Capitalize the first and last word, words following a special character, and major words
                 if (i === 0 || i === words.length - 1 || !lowerCaseWords.includes(lowerWord) || isFollowingSpecialChar(words, i, separators) || word.length >= 4) {
                     words[i] = capitalizeHyphenatedAndSlashed(word);
-                    console.log(`Capitalized: "${words[i]}"`);
                 } else {
                     words[i] = lowerWord;
-                    console.log(`Lowercased: "${words[i]}"`);
                 }
             }
 
-            // Ensure words following quotation marks are capitalized
             for (let i = 0; i < words.length; i++) {
                 if (words[i].startsWith('"') && words[i].length > 1) {
                     words[i] = '"' + capitalizeFirstLetter(words[i].slice(1));
-                    console.log(`Capitalized after quotation: "${words[i]}"`);
                 }
             }
 
-            // Check for text within parentheses and prompt user if not already uppercase, except for custom capitalization terms
-            return words.join(' ').replace(/\(([^)]+)\)/g, function(match, p1) {
+            return words.join(' ').replace(/\(([^)]+)\)/g, function (match, p1) {
                 const lowerP1 = p1.toLowerCase();
                 if (customCapitalization[lowerP1]) {
                     return `(${customCapitalization[lowerP1]})`;
@@ -69,113 +57,61 @@
             });
         }
 
-        // Function to capitalize both parts of a hyphenated or slashed word
         function capitalizeHyphenatedAndSlashed(word) {
             const separators = ['-', '/'];
-            return word.split(new RegExp(`(${separators.join('|')})`)).map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join('');
+            return word.split(new RegExp(`(${separators.join('|')})`)).map(part => capitalizeFirstLetter(part)).join('');
         }
 
-        // Capitalize the first letter of a word
         function capitalizeFirstLetter(word) {
             return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
         }
 
-        // Check if the word follows a special character (-, :, –, /, ")
         function isFollowingSpecialChar(arr, index, separators) {
             if (index > 0) {
                 const prevWord = arr[index - 1];
-                console.log(`Previous word: "${prevWord}"`);
                 return separators.some(separator => prevWord.endsWith(separator));
             }
             return false;
         }
 
-        // Utility function to escape special characters for regular expressions
         function escapeRegExp(string) {
             return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
 
-        // Utility function to convert a string to sentence case
         function toSentenceCase(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase().replace(/(\.\s*\w)/g, function(c) {
+            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase().replace(/(\.\s*\w)/g, function (c) {
                 return c.toUpperCase();
             });
         }
 
-        // Utility function to convert a string to upper case
         function toUpperCase(str) {
             return str.toUpperCase();
         }
 
-        // Utility function to convert a string to lower case
         function toLowerCase(str) {
             return str.toLowerCase();
         }
 
-        // Function to get a valid input for the scope of items to edit
-        async function getValidEditOption() {
+        async function getValidInput(promptMessage, validOptions) {
             while (true) {
-                const editOption = prompt("Enter '1' to edit only selected items, '2' to edit all items in the current collection, or '3' to edit all items in a saved search:");
-
-                // Sanitize the user input
-                const sanitizedEditOption = editOption ? editOption.trim() : null;
-
-                if (sanitizedEditOption === null) {
+                const userInput = prompt(promptMessage);
+                const sanitizedInput = userInput ? userInput.trim() : null;
+                if (sanitizedInput === null) {
                     alert("Operation canceled.");
                     return null;
                 }
-
-                if (['1', '2', '3'].includes(sanitizedEditOption)) {
-                    return sanitizedEditOption;
+                if (validOptions.includes(sanitizedInput)) {
+                    return sanitizedInput;
                 } else {
-                    alert(`Invalid option: "${sanitizedEditOption}". Please enter '1', '2', or '3'.`);
+                    alert(`Invalid option: "${sanitizedInput}". Please enter one of the following: ${validOptions.join(', ')}.`);
                 }
             }
         }
 
-        // Function to get a valid input for title case, sentence case, upper case, or lower case
-        async function getValidCaseOption() {
-            while (true) {
-                const caseOption = prompt("Enter '1' for Title Case, '2' for Sentence Case, '3' for Upper Case, '4' for Lower Case:");
-
-                // Sanitize the user input
-                const sanitizedCaseOption = caseOption ? caseOption.trim() : null;
-
-                if (sanitizedCaseOption === null) {
-                    alert("Operation canceled.");
-                    return null;
-                }
-
-                if (['1', '2', '3', '4'].includes(sanitizedCaseOption)) {
-                    return sanitizedCaseOption;
-                } else {
-                    alert(`Invalid option: "${sanitizedCaseOption}". Please enter '1', '2', '3', or '4'.`);
-                }
-            }
-        }
-
-        // Function to get a valid input for the field(s) to edit
-        async function getValidFieldOption() {
-            while (true) {
-                const fieldOption = prompt("Enter '1' to edit Title field, '2' to edit Short Title field, '3' to edit both:");
-
-                // Sanitize the user input
-                const sanitizedFieldOption = fieldOption ? fieldOption.trim() : null;
-
-                if (sanitizedFieldOption === null) {
-                    alert("Operation canceled.");
-                    return null;
-                }
-
-                if (['1', '2', '3'].includes(sanitizedFieldOption)) {
-                    return sanitizedFieldOption;
-                } else {
-                    alert(`Invalid option: "${sanitizedFieldOption}". Please enter '1', '2', or '3'.`);
-                }
-            }
-        }
-
-        const editOption = await getValidEditOption();
+        const editOption = await getValidInput(
+            "Enter '1' to edit only selected items, '2' to edit all items in the current collection, or '3' to edit all items in a saved search:",
+            ['1', '2', '3']
+        );
         logTime("Time to get valid edit option", performance.now() - startTime);
 
         const itemsToEdit = await getItemsToEdit(editOption, zoteroPane);
@@ -185,10 +121,16 @@
         }
         logTime("Time to retrieve items", performance.now() - startTime);
 
-        const caseOption = await getValidCaseOption();
+        const caseOption = await getValidInput(
+            "Enter '1' for Title Case, '2' for Sentence Case, '3' for Upper Case, '4' for Lower Case:",
+            ['1', '2', '3', '4']
+        );
         logTime("Time to get valid case option", performance.now() - startTime);
 
-        const fieldOption = await getValidFieldOption();
+        const fieldOption = await getValidInput(
+            "Enter '1' to edit Title field, '2' to edit Short Title field, '3' to edit both:",
+            ['1', '2', '3']
+        );
         logTime("Time to get valid field option", performance.now() - startTime);
 
         let caseFunction;
@@ -207,7 +149,6 @@
                 break;
         }
 
-        // Confirm the update with the user
         const confirmationMessage = `You have chosen to edit the titles of ${itemsToEdit.length} records.\n\nDo you want to proceed?`;
         const confirmation = confirm(confirmationMessage);
         if (!confirmation) {
@@ -270,14 +211,11 @@
                 return null;
             }
 
-            console.log(`Saved search found: ${savedSearch.name} (ID: ${savedSearch.id})`);
-
             let search = new Zotero.Search();
             search.libraryID = savedSearch.libraryID;
             search.addCondition('savedSearchID', 'is', savedSearch.id);
 
             let itemIDs = await search.search();
-            console.log(`Number of items found in saved search: ${itemIDs.length}`);
             if (itemIDs.length === 0) {
                 alert("No items found in the saved search.");
                 return null;
