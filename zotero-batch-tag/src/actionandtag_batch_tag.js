@@ -4,14 +4,18 @@ const window = require("window");
 (async function () {
     const startTime = new Date();
 
+    // Prevent duplicate execution
     if (window.batchTagRunning) return;
     window.batchTagRunning = true;
 
+    // Custom capitalization dictionary
     const customCapitalization = {
         'nist': 'NIST',
         'nerc': 'NERC',
+        // Add more custom capitalizations as needed
     };
 
+    // Convert a string to title case based on specified rules
     function toTitleCase(str, title, currentIndex, totalCount) {
         const lowerCaseWords = ["a", "an", "and", "as", "at", "but", "by", "for", "if", "nor", "of", "on", "or", "so", "the", "to", "up", "yet"];
         const separators = ['-', ':', '–', '/', '"', '“', '”'];
@@ -22,11 +26,13 @@ const window = require("window");
             let word = words[i];
             const lowerWord = word.toLowerCase();
 
+            // Handle custom capitalization
             if (customCapitalization[lowerWord]) {
                 words[i] = customCapitalization[lowerWord];
                 continue;
             }
 
+            // Capitalize the first and last word, words following a special character, and major words
             if (i === 0 || i === words.length - 1 || !lowerCaseWords.includes(lowerWord) || isFollowingSpecialChar(words, i, separators) || word.length >= 4) {
                 words[i] = capitalizeHyphenatedAndSlashed(word);
             } else {
@@ -34,12 +40,14 @@ const window = require("window");
             }
         }
 
+        // Ensure words following quotation marks are capitalized
         for (let i = 0; i < words.length; i++) {
             if (words[i].startsWith('"') && words[i].length > 1) {
                 words[i] = '"' + capitalizeFirstLetter(words[i].slice(1));
             }
         }
 
+        // Handle text within parentheses
         return words.join(' ').replace(/\(([^)]+)\)/g, function (match, p1) {
             const lowerP1 = p1.toLowerCase();
             if (customCapitalization[lowerP1]) {
@@ -58,15 +66,18 @@ const window = require("window");
         });
     }
 
+    // Capitalize both parts of a hyphenated or slashed word
     function capitalizeHyphenatedAndSlashed(word) {
         const separators = ['-', '/'];
         return word.split(new RegExp(`(${separators.join('|')})`)).map(part => capitalizeFirstLetter(part)).join('');
     }
 
+    // Capitalize the first letter of a word
     function capitalizeFirstLetter(word) {
         return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
     }
 
+    // Check if the word follows a special character (-, :, –, /, ")
     function isFollowingSpecialChar(arr, index, separators) {
         if (index > 0) {
             const prevWord = arr[index - 1];
@@ -75,24 +86,29 @@ const window = require("window");
         return false;
     }
 
+    // Convert a string to sentence case
     function toSentenceCase(str) {
         return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase().replace(/(\.\s*\w)/g, function (c) {
             return c.toUpperCase();
         });
     }
 
+    // Convert a string to upper case
     function toUpperCase(str) {
         return str.toUpperCase();
     }
 
+    // Convert a string to lower case
     function toLowerCase(str) {
         return str.toLowerCase();
     }
 
+    // Escape special characters for use in regular expressions
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
+    // Get items to edit based on user selection
     async function getItemsToEdit(triggerType, item, items) {
         const zoteroPane = Zotero.getActiveZoteroPane();
         if (triggerType === 'menu') {
@@ -114,6 +130,7 @@ const window = require("window");
         }
     }
 
+    // Get all unique tags from items
     function getAllTags(items) {
         const tagSet = new Set();
         for (const item of items) {
@@ -125,16 +142,18 @@ const window = require("window");
         return Array.from(tagSet);
     }
 
+    // Search for tags using the provided search term
     function searchTags(allTags, searchTerm) {
         let regex;
         if (searchTerm.includes('*')) {
-            regex = new RegExp(searchTerm.replace('*', '.*'), 'i');
+            regex = new RegExp(searchTerm.replace(/\*/g, '.*'), 'i');  // Replace all occurrences of '*' with '.*'
         } else {
             regex = new RegExp(escapeRegExp(searchTerm), 'i');
         }
         return allTags.filter(tag => regex.test(tag));
     }
 
+    // Prompt user to select tags from search results
     function selectTagsFromSearchResults(tags) {
         if (tags.length === 0) {
             window.alert("No matching tags found.");
@@ -150,9 +169,7 @@ const window = require("window");
         }
 
         const selectedIndices = choice.split(',').map(str => parseInt(str.trim(), 10) - 1);
-        const selectedTags = selectedIndices
-            .filter(index => !isNaN(index) && index >= 0 && index < tags.length)
-            .map(index => tags[index]);
+        const selectedTags = selectedIndices.filter(index => !isNaN(index) && index >= 0 && index < tags.length).map(index => tags[index]);
 
         if (selectedTags.length === 0) {
             window.alert("No valid tags selected.");
@@ -162,6 +179,7 @@ const window = require("window");
         return selectedTags;
     }
 
+    // Perform tag operations (add, remove, replace, split, combine, prefix, suffix)
     async function performTagOperation(operation, tags, items, newTags = [], delimiter = null) {
         const promises = items.map(async item => {
             try {
@@ -214,6 +232,7 @@ const window = require("window");
         window.alert(`Tag operation "${operation}" completed on ${items.length} item(s).`);
     }
 
+    // Apply case conversion to tags
     async function performTagCaseOperation(caseFunction, items) {
         const allTags = getAllTags(items);
         const tagMap = new Map();
@@ -236,6 +255,7 @@ const window = require("window");
         window.alert(`Tags have been updated for ${items.length} item(s).`);
     }
 
+    // Log the elapsed time for a given operation
     function logTime(label, time) {
         try {
             Zotero.logError(`${label}: ${(time / 1000).toFixed(2)} seconds`);
@@ -244,6 +264,7 @@ const window = require("window");
         }
     }
 
+    // Get valid input from the user based on predefined options
     async function getValidInput(promptMessage, validOptions) {
         while (true) {
             const userInput = window.prompt(promptMessage);
@@ -260,6 +281,7 @@ const window = require("window");
         }
     }
 
+    // Select a base tag from search results
     async function selectBaseTag(allTags) {
         let baseTagChoices = searchTags(allTags, window.prompt("Enter a search term for the base tag:"));
         baseTagChoices = baseTagChoices.map((tag, index) => `${index + 1}. ${tag}`).join("\n");
@@ -279,6 +301,7 @@ const window = require("window");
         return baseTagChoices.split("\n")[baseTagIndex].split(". ")[1];
     }
 
+    // Search and select tags from search results
     async function searchAndSelectTags(allTags) {
         const searchTerm = window.prompt("Enter the regex or tag to search for:");
         const matchingTags = searchTags(allTags, searchTerm);
@@ -291,12 +314,14 @@ const window = require("window");
     }
 
     try {
+        // Ensure items and item are provided
         if (!items && !item) {
             window.alert("Bulk Edit", "No item or items array provided.");
             window.batchTagRunning = false;
             return;
         }
 
+        // Get items to edit based on user selection
         let itemsToEdit = await getItemsToEdit(triggerType, item, items);
         if (!itemsToEdit) {
             window.batchTagRunning = false;
@@ -305,6 +330,7 @@ const window = require("window");
 
         Zotero.logError(`Total items to edit: ${itemsToEdit.length}`);
 
+        // Get the action to perform from the user
         const action = await getValidInput(
             `Choose an action:
             1. Add a tag
