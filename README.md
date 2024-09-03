@@ -47,6 +47,7 @@ The Actions and Tags plugin enables you to add these scripts to the plugin and e
 | **Batch Tagging** | Add, remove, replace, split, and combine tags for multiple items. | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-batch-tag/src/actionandtag_batch_tag.js) |
 | **Bulk Edit** | Edit the metadata (fields, notes, and authors) or item type (document, book, journal article...)  for multiple items. | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-bulk-edit/src/actionandtag_bulk_edit.js) |
 | **Duplicate Enhanced** | Detect, merge, or tag duplicate items in your Zotero library based on similar metadata. | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-duplicate-enhanced/src/actionandtag_duplicate.js) |
+| **Zoom by Page Height** | Sets the view of PDF reader tabs and windows to "Zoom by Page Height" | [Script](https://github.com/windingwind/zotero-actions-tags/discussions/378) |
 
 ## Usage
 
