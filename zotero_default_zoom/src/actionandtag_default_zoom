@@ -1,3 +1,10 @@
+/**
+ * This script changes the view to "Zoom by Page Height"
+ * @thalient-ai
+ * @link https://github.com/windingwind/zotero-actions-tags/discussions/378
+ * @see https://github.com/thalient-ai/zotero-scripts/blob/main/zotero_default_zoom/src/actionandtag_default_zoom
+ */
+
 // This script sets the zoom of PDF reader tabs or windows to "Zoom by Page Height"
 
 (function() {
