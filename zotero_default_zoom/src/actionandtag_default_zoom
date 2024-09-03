@@ -1,3 +1,5 @@
+// This script sets the zoom of PDF reader tabs or windows to "Zoom by Page Height"
+
 (function() {
   const Zotero = require("Zotero");
   const Zotero_Tabs = require("Zotero_Tabs");
