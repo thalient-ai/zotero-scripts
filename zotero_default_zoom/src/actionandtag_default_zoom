@@ -1,0 +1,83 @@
+(function() {
+  const Zotero = require("Zotero");
+  const Zotero_Tabs = require("Zotero_Tabs");
+  const window = require("window");
+
+  async function adjustPDFZoom() {
+    try {
+      Zotero.log("Script execution started.");
+
+      // Initial delay to allow the PDF reader and Zotero objects to initialize fully
+      await Zotero.Promise.delay(500); // Adjust delay as needed
+
+      let reader = null;
+
+      // Check if the PDF is opened in a tab
+      if (Zotero_Tabs.selectedID) {
+        Zotero.log("PDF opened in a tab.");
+        reader = Zotero.Reader.getByTabID(Zotero_Tabs.selectedID);
+      }
+
+      // If not found in a tab, check if the PDF is opened in a window
+      if (!reader) {
+        Zotero.log("Checking for reader in a window...");
+
+        // Get all window states from the session
+        let windowReaders = Zotero.Reader.getWindowStates();
+        if (windowReaders.length > 0) {
+          Zotero.log("Found window reader states.");
+
+          // Find a reader that has window-specific properties
+          reader = Zotero.Reader._readers.find(r => r._internalReader && r._internalReader._primaryView);
+          if (reader) {
+            Zotero.log("Reader object found in window.");
+          } else {
+            Zotero.logError("Reader object not found in window.");
+          }
+        } else {
+          Zotero.logError("No window reader states found.");
+        }
+      }
+
+      // Check if the reader object is available
+      if (reader) {
+        if (!reader._internalReader || !reader._internalReader._primaryView) {
+          Zotero.log("Waiting for internal reader to initialize...");
+          await Zotero.Promise.delay(100);  // Additional delay to wait for the internal reader to initialize
+          if (!reader._internalReader || !reader._internalReader._primaryView) {
+            Zotero.logError("Internal reader not initialized.");
+            return;
+          }
+        }
+
+        // Function to repeatedly set zoom
+        async function enforceZoom() {
+          let pdfViewer = reader._internalReader._primaryView._iframeWindow.PDFViewerApplication.pdfViewer;
+          if (pdfViewer) {
+            pdfViewer.currentScaleValue = 'page-height';
+            Zotero.log("Zoom set to page-height successfully.");
+
+            // Check the current zoom level and enforce again if needed
+            await Zotero.Promise.delay(100);
+            if (pdfViewer.currentScaleValue !== 'page-height') {
+              Zotero.log("Zoom reverted; resetting to page-height.");
+              await enforceZoom();
+            }
+          } else {
+            Zotero.logError("PDF viewer not found.");
+          }
+        }
+
+        // Start enforcing the zoom level
+        await enforceZoom();
+      } else {
+        Zotero.logError("Reader not found or not accessible.");
+      }
+    } catch (error) {
+      Zotero.logError(`Failed to set zoom mode: ${error.message}`);
+    }
+  }
+
+  // Execute the zoom adjustment function
+  adjustPDFZoom();
+})();
