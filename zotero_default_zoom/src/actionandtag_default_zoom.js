@@ -16,7 +16,7 @@
       Zotero.log("Script execution started.");
 
       // Increased initial delay to ensure the PDF reader and Zotero objects are fully initialized
-      await Zotero.Promise.delay(1000); // Adjust delay as needed for your environment
+      await Zotero.Promise.delay(750); // Adjust delay as needed for your environment
 
       let reader = null;
 
@@ -67,7 +67,8 @@
             .pdfViewer;
         if (pdfViewer) {
           pdfViewer.currentScaleValue = "page-height";
-          Zotero.log("Zoom set to page-height successfully.");
+          // options include "page-height", "page-width", "page-fit", and "auto"
+          Zotero.log("Zoom set successfully.");
         } else {
           Zotero.logError("PDF viewer not found.");
         }
