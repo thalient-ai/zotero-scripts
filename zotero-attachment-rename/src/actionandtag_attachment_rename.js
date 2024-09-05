@@ -37,7 +37,8 @@ async function processRenaming(attachment, processedAttachmentIds) {
     if (newName !== currentName) {
         try {
             await attachment.renameAttachmentFile(finalName);
-            attachment.setField('title', finalName);
+            // Set the title without the file extension
+            attachment.setField('title', newName);
             await attachment.saveTx();
             processedAttachmentIds.add(attachment.id);
             return { renamed: 1, errors: 0 };
