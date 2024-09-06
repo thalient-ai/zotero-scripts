@@ -273,23 +273,6 @@ const window = require("window");
         }
     }
 
-    // Get valid input from the user based on predefined options
-    async function getValidInput(promptMessage, validOptions) {
-        while (true) {
-            const userInput = window.prompt(promptMessage);
-            const sanitizedInput = userInput ? userInput.trim() : null;
-            if (sanitizedInput === null) {
-                window.alert("Operation canceled.");
-                return null;
-            }
-            if (validOptions.includes(sanitizedInput)) {
-                return sanitizedInput;
-            } else {
-                window.alert(`Invalid option: "${sanitizedInput}". Please enter one of the following: ${validOptions.join(', ')}.`);
-            }
-        }
-    }
-
     // Select a base tag from search results
     async function selectBaseTag(allTags) {
         let baseTagChoices = searchTags(allTags, window.prompt("Enter a search term for the base tag:"));
