@@ -85,6 +85,24 @@ const window = require("window");
         return false;
     }
 
+    // Convert a string to sentence case
+    function toSentenceCase(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase().replace(/(\.\s*\w)/g, function (c) {
+            return c.toUpperCase();
+        });
+    }
+
+    // Convert a string to upper case
+    function toUpperCase(str) {
+        return str.toUpperCase();
+    }
+
+    // Convert a string to lower case
+    function toLowerCase(str) {
+        return str.toLowerCase();
+    }
+
+
     // Escape special characters for use in regular expressions
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -221,6 +239,87 @@ const window = require("window");
 
         await Promise.all(promises);
         window.alert(`Tag operation "${operation}" completed on ${items.length} item(s).`);
+    }
+
+ // Apply case conversion to tags
+    async function performTagCaseOperation(caseFunction, items) {
+        const allTags = getAllTags(items);
+        const tagMap = new Map();
+
+        for (let tag of allTags) {
+            const newTag = caseFunction(tag, allTags.indexOf(tag) + 1, allTags.length);
+            tagMap.set(tag, newTag);
+        }
+
+        const promises = items.map(async item => {
+            const tags = item.getTags();
+            const newTags = tags.map(t => {
+                return { tag: tagMap.get(t.tag) || t.tag };
+            });
+            item.setTags(newTags);
+            await item.saveTx();
+        });
+
+        await Promise.all(promises);
+        window.alert(`Tags have been updated for ${items.length} item(s).`);
+    }
+
+    // Log the elapsed time for a given operation
+    function logTime(label, time) {
+        try {
+            Zotero.logError(`${label}: ${(time / 1000).toFixed(2)} seconds`);
+        } catch (error) {
+            Zotero.logError(`Failed to log time for ${label}: ${error.message}`);
+        }
+    }
+
+    // Get valid input from the user based on predefined options
+    async function getValidInput(promptMessage, validOptions) {
+        while (true) {
+            const userInput = window.prompt(promptMessage);
+            const sanitizedInput = userInput ? userInput.trim() : null;
+            if (sanitizedInput === null) {
+                window.alert("Operation canceled.");
+                return null;
+            }
+            if (validOptions.includes(sanitizedInput)) {
+                return sanitizedInput;
+            } else {
+                window.alert(`Invalid option: "${sanitizedInput}". Please enter one of the following: ${validOptions.join(', ')}.`);
+            }
+        }
+    }
+
+    // Select a base tag from search results
+    async function selectBaseTag(allTags) {
+        let baseTagChoices = searchTags(allTags, window.prompt("Enter a search term for the base tag:"));
+        baseTagChoices = baseTagChoices.map((tag, index) => `${index + 1}. ${tag}`).join("\n");
+        const baseTagChoice = window.prompt(`Select a base tag by number or enter a new search term:\n\n${baseTagChoices}`);
+
+        if (baseTagChoice === null) {
+            window.alert("Operation canceled.");
+            return null;
+        }
+
+        const baseTagIndex = parseInt(baseTagChoice.trim(), 10) - 1;
+        if (isNaN(baseTagIndex) || baseTagIndex < 0 || baseTagIndex >= baseTagChoices.length) {
+            window.alert("Invalid choice.");
+            return null;
+        }
+
+        return baseTagChoices.split("\n")[baseTagIndex].split(". ")[1];
+    }
+
+    // Search and select tags from search results
+    async function searchAndSelectTags(allTags) {
+        const searchTerm = window.prompt("Enter the regex or tag to search for:");
+        const matchingTags = searchTags(allTags, searchTerm);
+        if (matchingTags.length === 0) {
+            window.alert("No matching tags found.");
+            return null;
+        }
+
+        return matchingTags;
     }
 
     try {
