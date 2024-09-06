@@ -12,7 +12,6 @@ const window = require("window");
     const customCapitalization = {
         'nist': 'NIST',
         'nerc': 'NERC',
-        // Add more custom capitalizations as needed
     };
 
     // Convert a string to title case based on specified rules
@@ -86,47 +85,22 @@ const window = require("window");
         return false;
     }
 
-    // Convert a string to sentence case
-    function toSentenceCase(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase().replace(/(\.\s*\w)/g, function (c) {
-            return c.toUpperCase();
-        });
-    }
-
-    // Convert a string to upper case
-    function toUpperCase(str) {
-        return str.toUpperCase();
-    }
-
-    // Convert a string to lower case
-    function toLowerCase(str) {
-        return str.toLowerCase();
-    }
-
     // Escape special characters for use in regular expressions
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
-    // Get items to edit based on user selection
+    // Get items to edit based on user selection using the Actions and Tags plugin environment
     async function getItemsToEdit(triggerType, item, items) {
-        const zoteroPane = Zotero.getActiveZoteroPane();
-        if (triggerType === 'menu') {
-            if (items && items.length > 0) {
-                return items;
-            } else if (item) {
-                return [item];
-            } else {
-                window.alert("No items selected.");
-                return null;
-            }
+        if (items && items.length > 0) {
+            // Return multiple items if selected
+            return items;
+        } else if (item) {
+            // Return single item if selected
+            return [item];
         } else {
-            let selectedItems = zoteroPane.getSelectedItems();
-            if (!selectedItems.length) {
-                window.alert("No items selected.");
-                return null;
-            }
-            return selectedItems;
+            window.alert("No items selected.");
+            return null;
         }
     }
 
@@ -142,7 +116,7 @@ const window = require("window");
         return Array.from(tagSet);
     }
 
-    // Search for tags using the provided search term
+    // Function to search tags based on search term (with optional wildcard '*')
     function searchTags(allTags, searchTerm) {
         let regex;
         if (searchTerm.includes('*')) {
@@ -177,6 +151,23 @@ const window = require("window");
         }
 
         return selectedTags;
+    }
+
+    // Get valid input from the user based on predefined options
+    async function getValidInput(promptMessage, validOptions) {
+        while (true) {
+            const userInput = window.prompt(promptMessage);
+            const sanitizedInput = userInput ? userInput.trim() : null;
+            if (sanitizedInput === null) {
+                window.alert("Operation canceled.");
+                return null;
+            }
+            if (validOptions.includes(sanitizedInput)) {
+                return sanitizedInput;
+            } else {
+                window.alert(`Invalid option: "${sanitizedInput}". Please enter one of the following: ${validOptions.join(', ')}.`);
+            }
+        }
     }
 
     // Perform tag operations (add, remove, replace, split, combine, prefix, suffix)
@@ -232,91 +223,10 @@ const window = require("window");
         window.alert(`Tag operation "${operation}" completed on ${items.length} item(s).`);
     }
 
-    // Apply case conversion to tags
-    async function performTagCaseOperation(caseFunction, items) {
-        const allTags = getAllTags(items);
-        const tagMap = new Map();
-
-        for (let tag of allTags) {
-            const newTag = caseFunction(tag, allTags.indexOf(tag) + 1, allTags.length);
-            tagMap.set(tag, newTag);
-        }
-
-        const promises = items.map(async item => {
-            const tags = item.getTags();
-            const newTags = tags.map(t => {
-                return { tag: tagMap.get(t.tag) || t.tag };
-            });
-            item.setTags(newTags);
-            await item.saveTx();
-        });
-
-        await Promise.all(promises);
-        window.alert(`Tags have been updated for ${items.length} item(s).`);
-    }
-
-    // Log the elapsed time for a given operation
-    function logTime(label, time) {
-        try {
-            Zotero.logError(`${label}: ${(time / 1000).toFixed(2)} seconds`);
-        } catch (error) {
-            Zotero.logError(`Failed to log time for ${label}: ${error.message}`);
-        }
-    }
-
-    // Get valid input from the user based on predefined options
-    async function getValidInput(promptMessage, validOptions) {
-        while (true) {
-            const userInput = window.prompt(promptMessage);
-            const sanitizedInput = userInput ? userInput.trim() : null;
-            if (sanitizedInput === null) {
-                window.alert("Operation canceled.");
-                return null;
-            }
-            if (validOptions.includes(sanitizedInput)) {
-                return sanitizedInput;
-            } else {
-                window.alert(`Invalid option: "${sanitizedInput}". Please enter one of the following: ${validOptions.join(', ')}.`);
-            }
-        }
-    }
-
-    // Select a base tag from search results
-    async function selectBaseTag(allTags) {
-        let baseTagChoices = searchTags(allTags, window.prompt("Enter a search term for the base tag:"));
-        baseTagChoices = baseTagChoices.map((tag, index) => `${index + 1}. ${tag}`).join("\n");
-        const baseTagChoice = window.prompt(`Select a base tag by number or enter a new search term:\n\n${baseTagChoices}`);
-
-        if (baseTagChoice === null) {
-            window.alert("Operation canceled.");
-            return null;
-        }
-
-        const baseTagIndex = parseInt(baseTagChoice.trim(), 10) - 1;
-        if (isNaN(baseTagIndex) || baseTagIndex < 0 || baseTagIndex >= baseTagChoices.length) {
-            window.alert("Invalid choice.");
-            return null;
-        }
-
-        return baseTagChoices.split("\n")[baseTagIndex].split(". ")[1];
-    }
-
-    // Search and select tags from search results
-    async function searchAndSelectTags(allTags) {
-        const searchTerm = window.prompt("Enter the regex or tag to search for:");
-        const matchingTags = searchTags(allTags, searchTerm);
-        if (matchingTags.length === 0) {
-            window.alert("No matching tags found.");
-            return null;
-        }
-
-        return matchingTags;
-    }
-
     try {
         // Ensure items and item are provided
         if (!items && !item) {
-            window.alert("Bulk Edit", "No item or items array provided.");
+            window.alert("Batch Tag Operation", "No item or items array provided.");
             window.batchTagRunning = false;
             return;
         }
