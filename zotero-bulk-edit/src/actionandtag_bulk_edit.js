@@ -200,35 +200,15 @@ async function autocompletePrompt(promptText, suggestions) {
 
 // Function to get items to edit based on user selection
 async function getItemsToEdit(triggerType, item, items) {
-    const zoteroPane = Zotero.getActiveZoteroPane();
-    if (triggerType === 'menu') {
-        if (items && items.length > 0) {
-            return items;
-        } else if (item) {
-            return [item];
-        } else {
-            window.alert("No items selected.");
-            return null;
-        }
+    if (items && items.length > 0) {
+        // Return all items if multiple items are selected
+        return items;
+    } else if (item) {
+        // Return a single item if only one item is selected
+        return [item];
     } else {
-        if (triggerType === 'savedSearch') {
-            let savedSearch = zoteroPane.getSelectedSavedSearch();
-            if (!savedSearch) {
-                window.alert("No saved search selected.");
-                return null;
-            }
-            let search = new Zotero.Search();
-            search.addCondition('savedSearchID', 'is', savedSearch.id);
-            let itemIDs = await search.search();
-            return await Zotero.Items.getAsync(itemIDs);
-        } else {
-            let selectedItems = zoteroPane.getSelectedItems();
-            if (!selectedItems.length) {
-                window.alert("No items selected.");
-                return null;
-            }
-            return selectedItems;
-        }
+        window.alert("No items selected.");
+        return null;
     }
 }
 
