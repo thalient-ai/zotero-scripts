@@ -12,6 +12,7 @@ const window = require("window");
     const customCapitalization = {
         'nist': 'NIST',
         'nerc': 'NERC',
+        // Add more custom capitalizations as needed
     };
 
     // Convert a string to title case based on specified rules
@@ -241,7 +242,7 @@ const window = require("window");
         window.alert(`Tag operation "${operation}" completed on ${items.length} item(s).`);
     }
 
- // Apply case conversion to tags
+     // Apply case conversion to tags
     async function performTagCaseOperation(caseFunction, items) {
         const allTags = getAllTags(items);
         const tagMap = new Map();
