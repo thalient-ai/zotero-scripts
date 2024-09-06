@@ -48,6 +48,8 @@ The Actions and Tags plugin enables you to add these scripts to the plugin and e
 | **Bulk Edit** | Edit the metadata (fields, notes, and authors) or item type (document, book, journal article...)  for multiple items. | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-bulk-edit/src/actionandtag_bulk_edit.js) |
 | **Duplicate Enhanced** | Detect, merge, or tag duplicate items in your Zotero library based on similar metadata. | [Script](https://github.com/thalient-ai/zotero-scripts/blob/main/zotero-duplicate-enhanced/src/actionandtag_duplicate.js) |
 | **Zoom by Page Height** | Sets the view of PDF reader tabs and windows to "Zoom by Page Height" | [Script](https://github.com/windingwind/zotero-actions-tags/discussions/378) |
+| **Zutilo Copy** | Duplicates the copy functionality from Zutilo, copies an Item's metadata to the clipboard | [Script](https://github.com/windingwind/zotero-actions-tags/discussions/383) |
+| **Zutilo Paste** | Duplicates the paste functionality from Zutil, pastes an items fields, type, creators, or tags to other items | [Script](https://github.com/windingwind/zotero-actions-tags/discussions/384) |
 
 ## Usage
 
